@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Colleges | EventPortal</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .layout { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+        .sidebar { background: var(--bg-card); border-right: 1px solid var(--glass-border); padding: 2rem 1rem; }
+        .nav-link { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1rem; color: var(--text-muted); text-decoration: none; border-radius: 8px; margin-bottom: 0.5rem; transition: var(--transition); }
+        .nav-link.active, .nav-link:hover { background: rgba(99, 102, 241, 0.1); color: var(--primary); }
+        .main-content { padding: 2rem; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--glass-border); }
+        th { color: var(--text-muted); font-weight: 600; font-size: 0.875rem; text-transform: uppercase; }
+        
+        .status-badge { padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .status-pending { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+        .status-approved { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .status-rejected { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <h2 style="margin-bottom: 2rem; color: var(--primary);">EventPortal</h2>
+            <nav>
+                <a href="dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="colleges.html" class="nav-link active"><i class="fas fa-university"></i> Colleges</a>
+                <a href="students.html" class="nav-link"><i class="fas fa-user-graduate"></i> Students</a>
+                <a href="events.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Events</a>
+                <a href="analytics.html" class="nav-link"><i class="fas fa-chart-line"></i> Analytics</a>
+                <hr style="border: 0.5px solid var(--glass-border); margin: 1.5rem 0;">
+                <a href="#" id="logoutBtn" class="nav-link" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1>Manage Colleges</h1>
+                <button class="btn btn-primary" onclick="showAddCollegeModal()"><i class="fas fa-plus"></i> Add College</button>
+            </header>
+
+            <div class="glass" style="padding: 1.5rem;">
+                <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                    <input type="text" class="form-input" style="max-width: 300px;" placeholder="Search colleges...">
+                    <select class="form-input" style="max-width: 200px;">
+                        <option value="">All Districts</option>
+                        <option value="Kolhapur">Kolhapur</option>
+                        <option value="Sangli">Sangli</option>
+                        <option value="Satara">Satara</option>
+                    </select>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>College Name</th>
+                            <th>District</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="collegesTableBody">
+                        <!-- Data populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/admin-colleges.js"></script>
+</body>
+</html>

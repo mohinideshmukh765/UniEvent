@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Gallery | UniEvent Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --sidebar-width: 280px; }
+        .student-layout { display: grid; grid-template-columns: var(--sidebar-width) 1fr; min-height: 100vh; background: #f8fafc; }
+        .student-sidebar { background: white; border-right: 1px solid var(--glass-border); padding: 2rem 1.5rem; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }
+        .student-main { padding: 2rem 3rem; }
+        .nav-link { display: flex; align-items: center; gap: 1rem; padding: 0.875rem 1.25rem; color: var(--text-muted); text-decoration: none; border-radius: 12px; margin-bottom: 0.5rem; font-weight: 500; transition: var(--transition); }
+        .nav-link:hover, .nav-link.active { background: rgba(79, 70, 229, 0.08); color: var(--primary); }
+        
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2.5rem; }
+        .gallery-item { background: white; border-radius: 32px; overflow: hidden; border: 1px solid var(--glass-border); transition: var(--transition); }
+        .gallery-item:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); }
+        .gallery-img { height: 260px; background-size: cover; background-position: center; position: relative; }
+        .gallery-item .content { padding: 1.5rem; }
+        .interaction-bar { display: flex; gap: 1.5rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--bg-soft); color: var(--text-muted); font-size: 0.9rem; }
+        
+        .profile-footer { margin-top: auto; display: flex; align-items: center; gap: 1rem; padding-top: 2rem; border-top: 1px solid var(--glass-border); }
+        .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+    </style>
+</head>
+<body class="light-theme">
+    <div class="student-layout">
+        <aside class="student-sidebar">
+            <a href="/" class="logo" style="margin-left: 1.25rem;">UniEvent</a>
+            <nav class="sidebar-nav" style="margin-top: 2rem; flex: 1;">
+                <a href="/student/dashboard.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="/student/events.html" class="nav-link"><i class="fas fa-search"></i> Browse Events</a>
+                <a href="/student/my-registrations.html" class="nav-link"><i class="fas fa-ticket-alt"></i> My Registrations</a>
+                <a href="/student/results.html" class="nav-link"><i class="fas fa-award"></i> Results</a>
+                <a href="/student/gallery.html" class="nav-link active"><i class="fas fa-images"></i> Gallery</a>
+                <a href="/student/notifications.html" class="nav-link"><i class="fas fa-bell"></i> Notifications</a>
+                <a href="/student/profile.html" class="nav-link"><i class="fas fa-user"></i> Profile</a>
+                <a href="/student/certificates.html" class="nav-link"><i class="fas fa-certificate"></i> Certificates</a>
+                <a href="/student/recommendations.html" class="nav-link"><i class="fas fa-magic"></i> AI Recommendations</a>
+            </nav>
+            <div class="profile-footer">
+                <div class="avatar">AS</div>
+                <div style="flex: 1;">
+                    <div class="student-name" style="font-weight: 600; font-size: 0.9rem;">Aryan Sharma</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Computer Science</div>
+                </div>
+                <a href="#" class="logout-btn" style="color: var(--text-muted);"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </aside>
+
+        <main class="student-main">
+            <header class="top-bar" style="margin-bottom: 3rem;">
+                <h1 style="font-family: 'Outfit'; font-size: 2.25rem;">Event Gallery</h1>
+                <p style="color: var(--text-muted); margin-top: 0.5rem;">Memories and highlights from the latest university happenings.</p>
+            </header>
+
+            <div class="gallery-grid fade-in">
+                <!-- Item 1 -->
+                <div class="gallery-item">
+                    <div class="gallery-img" style="background-image: url('https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80')"></div>
+                    <div class="content">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                            <div style="font-weight: 700; font-size: 1.1rem;">Tech-Connect Expo</div>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">Oct 05, 2024</span>
+                        </div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);"><i class="fas fa-university"></i> Walchand College</div>
+                        <div class="interaction-bar">
+                            <span><i class="far fa-heart"></i> 124</span>
+                            <span><i class="far fa-comment"></i> 18</span>
+                            <span style="margin-left: auto;"><i class="fas fa-share-nodes"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 2 -->
+                <div class="gallery-item">
+                    <div class="gallery-img" style="background-image: url('https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=800&q=80')"></div>
+                    <div class="content">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                            <div style="font-weight: 700; font-size: 1.1rem;">NIGHT OF STARS '24</div>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">Sep 30, 2024</span>
+                        </div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);"><i class="fas fa-university"></i> KIT College</div>
+                        <div class="interaction-bar">
+                            <span><i class="fas fa-heart" style="color: #ef4444;"></i> 256</span>
+                            <span><i class="far fa-comment"></i> 42</span>
+                            <span style="margin-left: auto;"><i class="fas fa-share-nodes"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 3 -->
+                <div class="gallery-item">
+                    <div class="gallery-img" style="background-image: url('https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&q=80')"></div>
+                    <div class="content">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                            <div style="font-weight: 700; font-size: 1.1rem;">Debate Championship</div>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">Sep 22, 2024</span>
+                        </div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);"><i class="fas fa-university"></i> Shivaji University</div>
+                        <div class="interaction-bar">
+                            <span><i class="far fa-heart"></i> 89</span>
+                            <span><i class="far fa-comment"></i> 12</span>
+                            <span style="margin-left: auto;"><i class="fas fa-share-nodes"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/student.js"></script>
+</body>
+</html>

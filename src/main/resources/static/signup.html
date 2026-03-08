@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventPortal | Create Account</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="light-theme">
+    <div class="container" style="padding: 2rem 0;">
+        <div style="display: flex; justify-content: center; align-items: center;">
+            <div class="glass fade-in" style="width: 100%; max-width: 600px; padding: 2.5rem;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <h1 style="font-size: 2rem; background: linear-gradient(to right, #6366f1, #ec4899); -webkit-background-clip: text; background-clip: text; -webkit-fill-color: transparent;">Join UniEvent Portal</h1>
+                    <p style="color: var(--text-muted); margin-top: 0.5rem;">Create your account to get started.</p>
+                </div>
+
+                <form id="signupForm">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="fullName">Full Name</label>
+                            <input type="text" id="fullName" class="form-input" placeholder="John Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" class="form-input" placeholder="johndoe123" required>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" class="form-input" placeholder="john@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="text" id="phone" class="form-input" placeholder="9876543210">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="role">Sign up as</label>
+                            <select id="role" class="form-input">
+                                <option value="STUDENT">Student</option>
+                                <option value="COORDINATOR">College Coordinator</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="district">District</label>
+                            <select id="district" class="form-input">
+                                <option value="Kolhapur">Kolhapur</option>
+                                <option value="Sangli">Sangli</option>
+                                <option value="Satara">Satara</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="collegeSection" class="form-group" style="display: none;">
+                        <label for="collegeId">Select College</label>
+                        <select id="collegeId" class="form-input">
+                            <!-- Populated via JS -->
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">
+                        Create Account <i class="fas fa-user-plus"></i>
+                    </button>
+                </form>
+
+                <div style="margin-top: 1.5rem; text-align: center; font-size: 0.875rem;">
+                    <p style="color: var(--text-muted);">Already have an account? <a href="/login.html" style="color: var(--primary); text-decoration: none; font-weight: 600;">Sign in</a></p>
+                    <p style="margin-top: 1rem;"><a href="/" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;"><i class="fas fa-home"></i> Back to Home</a></p>
+                </div>
+                
+                <div id="signupMessage" style="margin-top: 1rem; text-align: center; font-size: 0.875rem; display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/signup.js"></script>
+</body>
+</html>

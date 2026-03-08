@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniEvent Portal | The Heart of Campus Life</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="light-theme">
+    <nav class="navbar sticky">
+        <div class="nav-container">
+            <a href="/" class="logo">UniEvent</a>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#stats">Impact</a>
+                <a href="/login.html" class="btn btn-secondary">Login</a>
+                <a href="/signup.html" class="btn btn-primary">Join Now</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-container">
+            <div class="hero-content fade-in">
+                <span class="badge">New Era of Campus Interaction</span>
+                <h1>Connect, Create, and <span class="gradient-text">Celebrate</span> Every Moment</h1>
+                <p>UniEvent Portal is the all-in-one platform for university events. From academic seminars to cultural fests, manage everything seamlessly in one place.</p>
+                <div class="hero-btns">
+                    <a href="/signup.html" class="btn btn-primary btn-lg">Get Started Free <i class="fas fa-sparkles"></i></a>
+                    <a href="#features" class="btn btn-secondary btn-lg">Explore Features</a>
+                </div>
+            </div>
+            <div class="hero-image fade-in delay-1">
+                <div class="image-wrapper">
+                    <img src="/img/hero.png" alt="UniEvent Portal App Interface">
+                    <div class="floating-card c1">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>12+ Upcoming Events</span>
+                    </div>
+                    <div class="floating-card c2">
+                        <i class="fas fa-users"></i>
+                        <span>Active Students: 5k+</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="features" class="features section">
+        <div class="section-header">
+            <span class="section-badge">Capabilities</span>
+            <h2>Designed for the Modern Campus</h2>
+            <p>Everything you need to organize, promote, and attend events efficiently.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="icon-box"><i class="fas fa-search"></i></div>
+                <h3>Smart Discovery</h3>
+                <p>Find events that match your interests using our intelligent filtering and recommendation system.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon-box"><i class="fas fa-ticket-alt"></i></div>
+                <h3>Easy Registration</h3>
+                <p>One-click registration for all your favorite events. Manage all your passes in one digital wallet.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon-box"><i class="fas fa-chart-line"></i></div>
+                <h3>Real-time Tracking</h3>
+                <p>Coordinators get instant insights into registration counts, attendance, and student participation.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon-box"><i class="fas fa-shield-alt"></i></div>
+                <h3>Admin Moderation</h3>
+                <p>A powerful dashboard for university admins to oversee and approve campus-wide activities.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="stats" class="stats section">
+        <div class="stats-container glass">
+            <div class="stat-item">
+                <div class="stat-value">500+</div>
+                <div class="stat-label">Successful Events</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <div class="stat-value">50+</div>
+                <div class="stat-label">Colleges Joined</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <div class="stat-value">10k+</div>
+                <div class="stat-label">Happy Students</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta section">
+        <div class="cta-container gradient-bg">
+            <h2>Ready to transform your campus experience?</h2>
+            <p>Join thousands of students and coordinators today. It's free and always will be.</p>
+            <a href="/signup.html" class="btn btn-light btn-lg">Create Your Account <i class="fas fa-rocket"></i></a>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <a href="/" class="logo">UniEvent</a>
+                <p>Connecting students through shared experiences and meaningful events.</p>
+            </div>
+            <div class="footer-links">
+                <div class="link-group">
+                    <h4>Platform</h4>
+                    <a href="#">About Us</a>
+                    <a href="#">Security</a>
+                    <a href="#">Privacy</a>
+                </div>
+                <div class="link-group">
+                    <h4>Connect</h4>
+                    <a href="#">Instagram</a>
+                    <a href="#">Twitter</a>
+                    <a href="#">LinkedIn</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 UniEvent Portal. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Simple scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | UniEvent Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --sidebar-width: 280px; }
+        .student-layout { display: grid; grid-template-columns: var(--sidebar-width) 1fr; min-height: 100vh; background: #f8fafc; }
+        .student-sidebar { background: white; border-right: 1px solid var(--glass-border); padding: 2rem 1.5rem; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }
+        .student-main { padding: 4rem; display: flex; justify-content: center; }
+        .nav-link { display: flex; align-items: center; gap: 1rem; padding: 0.875rem 1.25rem; color: var(--text-muted); text-decoration: none; border-radius: 12px; margin-bottom: 0.5rem; font-weight: 500; transition: var(--transition); }
+        .nav-link:hover, .nav-link.active { background: rgba(79, 70, 229, 0.08); color: var(--primary); }
+        
+        .profile-card { background: white; width: 100%; max-width: 900px; border-radius: 40px; border: 1px solid var(--glass-border); overflow: hidden; box-shadow: var(--shadow-xl); }
+        .profile-header-bg { height: 160px; background: linear-gradient(135deg, var(--primary), var(--secondary)); }
+        .profile-info-section { padding: 0 4rem 4rem; position: relative; }
+        .profile-avatar-large { width: 150px; height: 150px; border-radius: 40px; border: 8px solid white; background: var(--secondary); color: white; display: flex; align-items: center; justify-content: center; font-size: 4rem; font-weight: 800; position: absolute; top: -75px; box-shadow: var(--shadow-lg); font-family: 'Outfit'; }
+        
+        .profile-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 100px; }
+        
+        .profile-footer { margin-top: auto; display: flex; align-items: center; gap: 1rem; padding-top: 2rem; border-top: 1px solid var(--glass-border); }
+        .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+    </style>
+</head>
+<body class="light-theme">
+    <div class="student-layout">
+        <aside class="student-sidebar">
+            <a href="/" class="logo" style="margin-left: 1.25rem;">UniEvent</a>
+            <nav class="sidebar-nav" style="margin-top: 2rem; flex: 1;">
+                <a href="/student/dashboard.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="/student/events.html" class="nav-link"><i class="fas fa-search"></i> Browse Events</a>
+                <a href="/student/my-registrations.html" class="nav-link"><i class="fas fa-ticket-alt"></i> My Registrations</a>
+                <a href="/student/results.html" class="nav-link"><i class="fas fa-award"></i> Results</a>
+                <a href="/student/gallery.html" class="nav-link"><i class="fas fa-images"></i> Gallery</a>
+                <a href="/student/notifications.html" class="nav-link"><i class="fas fa-bell"></i> Notifications</a>
+                <a href="/student/profile.html" class="nav-link active"><i class="fas fa-user"></i> Profile</a>
+                <a href="/student/certificates.html" class="nav-link"><i class="fas fa-certificate"></i> Certificates</a>
+                <a href="/student/recommendations.html" class="nav-link"><i class="fas fa-magic"></i> AI Recommendations</a>
+            </nav>
+            <div class="profile-footer">
+                <div class="avatar">AS</div>
+                <div style="flex: 1;">
+                    <div class="student-name" style="font-weight: 600; font-size: 0.9rem;">Aryan Sharma</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Computer Science</div>
+                </div>
+                <a href="#" class="logout-btn" style="color: var(--text-muted);"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </aside>
+
+        <main class="student-main">
+            <div class="profile-card fade-in">
+                <div class="profile-header-bg"></div>
+                <div class="profile-info-section">
+                    <div class="profile-avatar-large">AS</div>
+                    
+                    <div class="profile-form-grid">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" class="form-input" id="profileName" value="Aryan Sharma">
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" class="form-input" id="profileEmail" value="aryan@university.edu" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>University / College</label>
+                            <select class="form-input">
+                                <option>KIT College of Engineering</option>
+                                <option>Shivaji University</option>
+                                <option selected>WCE Sangli</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="tel" class="form-input" value="+91 9876543210">
+                        </div>
+                        <div class="form-group">
+                            <label>District</label>
+                            <select class="form-input">
+                                <option selected>Kolhapur</option>
+                                <option>Sangli</option>
+                                <option>Satara</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Current Sem / Year</label>
+                            <input type="text" class="form-input" value="TY - B.Tech (CS)">
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--bg-soft); display: flex; justify-content: space-between; align-items: center;">
+                        <button class="link-primary" style="font-size: 0.95rem; font-weight: 600; color: #ef4444;"><i class="fas fa-lock"></i> Change Password</button>
+                        <button class="btn btn-primary" style="padding: 1rem 3rem;">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/student.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('user'));
+            document.getElementById('profileName').value = user.fullName || user.username;
+            document.getElementById('profileEmail').value = user.email;
+        });
+    </script>
+</body>
+</html>
