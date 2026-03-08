@@ -54,19 +54,48 @@ public class AuthController {
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
-        User user = userRepository.findByUsername(userDetails.getUsername()).get();
+        String userId = null;
+        String username = userDetails.getUsername();
+        String email = null;
+        String fullName = null;
+        String phone = null;
+        String district = null;
+        String collegeId = null;
+        String collegeName = null;
 
-        Long collegeId = user.getCollege() != null ? user.getCollege().getId() : null;
-        String collegeName = user.getCollege() != null ? user.getCollege().getName() : null;
+        if (roles.contains("ROLE_COORDINATOR")) {
+            com.mohini.eventportal.model.College college = collegeRepository.findByUsername(username).get();
+            userId = college.getCollegeCode();
+            email = college.getEmail();
+            fullName = college.getCoordinatorName();
+            phone = college.getPhone();
+            district = college.getDistrict();
+            collegeId = college.getCollegeCode();
+            collegeName = college.getCollegeName();
+        } else {
+            User user = userRepository.findByUsername(username).get();
+            userId = String.valueOf(user.getId());
+            email = user.getEmail();
+            fullName = user.getFullName();
+            phone = user.getPhone();
+            district = user.getDistrict();
+            if (user.getCollegeId() != null) {
+                collegeId = user.getCollegeId();
+                com.mohini.eventportal.model.College c = collegeRepository.findById(collegeId).orElse(null);
+                if (c != null) {
+                    collegeName = c.getCollegeName();
+                }
+            }
+        }
 
         return ResponseEntity.ok(new JwtResponse(jwt,
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
+                userId,
+                username,
+                email,
                 roles,
-                user.getFullName(),
-                user.getPhone(),
-                user.getDistrict(),
+                fullName,
+                phone,
+                district,
                 collegeId,
                 collegeName));
     }
@@ -102,12 +131,6 @@ public class AuthController {
             switch (strRole.toUpperCase()) {
                 case "ADMIN":
                     user.setRole(User.Role.ADMIN);
-                    break;
-                case "COORDINATOR":
-                    user.setRole(User.Role.COORDINATOR);
-                    if (signUpRequest.getCollegeId() != null) {
-                        user.setCollege(collegeRepository.findById(signUpRequest.getCollegeId()).orElse(null));
-                    }
                     break;
                 default:
                     user.setRole(User.Role.STUDENT);

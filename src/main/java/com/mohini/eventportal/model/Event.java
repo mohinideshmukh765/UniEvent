@@ -50,11 +50,6 @@ public class Event {
     @JoinColumn(name = "college_id")
     private College college;
 
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "password", "college"})
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coordinator_id")
-    private User coordinator;
-
     @Builder.Default
     @Enumerated(EnumType.STRING)
     private EventStatus status = EventStatus.PUBLISHED;

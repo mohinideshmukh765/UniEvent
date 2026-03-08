@@ -12,23 +12,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             const colleges = await response.json();
             const tbody = document.getElementById('collegesTableBody');
-            
             tbody.innerHTML = colleges.map(college => `
                 <tr>
                     <td>
-                        <div style="font-weight: 600;">${college.name}</div>
-                        <div style="font-size: 0.75rem; color: var(--text-muted);">${college.address}</div>
+                        <div style="font-weight: 600;">${college.collegeName}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">${college.collegeCode}</div>
                     </td>
-                    <td>${college.district}</td>
+                    <td>${college.district || 'N/A'}</td>
                     <td>
-                        <span class="status-badge status-${college.status.toLowerCase()}">${college.status}</span>
+                        <span class="status-badge status-${college.enabled ? 'activated' : 'disabled'}">
+                            ${college.enabled ? 'Active' : 'Disabled'}
+                        </span>
                     </td>
                     <td>
-                        ${college.status === 'PENDING' ? `
-                            <button class="btn btn-primary" onclick="updateStatus(${college.id}, 'APPROVED')" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Approve</button>
-                            <button class="btn btn-secondary" onclick="updateStatus(${college.id}, 'REJECTED')" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Reject</button>
+                        ${college.enabled ? `
+                            <button class="btn btn-secondary" onclick="toggleStatus('${college.collegeCode}', 'deactivate')" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; background: var(--danger); border: none; color: white;">Deactivate</button>
                         ` : `
-                            <button class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-primary" onclick="toggleStatus('${college.collegeCode}', 'activate')" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; background: var(--primary); border: none; color: white;">Activate</button>
                         `}
                     </td>
                 </tr>
@@ -38,17 +38,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    window.updateStatus = async (id, status) => {
+    window.toggleStatus = async (collegeCode, action) => {
         try {
-            const response = await fetch(`/api/admin/colleges/${id}/status?status=${status}`, {
+            const response = await fetch(`/api/admin/colleges/${action}/${collegeCode}`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (response.ok) {
                 loadColleges();
+            } else {
+                alert("Failed to " + action + ": " + await response.text());
             }
         } catch (error) {
             console.error('Error updating status', error);
+            alert("Error: " + error.message);
         }
     };
 

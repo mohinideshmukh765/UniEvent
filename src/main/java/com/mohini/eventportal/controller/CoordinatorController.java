@@ -1,12 +1,7 @@
 package com.mohini.eventportal.controller;
 
-import com.mohini.eventportal.dto.DashboardStats;
 import com.mohini.eventportal.model.Event;
-import com.mohini.eventportal.model.User;
-import com.mohini.eventportal.repository.EventRepository;
 import com.mohini.eventportal.repository.PostRepository;
-import com.mohini.eventportal.repository.RegistrationRepository;
-import com.mohini.eventportal.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,13 +17,16 @@ import java.util.Optional;
 public class CoordinatorController {
 
     @Autowired
-    UserRepository userRepository;
+    com.mohini.eventportal.repository.UserRepository userRepository;
 
     @Autowired
-    EventRepository eventRepository;
+    com.mohini.eventportal.repository.CollegeRepository collegeRepository;
 
     @Autowired
-    RegistrationRepository registrationRepository;
+    com.mohini.eventportal.repository.EventRepository eventRepository;
+
+    @Autowired
+    com.mohini.eventportal.repository.RegistrationRepository registrationRepository;
 
     @Autowired
     PostRepository postRepository;
@@ -36,22 +34,16 @@ public class CoordinatorController {
     @GetMapping("/stats")
     @PreAuthorize("hasRole('COORDINATOR')")
     public ResponseEntity<?> getDashboardStats() {
-        User user = getCurrentUser();
-        if (user == null) {
+        com.mohini.eventportal.model.College college = getCurrentCollege();
+        if (college == null) {
             return ResponseEntity.ok(new com.mohini.eventportal.dto.DashboardStats(0, 0, 0, 0));
         }
 
-        Long coordinatorId = user.getId();
-        long totalEvents = eventRepository.countByCoordinatorId(coordinatorId);
-        long presentEvents = eventRepository.countByCoordinatorIdAndStatus(coordinatorId, com.mohini.eventportal.model.Event.EventStatus.PUBLISHED);
-        long pastEvents = eventRepository.countByCoordinatorIdAndStatus(coordinatorId, com.mohini.eventportal.model.Event.EventStatus.COMPLETED);
-        
-        // Let's also check if college is null for registrations, if null then 0 for now as registrations are tied to an event's college.
-        // It would be better to fetch registrations for the coordinator's events, but for simplicity we keep college logic or 0.
-        long totalRegistrations = 0;
-        if (user.getCollege() != null) {
-            totalRegistrations = registrationRepository.countByEventCollegeId(user.getCollege().getId());
-        }
+        String collegeCode = college.getCollegeCode();
+        long totalEvents = eventRepository.countByCollegeCollegeCode(collegeCode);
+        long presentEvents = eventRepository.countByCollegeCollegeCodeAndStatus(collegeCode, com.mohini.eventportal.model.Event.EventStatus.PUBLISHED);
+        long pastEvents = eventRepository.countByCollegeCollegeCodeAndStatus(collegeCode, com.mohini.eventportal.model.Event.EventStatus.COMPLETED);
+        long totalRegistrations = registrationRepository.countByEventCollegeCollegeCode(collegeCode);
 
         return ResponseEntity.ok(new com.mohini.eventportal.dto.DashboardStats(totalEvents, presentEvents, pastEvents, totalRegistrations));
     }
@@ -59,19 +51,17 @@ public class CoordinatorController {
     @GetMapping("/events")
     @PreAuthorize("hasRole('COORDINATOR')")
     public ResponseEntity<?> getEvents() {
-        User user = getCurrentUser();
-        if (user == null) return ResponseEntity.ok(java.util.Collections.emptyList());
-        
-        // Fetch by coordinator ID so they always see events they created
-        return ResponseEntity.ok(eventRepository.findByCoordinatorId(user.getId()));
+        com.mohini.eventportal.model.College college = getCurrentCollege();
+        if (college == null) return ResponseEntity.ok(java.util.Collections.emptyList());
+        return ResponseEntity.ok(eventRepository.findByCollegeCollegeCode(college.getCollegeCode()));
     }
 
     @GetMapping("/registrations")
     @PreAuthorize("hasRole('COORDINATOR')")
     public ResponseEntity<?> getRegistrations() {
-        User user = getCurrentUser();
-        if (user == null || user.getCollege() == null) return ResponseEntity.ok(java.util.Collections.emptyList());
-        return ResponseEntity.ok(registrationRepository.findByEventCollegeId(user.getCollege().getId()));
+        com.mohini.eventportal.model.College college = getCurrentCollege();
+        if (college == null) return ResponseEntity.ok(java.util.Collections.emptyList());
+        return ResponseEntity.ok(registrationRepository.findByEventCollegeCollegeCode(college.getCollegeCode()));
     }
 
     @GetMapping("/posts")
@@ -82,8 +72,8 @@ public class CoordinatorController {
     @PostMapping("/events")
     @PreAuthorize("hasRole('COORDINATOR')")
     public ResponseEntity<?> createEvent(@RequestBody Event eventData) {
-        User user = getCurrentUser();
-        if (user == null) return ResponseEntity.badRequest().body("User not found");
+        com.mohini.eventportal.model.College college = getCurrentCollege();
+        if (college == null) return ResponseEntity.badRequest().body("Coordinator profile not found");
 
         Event event = Event.builder()
                 .title(eventData.getTitle())
@@ -93,8 +83,7 @@ public class CoordinatorController {
                 .venue(eventData.getVenue())
                 .maxParticipants(eventData.getMaxParticipants())
                 .registrationDeadline(eventData.getRegistrationDeadline())
-                .coordinator(user)
-                .college(user.getCollege())
+                .college(college)
                 .status(Event.EventStatus.PUBLISHED)
                 .build();
 
@@ -108,8 +97,8 @@ public class CoordinatorController {
             @RequestParam("caption") String caption,
             @RequestParam(value = "images", required = false) java.util.List<org.springframework.web.multipart.MultipartFile> images) {
 
-        User user = getCurrentUser();
-        if (user == null) return ResponseEntity.badRequest().body("User not found");
+        com.mohini.eventportal.model.College college = getCurrentCollege();
+        if (college == null) return ResponseEntity.badRequest().body("Coordinator profile not found");
 
         String imagePaths = "";
         if (images != null && !images.isEmpty()) {
@@ -134,7 +123,7 @@ public class CoordinatorController {
         com.mohini.eventportal.model.Post post = com.mohini.eventportal.model.Post.builder()
                 .caption(caption)
                 .images(imagePaths.isEmpty() ? null : imagePaths)
-                .coordinator(user)
+                .college(college)
                 .build();
 
         com.mohini.eventportal.model.Post saved = postRepository.save(post);
@@ -144,8 +133,8 @@ public class CoordinatorController {
     @PutMapping("/events/{eventId}/dates")
     @PreAuthorize("hasRole('COORDINATOR')")
     public ResponseEntity<?> updateEventDates(@PathVariable("eventId") Long eventId, @RequestBody java.util.Map<String, String> dates) {
-        User user = getCurrentUser();
-        if (user == null) return ResponseEntity.badRequest().body("User not found");
+        com.mohini.eventportal.model.College college = getCurrentCollege();
+        if (college == null) return ResponseEntity.badRequest().body("Coordinator profile not found");
 
         Optional<Event> optionalEvent = eventRepository.findById(eventId);
         if (!optionalEvent.isPresent()) {
@@ -153,8 +142,8 @@ public class CoordinatorController {
         }
 
         Event event = optionalEvent.get();
-        // Verify ownership
-        if (event.getCoordinator() == null || !event.getCoordinator().getId().equals(user.getId())) {
+        // Verify college ownership
+        if (event.getCollege() == null || !event.getCollege().getCollegeCode().equals(college.getCollegeCode())) {
             return ResponseEntity.status(403).body("Unauthorized to edit this event");
         }
 
@@ -178,29 +167,22 @@ public class CoordinatorController {
 
     @PutMapping("/profile")
     @PreAuthorize("hasRole('COORDINATOR')")
-    public ResponseEntity<?> updateProfile(@RequestBody User profileData) {
-        User user = getCurrentUser();
-        if (user == null) {
-            return ResponseEntity.badRequest().body("Error: User not found!");
+    public ResponseEntity<?> updateProfile(@RequestBody com.mohini.eventportal.model.College profileData) {
+        com.mohini.eventportal.model.College college = getCurrentCollege();
+        if (college == null) {
+            return ResponseEntity.badRequest().body("Error: Coordinator profile not found!");
         }
 
-        // Update fields allowed for modification
-        if (profileData.getUsername() != null && !profileData.getUsername().trim().isEmpty() && !profileData.getUsername().equals(user.getUsername())) {
-             if (userRepository.existsByUsername(profileData.getUsername())) {
-                  return ResponseEntity.badRequest().body("Error: Username is already taken!");
-             }
-             user.setUsername(profileData.getUsername());
-        }
+        if (profileData.getCoordinatorName() != null) college.setCoordinatorName(profileData.getCoordinatorName());
+        if (profileData.getPhone() != null) college.setPhone(profileData.getPhone());
+        if (profileData.getCity() != null) college.setCity(profileData.getCity());
+        if (profileData.getDistrict() != null) college.setDistrict(profileData.getDistrict());
 
-        if (profileData.getFullName() != null) user.setFullName(profileData.getFullName());
-        if (profileData.getPhone() != null) user.setPhone(profileData.getPhone());
-        if (profileData.getDistrict() != null) user.setDistrict(profileData.getDistrict());
-        
-        userRepository.save(user);
-        return ResponseEntity.ok(user);
+        collegeRepository.save(college);
+        return ResponseEntity.ok(college);
     }
 
-    private User getCurrentUser() {
+    private com.mohini.eventportal.model.College getCurrentCollege() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username;
         if (principal instanceof UserDetails) {
@@ -208,6 +190,6 @@ public class CoordinatorController {
         } else {
             username = principal.toString();
         }
-        return userRepository.findByUsername(username).orElse(null);
+        return collegeRepository.findByUsername(username).orElse(null);
     }
 }

@@ -8,12 +8,12 @@ import java.util.List;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long> {
-    List<Event> findByCollegeId(Long collegeId);
+    List<Event> findByCollegeCollegeCode(String collegeCode);
     List<Event> findByCategory(String category);
     List<Event> findByStatus(Event.EventStatus status);
 
-    long countByCollegeId(Long collegeId);
-    long countByCollegeIdAndStatus(Long collegeId, Event.EventStatus status);
+    long countByCollegeCollegeCode(String collegeCode);
+    long countByCollegeCollegeCodeAndStatus(String collegeCode, Event.EventStatus status);
 
     long countByEventDateAfter(java.time.LocalDateTime date);
     long countByEventDateBefore(java.time.LocalDateTime date);

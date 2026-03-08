@@ -18,39 +18,45 @@ import java.time.LocalDateTime;
 public class College {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @NotBlank
-    private String name;
-
-    @NotBlank
-    @Column(unique = true)
+    @Column(name = "college_code")
     private String collegeCode;
 
     @NotBlank
+    @Column(name = "name")
+    private String collegeName;
+
+    @Column(name = "coordinator_name")
+    private String coordinatorName;
+
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "city")
     private String city;
 
-    @NotBlank
+    @Column(name = "district")
     private String district;
 
-    @NotBlank
-    private String address;
+    @Column(name = "username", unique = true)
+    private String username;
 
-    private String universityAffiliation;
+    @Column(name = "password")
+    private String password;
 
+    @Column(name = "enabled", columnDefinition = "boolean default true")
     @Builder.Default
-    @Enumerated(EnumType.STRING)
-    private CollegeStatus status = CollegeStatus.PENDING;
+    private Boolean enabled = true;
 
-    private LocalDateTime createdAt;
+    @Column(name = "created_at")
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
-    }
-
-    public enum CollegeStatus {
-        PENDING, APPROVED, REJECTED, DISABLED
+        if (createdAt == null) createdAt = LocalDateTime.now();
+        if (enabled == null) enabled = true;
     }
 }

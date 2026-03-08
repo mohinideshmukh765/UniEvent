@@ -26,10 +26,10 @@ public class Post {
 
     private String images; // JSON or comma-separated URLs
 
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "password", "college"})
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "events"})
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coordinator_id")
-    private User coordinator;
+    @JoinColumn(name = "college_id")
+    private College college;
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "coordinator", "college"})
     @ManyToOne(fetch = FetchType.LAZY)
