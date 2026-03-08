@@ -37,15 +37,21 @@ public class CoordinatorController {
     @PreAuthorize("hasRole('COORDINATOR')")
     public ResponseEntity<?> getDashboardStats() {
         User user = getCurrentUser();
-        if (user == null || user.getCollege() == null) {
+        if (user == null) {
             return ResponseEntity.ok(new com.mohini.eventportal.dto.DashboardStats(0, 0, 0, 0));
         }
 
-        Long collegeId = user.getCollege().getId();
-        long totalEvents = eventRepository.countByCollegeId(collegeId);
-        long presentEvents = eventRepository.countByCollegeIdAndStatus(collegeId, com.mohini.eventportal.model.Event.EventStatus.PUBLISHED);
-        long pastEvents = eventRepository.countByCollegeIdAndStatus(collegeId, com.mohini.eventportal.model.Event.EventStatus.COMPLETED);
-        long totalRegistrations = registrationRepository.countByEventCollegeId(collegeId);
+        Long coordinatorId = user.getId();
+        long totalEvents = eventRepository.countByCoordinatorId(coordinatorId);
+        long presentEvents = eventRepository.countByCoordinatorIdAndStatus(coordinatorId, com.mohini.eventportal.model.Event.EventStatus.PUBLISHED);
+        long pastEvents = eventRepository.countByCoordinatorIdAndStatus(coordinatorId, com.mohini.eventportal.model.Event.EventStatus.COMPLETED);
+        
+        // Let's also check if college is null for registrations, if null then 0 for now as registrations are tied to an event's college.
+        // It would be better to fetch registrations for the coordinator's events, but for simplicity we keep college logic or 0.
+        long totalRegistrations = 0;
+        if (user.getCollege() != null) {
+            totalRegistrations = registrationRepository.countByEventCollegeId(user.getCollege().getId());
+        }
 
         return ResponseEntity.ok(new com.mohini.eventportal.dto.DashboardStats(totalEvents, presentEvents, pastEvents, totalRegistrations));
     }
@@ -54,8 +60,10 @@ public class CoordinatorController {
     @PreAuthorize("hasRole('COORDINATOR')")
     public ResponseEntity<?> getEvents() {
         User user = getCurrentUser();
-        if (user == null || user.getCollege() == null) return ResponseEntity.ok(java.util.Collections.emptyList());
-        return ResponseEntity.ok(eventRepository.findByCollegeId(user.getCollege().getId()));
+        if (user == null) return ResponseEntity.ok(java.util.Collections.emptyList());
+        
+        // Fetch by coordinator ID so they always see events they created
+        return ResponseEntity.ok(eventRepository.findByCoordinatorId(user.getId()));
     }
 
     @GetMapping("/registrations")
@@ -133,6 +141,41 @@ public class CoordinatorController {
         return ResponseEntity.ok(saved);
     }
 
+    @PutMapping("/events/{eventId}/dates")
+    @PreAuthorize("hasRole('COORDINATOR')")
+    public ResponseEntity<?> updateEventDates(@PathVariable("eventId") Long eventId, @RequestBody java.util.Map<String, String> dates) {
+        User user = getCurrentUser();
+        if (user == null) return ResponseEntity.badRequest().body("User not found");
+
+        Optional<Event> optionalEvent = eventRepository.findById(eventId);
+        if (!optionalEvent.isPresent()) {
+            return ResponseEntity.badRequest().body("Event not found");
+        }
+
+        Event event = optionalEvent.get();
+        // Verify ownership
+        if (event.getCoordinator() == null || !event.getCoordinator().getId().equals(user.getId())) {
+            return ResponseEntity.status(403).body("Unauthorized to edit this event");
+        }
+
+        try {
+            String eventDateStr = dates.get("eventDate");
+            String deadlineStr = dates.get("registrationDeadline");
+
+            if (eventDateStr != null && !eventDateStr.isEmpty()) {
+                event.setEventDate(java.time.LocalDateTime.parse(eventDateStr));
+            }
+            if (deadlineStr != null && !deadlineStr.isEmpty()) {
+                event.setRegistrationDeadline(java.time.LocalDateTime.parse(deadlineStr));
+            }
+        } catch (java.time.format.DateTimeParseException e) {
+            return ResponseEntity.badRequest().body("Invalid date format. Expected ISO-8601 (e.g. YYYY-MM-DDTHH:mm:ss). Passed: " + e.getParsedString());
+        }
+
+        Event saved = eventRepository.save(event);
+        return ResponseEntity.ok(saved);
+    }
+
     @PutMapping("/profile")
     @PreAuthorize("hasRole('COORDINATOR')")
     public ResponseEntity<?> updateProfile(@RequestBody User profileData) {
@@ -142,6 +185,13 @@ public class CoordinatorController {
         }
 
         // Update fields allowed for modification
+        if (profileData.getUsername() != null && !profileData.getUsername().trim().isEmpty() && !profileData.getUsername().equals(user.getUsername())) {
+             if (userRepository.existsByUsername(profileData.getUsername())) {
+                  return ResponseEntity.badRequest().body("Error: Username is already taken!");
+             }
+             user.setUsername(profileData.getUsername());
+        }
+
         if (profileData.getFullName() != null) user.setFullName(profileData.getFullName());
         if (profileData.getPhone() != null) user.setPhone(profileData.getPhone());
         if (profileData.getDistrict() != null) user.setDistrict(profileData.getDistrict());

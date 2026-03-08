@@ -143,6 +143,7 @@ const CoordinatorPanel = {
                                     <th>Event Title</th>
                                     <th>Category</th>
                                     <th>Date</th>
+                                    <th>Deadline</th>
                                     <th>Registrations</th>
                                     <th>Status</th>
                                     <th>Actions</th>
@@ -202,8 +203,33 @@ const CoordinatorPanel = {
                         <div style="margin-bottom: 2rem;">
                             <h4 style="margin-bottom: 1rem; color: var(--primary);">3. Additional Requirements</h4>
                             <label class="checkbox-container">
-                                <input type="checkbox" id="field-payment" checked onchange="CoordinatorPanel.updateFormPreview()"> Require Payment Screenshot
+                                <input type="checkbox" id="field-payment" onchange="CoordinatorPanel.updateFormPreview()"> Require Payment Screenshot
                             </label>
+                        </div>
+
+                        <div style="margin-bottom: 2rem;">
+                            <h4 style="margin-bottom: 1rem; color: var(--primary);">4. Choose Payment Method</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Select how students will pay the registration fee.</p>
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                <label class="checkbox-container">
+                                    <input type="radio" name="payment-method" id="payment-none" value="none" checked onchange="CoordinatorPanel.updateFormPreview()"> No Payment Required
+                                </label>
+                                <label class="checkbox-container">
+                                    <input type="radio" name="payment-method" id="payment-screenshot" value="screenshot" onchange="CoordinatorPanel.updateFormPreview()"> Manual Screenshot Upload
+                                </label>
+                                <label class="checkbox-container" style="border: 1px solid #635bff; border-radius: 8px; padding: 0.5rem;">
+                                    <input type="radio" name="payment-method" id="payment-stripe" value="stripe" onchange="CoordinatorPanel.updateFormPreview()">
+                                    <span style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <svg width="18" height="18" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="60" rx="10" fill="#635bff"/><path d="M29.3 22.8c0-2 1.6-2.8 4.3-2.8 3.8 0 8.5 1.2 8.5 1.2V14s-4.8-1-9.6-1C26 13 20 16.2 20 23.2c0 8.2 10.9 6 10.9 10.8 0 2.3-2 3.2-4.7 3.2-4 0-9.2-1.8-9.2-1.8v7.4s4.6 1.2 9.2 1.2c6.7 0 13-3.4 13-10.6 0-8.4-10.9-6.6-10.9-10.6z" fill="white"/></svg>
+                                        <strong>Stripe Gateway</strong>
+                                        <span style="font-size:0.7rem; background:#ede9fe; color:#5b21b6; padding:1px 6px; border-radius:9px;">Recommended</span>
+                                    </span>
+                                </label>
+                            </div>
+                            <div id="stripe-amount-box" style="display:none; margin-top:1rem; padding:0.75rem; background:#f5f3ff; border-radius:8px; border:1px solid #c4b5fd;">
+                                <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:0.4rem;">Registration Fee (INR)</label>
+                                <input type="number" id="stripe-amount" min="1" value="299" style="width:100%; padding:0.5rem; border-radius:8px; border:1px solid #ddd;" onchange="CoordinatorPanel.updateFormPreview()">
+                            </div>
                         </div>
 
                         <button class="btn-primary" style="width: 100%;" onclick="alert('Form configuration saved!')">Save Configuration</button>
@@ -406,6 +432,10 @@ const CoordinatorPanel = {
                                     <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem;">Coordinator</label>
                                     <div id="profileCoordName" style="font-weight: 500;"></div>
                                 </div>
+                                <div>
+                                    <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem;">Login Username</label>
+                                    <div id="profileUsername" style="font-weight: 500;"></div>
+                                </div>
                             </div>
                             <button class="btn-primary" onclick="CoordinatorPanel.editProfile()" style="margin-top: 2rem; background: var(--secondary);">Edit Profile</button>
                         </div>
@@ -417,6 +447,10 @@ const CoordinatorPanel = {
                                     <div style="grid-column: span 2;">
                                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Full Name (Coordinator)</label>
                                         <input type="text" id="editFullName" style="width: 100%; padding: 0.75rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                                    </div>
+                                    <div style="grid-column: span 2;">
+                                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Username (For Login)</label>
+                                        <input type="text" id="editUsername" style="width: 100%; padding: 0.75rem; border-radius: 12px; border: 1px solid var(--border-color);">
                                     </div>
                                     <div>
                                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Phone Number</label>
@@ -467,7 +501,7 @@ const CoordinatorPanel = {
                 date: e.eventDate,
                 venue: e.venue,
                 registrations: 0, // Should be calculated or returned from backend
-                status: e.status === 'PUBLISHED' ? 'Active' : (e.status === 'COMPLETED' ? 'Completed' : 'Draft'),
+                status: this.calculateEventStatus(e.eventDate, e.registrationDeadline),
                 description: e.description,
                 rules: "", // Add if available
                 deadline: e.registrationDeadline,
@@ -491,9 +525,28 @@ const CoordinatorPanel = {
         }
     },
 
+    calculateEventStatus(eventDateStr, regDeadlineStr) {
+        if (!eventDateStr) return 'Active';
+        
+        const now = new Date();
+        const eventDate = new Date(eventDateStr);
+        const regDeadline = regDeadlineStr ? new Date(regDeadlineStr) : null;
+
+        if (eventDate < now) {
+            return 'Completed';
+        }
+
+        if (regDeadline && regDeadline < now) {
+            return 'Expired';
+        }
+
+        return 'Active';
+    },
+
     formatDateTime(dateStr) {
-        if (!dateStr) return "";
+        if (!dateStr) return "Not Set";
         const date = new Date(dateStr);
+        if (isNaN(date)) return "Not Set";
         return date.toLocaleString();
     },
 
@@ -506,6 +559,7 @@ const CoordinatorPanel = {
                 this.user = {
                     ...this.user,
                     name: parsed.fullName || parsed.name || this.user.name,
+                    username: parsed.username || this.user.username,
                     collegeName: parsed.collegeName || this.user.collegeName,
                     email: parsed.email || this.user.email,
                     district: parsed.district || this.user.district,
@@ -637,7 +691,8 @@ const CoordinatorPanel = {
             email: document.getElementById('profileEmail'),
             phone: document.getElementById('profilePhone'),
             district: document.getElementById('profileDistrict'),
-            coord: document.getElementById('profileCoordName')
+            coord: document.getElementById('profileCoordName'),
+            username: document.getElementById('profileUsername')
         };
 
         if (elements.college) elements.college.textContent = this.user.collegeName;
@@ -646,6 +701,7 @@ const CoordinatorPanel = {
         if (elements.phone) elements.phone.textContent = this.user.phone;
         if (elements.district) elements.district.textContent = this.user.district;
         if (elements.coord) elements.coord.textContent = this.user.name;
+        if (elements.username) elements.username.textContent = this.user.username;
     },
 
     editProfile() {
@@ -654,6 +710,7 @@ const CoordinatorPanel = {
 
         // Pre-fill inputs
         document.getElementById('editFullName').value = this.user.name;
+        document.getElementById('editUsername').value = this.user.username || '';
         document.getElementById('editPhone').value = this.user.phone;
         document.getElementById('editDistrict').value = this.user.district;
     },
@@ -663,9 +720,12 @@ const CoordinatorPanel = {
         
         const updatedData = {
             fullName: document.getElementById('editFullName').value,
+            username: document.getElementById('editUsername').value,
             phone: document.getElementById('editPhone').value,
             district: document.getElementById('editDistrict').value
         };
+
+        const oldUsername = this.user.username;
 
         try {
             const token = localStorage.getItem('token');
@@ -681,9 +741,18 @@ const CoordinatorPanel = {
             if (response.ok) {
                 const refreshedUser = await response.json();
                 
+                // If username was changed, force logout immediately
+                if (updatedData.username && updatedData.username.trim() !== '' && updatedData.username !== oldUsername) {
+                    alert("Username updated successfully! Please log in again with your new username.");
+                    localStorage.clear();
+                    window.location.href = '/login.html';
+                    return;
+                }
+
                 // Update local storage and panel state
                 const localUserData = JSON.parse(localStorage.getItem('user'));
                 localUserData.name = refreshedUser.fullName;
+                localUserData.username = refreshedUser.username;
                 localUserData.phone = refreshedUser.phone;
                 localUserData.district = refreshedUser.district;
                 localStorage.setItem('user', JSON.stringify(localUserData));
@@ -694,7 +763,8 @@ const CoordinatorPanel = {
                 
                 alert("Profile updated successfully!");
             } else {
-                alert("Failed to update profile. Please try again.");
+                const errorText = await response.text();
+                alert(errorText || "Failed to update profile. Please try again.");
             }
         } catch (error) {
             console.error("Error updating profile:", error);
@@ -713,8 +783,8 @@ const CoordinatorPanel = {
             category: document.getElementById('evCategory').value,
             maxParticipants: parseInt(document.getElementById('evMaxParticipants').value),
             description: document.getElementById('evDescription').value,
-            registrationDeadline: document.getElementById('evRegDeadline').value + 'T00:00:00',
-            eventDate: document.getElementById('evDate').value,
+            registrationDeadline: document.getElementById('evRegDeadline').value + 'T23:59:59',
+            eventDate: document.getElementById('evDate').value + 'T08:00:00',
             venue: document.getElementById('evVenue').value
         };
 
@@ -736,7 +806,7 @@ const CoordinatorPanel = {
                     date: created.eventDate,
                     venue: created.venue,
                     registrations: 0,
-                    status: 'Active',
+                    status: this.calculateEventStatus(created.eventDate, created.registrationDeadline),
                     description: created.description,
                     maxParticipants: created.maxParticipants,
                     minParticipants: 1
@@ -886,6 +956,7 @@ const CoordinatorPanel = {
                             <tr>
                                 <th>Event Name</th>
                                 <th>Date</th>
+                                <th>Deadline</th>
                                 <th>Venue</th>
                                 <th>Registrations</th>
                                 <th>Status</th>
@@ -896,9 +967,10 @@ const CoordinatorPanel = {
                                 <tr>
                                     <td><strong>${e.name}</strong></td>
                                     <td>${this.formatDateShort(e.date)}</td>
+                                    <td>${this.formatDateShort(e.deadline)}</td>
                                     <td>${e.venue}</td>
                                     <td>${e.registrations}</td>
-                                    <td><span class="status-badge ${e.status === 'Active' ? 'status-active' : 'status-completed'}">${e.status}</span></td>
+                                    <td><span class="status-badge ${e.status === 'Active' ? 'status-active' : (e.status === 'Completed' ? 'status-completed' : 'status-pending')}">${e.status}</span></td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -950,7 +1022,9 @@ const CoordinatorPanel = {
     },
 
     formatDateShort(dateStr) {
+        if (!dateStr) return "Not Set";
         const d = new Date(dateStr);
+        if (isNaN(d)) return "Not Set";
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         return `${months[d.getMonth()]} ${d.getDate()}`;
     },
@@ -982,8 +1056,9 @@ const CoordinatorPanel = {
                 <td><strong>${e.name}</strong></td>
                 <td>${e.category}</td>
                 <td>${this.formatDateShort(e.date)}</td>
+                <td>${this.formatDateShort(e.deadline)}</td>
                 <td>${e.registrations}</td>
-                <td><span class="status-badge ${e.status === 'Active' ? 'status-active' : 'status-completed'}">${e.status}</span></td>
+                <td><span class="status-badge ${e.status === 'Active' ? 'status-active' : (e.status === 'Completed' ? 'status-completed' : 'status-pending')}">${e.status}</span></td>
                 <td>
                     <button class="btn-primary" onclick="CoordinatorPanel.viewEventDetails(${e.id})" style="padding: 0.4rem; background: var(--secondary);"><i class="fas fa-eye"></i></button>
                     <button class="btn-primary" onclick="CoordinatorPanel.editEventDates(${e.id})" style="padding: 0.4rem; background: var(--accent);"><i class="fas fa-edit"></i></button>
@@ -1006,7 +1081,7 @@ const CoordinatorPanel = {
                 <div class="card" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
                     <div style="grid-column: span 2;">
                         <h2 style="color: var(--primary);">${event.name}</h2>
-                        <span class="status-badge ${event.status === 'Active' ? 'status-active' : 'status-completed'}">${event.status}</span>
+                        <span class="status-badge ${event.status === 'Active' ? 'status-active' : (event.status === 'Completed' ? 'status-completed' : 'status-pending')}">${event.status}</span>
                     </div>
                     <div>
                         <p><strong>Category:</strong> ${event.category}</p>
@@ -1049,11 +1124,11 @@ const CoordinatorPanel = {
                     <form onsubmit="CoordinatorPanel.saveEventDates(event, ${event.id})" style="display: grid; gap: 1.5rem; max-width: 500px;">
                         <div>
                             <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Registration Deadline</label>
-                            <input type="date" id="editDeadline" value="${event.deadline}" style="width: 100%; padding: 0.75rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                            <input type="date" id="editDeadline" value="${event.deadline ? event.deadline.split('T')[0] : ''}" style="width: 100%; padding: 0.75rem; border-radius: 12px; border: 1px solid var(--border-color);">
                         </div>
                         <div>
                             <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Event Date</label>
-                            <input type="date" id="editDate" value="${event.date}" style="width: 100%; padding: 0.75rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                            <input type="date" id="editDate" value="${event.date ? event.date.split('T')[0] : ''}" style="width: 100%; padding: 0.75rem; border-radius: 12px; border: 1px solid var(--border-color);">
                         </div>
                         <button type="submit" class="btn-primary" style="width: fit-content;">Save Changes</button>
                     </form>
@@ -1062,22 +1137,55 @@ const CoordinatorPanel = {
         `;
     },
 
-    saveEventDates(e, id) {
+    async saveEventDates(e, id) {
         e.preventDefault();
         const deadline = document.getElementById('editDeadline').value;
         const date = document.getElementById('editDate').value;
+
+        // Perform validation
+        if (!deadline || !date) {
+            alert("Both dates are required.");
+            return;
+        }
         
-        const index = this.data.events.findIndex(ev => ev.id === id);
-        if (index !== -1) {
-            this.data.events[index].deadline = deadline;
-            this.data.events[index].date = date;
-            
-            // Re-check status based on date if needed (mock logic)
-            const today = new Date('2024-03-08');
-            this.data.events[index].status = new Date(date) < today ? 'Completed' : 'Active';
-            
-            alert("Dates updated successfully!");
-            this.navigate('manage-events');
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('/api/coordinator/events/' + id + '/dates', {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify({
+                    title: "update",
+                    category: "update",
+                    description: "update",
+                    venue: "update",
+                    eventDate: date + 'T08:00:00',
+                    registrationDeadline: deadline + 'T23:59:59'
+                })
+            });
+
+            if (response.ok) {
+                const updatedEvent = await response.json();
+                
+                // Update local array with fresh data
+                const index = this.data.events.findIndex(ev => ev.id === id);
+                if (index !== -1) {
+                    this.data.events[index].deadline = updatedEvent.registrationDeadline;
+                    this.data.events[index].date = updatedEvent.eventDate;
+                    this.data.events[index].status = this.calculateEventStatus(updatedEvent.eventDate, updatedEvent.registrationDeadline);
+                }
+                
+                alert("Dates updated successfully!");
+                this.navigate('manage-events');
+            } else {
+                const err = await response.text();
+                alert("Failed to update dates: " + err);
+            }
+        } catch(error) {
+             console.error("Error updating dates:", error);
+             alert("Network error.");
         }
     },
 
@@ -1110,6 +1218,11 @@ const CoordinatorPanel = {
             year: document.getElementById('field-year')?.checked,
             payment: document.getElementById('field-payment')?.checked
         };
+
+        const paymentMethod = document.querySelector('input[name="payment-method"]:checked')?.value || 'none';
+        const stripeAmountBox = document.getElementById('stripe-amount-box');
+        if (stripeAmountBox) stripeAmountBox.style.display = (paymentMethod === 'stripe') ? 'block' : 'none';
+        const amount = document.getElementById('stripe-amount')?.value || '299';
 
         const selectedEventName = document.querySelector('.event-choice:checked')?.value;
         const event = this.data.events.find(ev => ev.name === selectedEventName);
@@ -1158,12 +1271,24 @@ const CoordinatorPanel = {
             `;
         }
 
-        if (fields.payment) {
+        if (paymentMethod === 'screenshot' || fields.payment) {
             html += `
                 <div style="margin-top: 1.5rem; padding: 1.5rem; border: 2px dashed #94a3b8; text-align: center; border-radius: 12px; background: #f8fafc;">
                     <i class="fas fa-upload" style="color: #64748b; font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
                     <p style="font-size: 0.85rem; color: #475569; font-weight: 600;">Upload Payment Screenshot</p>
                     <p style="font-size: 0.7rem; color: var(--text-muted);">Required for registration</p>
+                </div>
+            `;
+        } else if (paymentMethod === 'stripe') {
+            html += `
+                <div style="margin-top: 1.5rem; padding: 1.5rem; border: 2px solid #635bff; border-radius: 12px; background: #f5f3ff; text-align: center;">
+                    <p style="font-size: 0.85rem; color: #5b21b6; font-weight: 600; margin-bottom: 0.75rem;">Registration Fee: \u20b9${amount}</p>
+                    <button onclick="CoordinatorPanel.openStripe(${amount})" type="button"
+                        style="background: #635bff; color: white; border: none; padding: 0.65rem 2rem; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <svg width="16" height="16" viewBox="0 0 60 60" fill="none"><rect width="60" height="60" rx="10" fill="white"/><path d="M29.3 22.8c0-2 1.6-2.8 4.3-2.8 3.8 0 8.5 1.2 8.5 1.2V14s-4.8-1-9.6-1C26 13 20 16.2 20 23.2c0 8.2 10.9 6 10.9 10.8 0 2.3-2 3.2-4.7 3.2-4 0-9.2-1.8-9.2-1.8v7.4s4.6 1.2 9.2 1.2c6.7 0 13-3.4 13-10.6 0-8.4-10.9-6.6-10.9-10.6z" fill="#635bff"/></svg>
+                        Pay with Stripe
+                    </button>
+                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.5rem;">Secure payment powered by Stripe</p>
                 </div>
             `;
         }
@@ -1174,6 +1299,40 @@ const CoordinatorPanel = {
         `;
 
         preview.innerHTML = html;
+    },
+
+    async openStripe(amount) {
+        try {
+            const token = localStorage.getItem('token');
+            const selectedEvent = document.querySelector('.event-choice:checked')?.value || 'Event Registration';
+
+            const res = await fetch('/api/payment/createSession', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    amount: parseInt(amount),
+                    eventName: selectedEvent,
+                    successUrl: window.location.href.split('?')[0] + '?payment=success',
+                    cancelUrl:  window.location.href.split('?')[0] + '?payment=cancelled'
+                })
+            });
+
+            if (!res.ok) {
+                const err = await res.text();
+                alert('Could not start Stripe checkout. Error: ' + err);
+                return;
+            }
+
+            const data = await res.json();
+            // Redirect to hosted Stripe checkout page
+            window.location.href = data.url;
+        } catch (err) {
+            console.error('Stripe error:', err);
+            alert('Payment error: ' + err.message);
+        }
     },
 
     setupEventListeners() {
