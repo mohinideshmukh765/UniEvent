@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Approvals | UniEvent Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="light-theme">
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <a href="/" class="logo">UniEvent</a>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="approvals.html" class="nav-item active"><i class="fas fa-check-double"></i> College Approvals</a>
+                <a href="colleges.html" class="nav-item"><i class="fas fa-university"></i> Manage Colleges</a>
+                <a href="coordinators.html" class="nav-item"><i class="fas fa-user-tie"></i> Coordinators</a>
+                <a href="events.html" class="nav-item"><i class="fas fa-calendar-star"></i> Event Moderation</a>
+                <a href="categories.html" class="nav-item"><i class="fas fa-tags"></i> Categories</a>
+                <a href="students.html" class="nav-item"><i class="fas fa-user-graduate"></i> Students</a>
+                <a href="registrations.html" class="nav-item"><i class="fas fa-ticket-alt"></i> Registrations</a>
+                <a href="posts.html" class="nav-item"><i class="fas fa-image"></i> Post Moderation</a>
+                <a href="analytics.html" class="nav-item"><i class="fas fa-chart-bar"></i> Analytics</a>
+                <a href="notifications.html" class="nav-item"><i class="fas fa-paper-plane"></i> Notifications</a>
+                <a href="reports.html" class="nav-item"><i class="fas fa-file-pdf"></i> Reports</a>
+                <a href="logs.html" class="nav-item"><i class="fas fa-history"></i> Activity Logs</a>
+                <a href="settings.html" class="nav-item"><i class="fas fa-sliders-h"></i> Settings</a>
+                <a href="ai-insights.html" class="nav-item"><i class="fas fa-brain"></i> AI Insights</a>
+            </nav>
+            <a href="#" id="logoutBtn" class="nav-item" style="margin-top: auto; color: #f87171;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-header">
+                <div>
+                    <h1>Pending Approvals</h1>
+                    <p style="color: var(--admin-text-muted);">Review and verify new college registrations.</p>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <div class="stat-card" style="padding: 0.5rem 1rem; margin-bottom: 0;">
+                        <select class="form-input" style="border: none; padding: 0; background: transparent; width: 140px; font-weight: 600;">
+                            <option>All Districts</option>
+                            <option>Kolhapur</option>
+                            <option>Sangli</option>
+                            <option>Satara</option>
+                        </select>
+                    </div>
+                </div>
+            </header>
+
+            <div class="admin-card">
+                <div class="card-header">
+                    <h3>College Applications</h3>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-secondary" style="font-size: 0.8rem;"><i class="fas fa-filter"></i> Filter</button>
+                        <button class="btn btn-primary" style="font-size: 0.8rem;"><i class="fas fa-download"></i> Export</button>
+                    </div>
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>College Name</th>
+                            <th>District</th>
+                            <th>Coordinator</th>
+                            <th>Applied Date</th>
+                            <th>Documents</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="approvalsTableBody">
+                        <tr>
+                            <td>
+                                <div style="font-weight: 600;">Ghogare Institute</div>
+                                <div style="font-size: 0.75rem; color: var(--admin-text-muted);">Code: GI-202</div>
+                            </td>
+                            <td>Sangli</td>
+                            <td>
+                                <div style="font-weight: 500;">Prof. S. R. Patil</div>
+                                <div style="font-size: 0.75rem; color: var(--admin-text-muted);">patil.sr@gi.edu</div>
+                            </td>
+                            <td>Oct 12, 2024</td>
+                            <td><a href="#" class="link-primary"><i class="fas fa-file-pdf"></i> View ID</a></td>
+                            <td style="display: flex; gap: 0.5rem;">
+                                <button class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; background: #10b981;">Approve</button>
+                                <button class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; color: #ef4444;">Reject</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div style="font-weight: 600;">Satara Arts & Commerce</div>
+                                <div style="font-size: 0.75rem; color: var(--admin-text-muted);">Code: SAC-99</div>
+                            </td>
+                            <td>Satara</td>
+                            <td>
+                                <div style="font-weight: 500;">Amit Deshmukh</div>
+                                <div style="font-size: 0.75rem; color: var(--admin-text-muted);">amit.d@sac.edu</div>
+                            </td>
+                            <td>Oct 10, 2024</td>
+                            <td><a href="#" class="link-primary"><i class="fas fa-file-pdf"></i> View ID</a></td>
+                            <td style="display: flex; gap: 0.5rem;">
+                                <button class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; background: #10b981;">Approve</button>
+                                <button class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; color: #ef4444;">Reject</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/admin-shared.js"></script>
+    <script>
+        // Placeholder for approval logic
+    </script>
+</body>
+</html>

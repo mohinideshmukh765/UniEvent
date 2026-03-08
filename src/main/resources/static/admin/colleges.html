@@ -3,75 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Colleges | EventPortal</title>
+    <title>Manage Colleges | UniEvent Portal</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        .layout { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
-        .sidebar { background: var(--bg-card); border-right: 1px solid var(--glass-border); padding: 2rem 1rem; }
-        .nav-link { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1rem; color: var(--text-muted); text-decoration: none; border-radius: 8px; margin-bottom: 0.5rem; transition: var(--transition); }
-        .nav-link.active, .nav-link:hover { background: rgba(99, 102, 241, 0.1); color: var(--primary); }
-        .main-content { padding: 2rem; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--glass-border); }
-        th { color: var(--text-muted); font-weight: 600; font-size: 0.875rem; text-transform: uppercase; }
-        
-        .status-badge { padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
-        .status-pending { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
-        .status-approved { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-        .status-rejected { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .college-tag {
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            background: var(--admin-bg);
+            color: var(--admin-text-muted);
+            margin-right: 0.25rem;
+        }
     </style>
 </head>
-<body>
-    <div class="layout">
-        <aside class="sidebar">
-            <h2 style="margin-bottom: 2rem; color: var(--primary);">EventPortal</h2>
-            <nav>
-                <a href="dashboard.html" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
-                <a href="colleges.html" class="nav-link active"><i class="fas fa-university"></i> Colleges</a>
-                <a href="students.html" class="nav-link"><i class="fas fa-user-graduate"></i> Students</a>
-                <a href="events.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Events</a>
-                <a href="analytics.html" class="nav-link"><i class="fas fa-chart-line"></i> Analytics</a>
-                <hr style="border: 0.5px solid var(--glass-border); margin: 1.5rem 0;">
-                <a href="#" id="logoutBtn" class="nav-link" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+<body class="light-theme">
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <a href="/" class="logo">UniEvent</a>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="approvals.html" class="nav-item"><i class="fas fa-check-double"></i> College Approvals</a>
+                <a href="colleges.html" class="nav-item active"><i class="fas fa-university"></i> Manage Colleges</a>
+                <a href="coordinators.html" class="nav-item"><i class="fas fa-user-tie"></i> Coordinators</a>
+                <a href="events.html" class="nav-item"><i class="fas fa-calendar-star"></i> Event Moderation</a>
+                <a href="categories.html" class="nav-item"><i class="fas fa-tags"></i> Categories</a>
+                <a href="students.html" class="nav-item"><i class="fas fa-user-graduate"></i> Students</a>
+                <a href="registrations.html" class="nav-item"><i class="fas fa-ticket-alt"></i> Registrations</a>
+                <a href="posts.html" class="nav-item"><i class="fas fa-image"></i> Post Moderation</a>
+                <a href="analytics.html" class="nav-item"><i class="fas fa-chart-bar"></i> Analytics</a>
+                <a href="notifications.html" class="nav-item"><i class="fas fa-paper-plane"></i> Notifications</a>
+                <a href="reports.html" class="nav-item"><i class="fas fa-file-pdf"></i> Reports</a>
+                <a href="logs.html" class="nav-item"><i class="fas fa-history"></i> Activity Logs</a>
+                <a href="settings.html" class="nav-item"><i class="fas fa-sliders-h"></i> Settings</a>
+                <a href="ai-insights.html" class="nav-item"><i class="fas fa-brain"></i> AI Insights</a>
             </nav>
+            <a href="#" id="logoutBtn" class="nav-item" style="margin-top: auto; color: #f87171;"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </aside>
 
-        <main class="main-content">
-            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h1>Manage Colleges</h1>
-                <button class="btn btn-primary" onclick="showAddCollegeModal()"><i class="fas fa-plus"></i> Add College</button>
+        <main class="admin-main">
+            <header class="admin-header">
+                <div>
+                    <h1>Colleges Directory</h1>
+                    <p style="color: var(--admin-text-muted);">Manage and monitor affiliated institutions.</p>
+                </div>
+                <button class="btn btn-primary"><i class="fas fa-plus"></i> Add New College</button>
             </header>
 
-            <div class="glass" style="padding: 1.5rem;">
-                <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
-                    <input type="text" class="form-input" style="max-width: 300px;" placeholder="Search colleges...">
-                    <select class="form-input" style="max-width: 200px;">
-                        <option value="">All Districts</option>
-                        <option value="Kolhapur">Kolhapur</option>
-                        <option value="Sangli">Sangli</option>
-                        <option value="Satara">Satara</option>
-                    </select>
+            <!-- Search & Filters -->
+            <div class="admin-card" style="margin-bottom: 2rem; padding: 1.5rem;">
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label style="font-size: 0.8rem; font-weight: 600; color: var(--admin-text-muted);">Search</label>
+                        <input type="text" class="form-input" placeholder="Search by name, code or location...">
+                    </div>
+                    <div class="form-group">
+                        <label style="font-size: 0.8rem; font-weight: 600; color: var(--admin-text-muted);">District</label>
+                        <select class="form-input">
+                            <option>All Districts</option>
+                            <option>Kolhapur</option>
+                            <option>Sangli</option>
+                            <option>Satara</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label style="font-size: 0.8rem; font-weight: 600; color: var(--admin-text-muted);">Status</label>
+                        <select class="form-input">
+                            <option>All Status</option>
+                            <option>Active</option>
+                            <option>Pending</option>
+                            <option>Disabled</option>
+                        </select>
+                    </div>
                 </div>
+            </div>
 
-                <table>
+            <div class="admin-card">
+                <table class="admin-table">
                     <thead>
                         <tr>
                             <th>College Name</th>
                             <th>District</th>
+                            <th>Coordinators</th>
+                            <th>Total Events</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="collegesTableBody">
-                        <!-- Data populated by JS -->
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(59, 130, 246, 0.1); display: flex; align-items: center; justify-content: center; color: var(--admin-accent);">
+                                        <i class="fas fa-university"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 700;">Rajaram College</div>
+                                        <div style="font-size: 0.75rem; color: var(--admin-text-muted);">Code: RC-2023</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Kolhapur</td>
+                            <td>
+                                <div style="display: flex; gap: 4px;">
+                                    <div style="width: 24px; height: 24px; border-radius: 50%; background: #e2e8f0; border: 2px solid white; display:flex; align-items:center; justify-content:center; font-size: 10px;">RP</div>
+                                    <div style="width: 24px; height: 24px; border-radius: 50%; background: #e2e8f0; border: 2px solid white; display:flex; align-items:center; justify-content:center; font-size: 10px;">AS</div>
+                                    <div style="width: 24px; height: 24px; border-radius: 50%; background: #ebf4ff; border: 2px solid white; display:flex; align-items:center; justify-content:center; font-size: 10px; color: #3b82f6;">+2</div>
+                                </div>
+                            </td>
+                            <td style="font-weight: 600;">42</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td style="display: flex; gap: 0.5rem;">
+                                <button class="btn btn-secondary" style="padding: 0.4rem;"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-secondary" style="padding: 0.4rem; color: #f87171;"><i class="fas fa-ban"></i></button>
+                                <button class="btn btn-secondary" style="padding: 0.4rem;"><i class="fas fa-eye"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(236, 72, 153, 0.1); display: flex; align-items: center; justify-content: center; color: #ec4899;">
+                                        <i class="fas fa-university"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 700;">Willingdon College</div>
+                                        <div style="font-size: 0.75rem; color: var(--admin-text-muted);">Code: WC-Sangli</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Sangli</td>
+                            <td>
+                                <div style="display: flex; gap: 4px;">
+                                    <div style="width: 24px; height: 24px; border-radius: 50%; background: #e2e8f0; border: 2px solid white; display:flex; align-items:center; justify-content:center; font-size: 10px;">MS</div>
+                                    <div style="width: 24px; height: 24px; border-radius: 50%; background: #e2e8f0; border: 2px solid white; display:flex; align-items:center; justify-content:center; font-size: 10px;">PK</div>
+                                </div>
+                            </td>
+                            <td style="font-weight: 600;">28</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
+                            <td style="display: flex; gap: 0.5rem;">
+                                <button class="btn btn-secondary" style="padding: 0.4rem;"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-secondary" style="padding: 0.4rem; color: #f87171;"><i class="fas fa-ban"></i></button>
+                                <button class="btn btn-secondary" style="padding: 0.4rem;"><i class="fas fa-eye"></i></button>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Featured Cards (as per design) -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 2rem;">
+                <div class="admin-card" style="padding: 1.5rem; border-top: 4px solid var(--admin-accent);">
+                    <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem;">Shivaji Science Institute</div>
+                    <div style="font-size: 0.8rem; color: var(--admin-text-muted); margin-bottom: 1.5rem;"><i class="fas fa-map-marker-alt"></i> KOLHAPUR</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size: 0.7rem; color: var(--admin-text-muted);">EVENTS</div>
+                            <div style="font-weight: 800; font-size: 1.2rem;">128</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.7rem; color: var(--admin-text-muted);">RANK</div>
+                            <div style="font-weight: 800; font-size: 1.2rem; color: var(--admin-accent);">#4</div>
+                        </div>
+                        <span class="status-badge status-active">Active</span>
+                    </div>
+                </div>
+                <div class="admin-card" style="padding: 1.5rem; border-top: 4px solid #818cf8;">
+                    <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem;">Sangli Engineering College</div>
+                    <div style="font-size: 0.8rem; color: var(--admin-text-muted); margin-bottom: 1.5rem;"><i class="fas fa-map-marker-alt"></i> SANGLI</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size: 0.7rem; color: var(--admin-text-muted);">EVENTS</div>
+                            <div style="font-weight: 800; font-size: 1.2rem;">85</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.7rem; color: var(--admin-text-muted);">RANK</div>
+                            <div style="font-weight: 800; font-size: 1.2rem; color: var(--admin-accent);">#12</div>
+                        </div>
+                        <span class="status-badge status-pending">Pending</span>
+                    </div>
+                </div>
+                <div class="admin-card" style="padding: 1.5rem; border-top: 4px solid #94a3b8;">
+                    <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem;">Satara Arts & Commerce</div>
+                    <div style="font-size: 0.8rem; color: var(--admin-text-muted); margin-bottom: 1.5rem;"><i class="fas fa-map-marker-alt"></i> SATARA</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size: 0.7rem; color: var(--admin-text-muted);">EVENTS</div>
+                            <div style="font-weight: 800; font-size: 1.2rem;">54</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.7rem; color: var(--admin-text-muted);">RANK</div>
+                            <div style="font-weight: 800; font-size: 1.2rem; color: var(--admin-accent);">#21</div>
+                        </div>
+                        <span class="status-badge status-disabled">Disabled</span>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
 
+    <script src="/js/admin-shared.js"></script>
     <script src="/js/admin-colleges.js"></script>
 </body>
 </html>
