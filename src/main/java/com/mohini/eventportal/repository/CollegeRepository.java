@@ -10,4 +10,8 @@ import java.util.List;
 public interface CollegeRepository extends JpaRepository<College, Long> {
     List<College> findByDistrict(String district);
     List<College> findByStatus(College.CollegeStatus status);
+    @org.springframework.data.jpa.repository.Query("SELECT COUNT(DISTINCT c.collegeCode) FROM College c")
+    long countDistinctCollegeCode();
+
+    boolean existsByCollegeCode(String collegeCode);
 }

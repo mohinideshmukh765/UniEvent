@@ -25,6 +25,13 @@ public class College {
     private String name;
 
     @NotBlank
+    @Column(unique = true)
+    private String collegeCode;
+
+    @NotBlank
+    private String city;
+
+    @NotBlank
     private String district;
 
     @NotBlank

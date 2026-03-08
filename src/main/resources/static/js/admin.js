@@ -18,23 +18,23 @@ const AdminPanel = {
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-icon" style="background: #eff6ff; color: #3b82f6;"><i class="fas fa-university"></i></div>
-                        <div class="stat-info"><h3>Total Colleges</h3><p>48</p></div>
-                        <div style="margin-left: auto; color: #10b981; font-size: 0.8rem; font-weight: 600;"><i class="fas fa-arrow-up"></i> +2</div>
+                        <div class="stat-info"><h3>Total Colleges</h3><p id="stat-colleges">--</p></div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon" style="background: #f5f3ff; color: #8b5cf6;"><i class="fas fa-users"></i></div>
-                        <div class="stat-info"><h3>Total Students</h3><p>6,200</p></div>
-                        <div style="margin-left: auto; color: #10b981; font-size: 0.8rem; font-weight: 600;"><i class="fas fa-arrow-up"></i> +12%</div>
+                        <div class="stat-info"><h3>Total Students</h3><p id="stat-students">--</p></div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon" style="background: #fff1f2; color: #f43f5e;"><i class="fas fa-calendar-alt"></i></div>
-                        <div class="stat-info"><h3>Total Events</h3><p>135</p></div>
-                        <div style="margin-left: auto; color: #64748b; font-size: 0.8rem;">Active now</div>
+                        <div class="stat-icon" style="background: #ecfdf5; color: #10b981;"><i class="fas fa-calendar-check"></i></div>
+                        <div class="stat-info"><h3>Upcoming Events</h3><p id="stat-upcoming">--</p></div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon" style="background: #ecfdf5; color: #10b981;"><i class="fas fa-ticket-alt"></i></div>
-                        <div class="stat-info"><h3>Total Registrations</h3><p>3,980</p></div>
-                        <div style="margin-left: auto; color: #10b981; font-size: 0.8rem; font-weight: 600;"><i class="fas fa-arrow-up"></i> +8%</div>
+                        <div class="stat-icon" style="background: #fff1f2; color: #f43f5e;"><i class="fas fa-history"></i></div>
+                        <div class="stat-info"><h3>Past Events</h3><p id="stat-past">--</p></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #fdf2f8; color: #db2777;"><i class="fas fa-ticket-alt"></i></div>
+                        <div class="stat-info"><h3>Total Registrations</h3><p id="stat-registrations">--</p></div>
                     </div>
                 </div>
 
@@ -46,40 +46,26 @@ const AdminPanel = {
                         </div>
                         <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 2rem;">Regional event density across university jurisdiction</p>
                         
-                        <div style="height: 300px; display: flex; align-items: flex-end; justify-content: space-around; padding: 0 2rem; border-bottom: 2px solid var(--border-color);">
+                        <div id="district-chart" style="height: 300px; display: flex; align-items: flex-end; justify-content: space-around; padding: 0 2rem; border-bottom: 2px solid var(--border-color);">
+                            <!-- Chart bars will be injected here -->
                             <div style="width: 60px; height: 90%; background: #e2e8f0; border-radius: 8px 8px 0 0; position: relative;">
-                                <div class="chart-bar" style="position: absolute; bottom: 0; width: 100%; height: 85%; background: #cbd5e1; border-radius: 8px 8px 0 0;"></div>
+                                <div class="chart-bar" style="position: absolute; bottom: 0; width: 100%; height: 65%; background: #3b82f6; border-radius: 8px 8px 0 0;"></div>
                                 <span style="position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); font-size: 0.8rem; font-weight: 600;">Kolhapur</span>
                             </div>
                             <div style="width: 60px; height: 90%; background: #e2e8f0; border-radius: 8px 8px 0 0; position: relative;">
-                                <div class="chart-bar" style="position: absolute; bottom: 0; width: 100%; height: 45%; background: #cbd5e1; border-radius: 8px 8px 0 0;"></div>
+                                <div class="chart-bar" style="position: absolute; bottom: 0; width: 100%; height: 45%; background: #3b82f6; border-radius: 8px 8px 0 0;"></div>
                                 <span style="position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); font-size: 0.8rem; font-weight: 600;">Sangli</span>
                             </div>
                             <div style="width: 60px; height: 90%; background: #e2e8f0; border-radius: 8px 8px 0 0; position: relative;">
-                                <div class="chart-bar" style="position: absolute; bottom: 0; width: 100%; height: 35%; background: #cbd5e1; border-radius: 8px 8px 0 0;"></div>
+                                <div class="chart-bar" style="position: absolute; bottom: 0; width: 100%; height: 35%; background: #3b82f6; border-radius: 8px 8px 0 0;"></div>
                                 <span style="position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); font-size: 0.8rem; font-weight: 600;">Satara</span>
                             </div>
                         </div>
                         
                         <div style="margin-top: 3rem;">
                             <h3>Recent Activities</h3>
-                            <div style="margin-top: 1rem;">
-                                <div class="recent-activity-item">
-                                    <span style="font-size: 0.8rem; color: var(--text-muted); width: 80px;">10:30 AM</span>
-                                    <div style="flex: 1;">
-                                        <p style="font-size: 0.9rem; font-weight: 600;">Technical Symposia created</p>
-                                    </div>
-                                    <span style="font-size: 0.9rem; color: var(--text-muted); width: 150px;">KIT College of Engineering</span>
-                                    <span class="status-badge" style="background: #dcfce7; color: #166534;">Published</span>
-                                </div>
-                                <div class="recent-activity-item">
-                                    <span style="font-size: 0.8rem; color: var(--text-muted); width: 80px;">09:45 AM</span>
-                                    <div style="flex: 1;">
-                                        <p style="font-size: 0.9rem; font-weight: 600;">New student registration</p>
-                                    </div>
-                                    <span style="font-size: 0.9rem; color: var(--text-muted); width: 150px;">DKTE Institute, Ichalkaranji</span>
-                                    <span class="status-badge" style="background: #fff7ed; color: #9a3412;">Pending</span>
-                                </div>
+                            <div id="activity-list" style="margin-top: 1rem;">
+                                <p style="color: var(--text-muted);">Loading activities...</p>
                             </div>
                         </div>
                     </div>
@@ -87,38 +73,11 @@ const AdminPanel = {
                     <div>
                         <div class="card">
                             <div class="flex-between" style="margin-bottom: 1.5rem;">
-                                <h3>Upcoming Events</h3>
+                                <h3>Active Upcoming Events</h3>
                                 <i class="fas fa-ellipsis-h" style="color: var(--text-muted);"></i>
                             </div>
-                            <div style="display: flex; flex-direction: column; gap: 1rem;">
-                                <div style="display: flex; gap: 1rem; align-items: flex-start;">
-                                    <div style="background: #eff6ff; padding: 0.5rem; border-radius: 8px; text-align: center; min-width: 60px;">
-                                        <div style="text-transform: uppercase; font-size: 0.75rem; font-weight: 700; color: var(--primary);">Oct</div>
-                                        <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">24</div>
-                                    </div>
-                                    <div style="flex: 1;">
-                                        <p style="font-size: 0.9rem; font-weight: 700;">Youth Festival 2024</p>
-                                        <p style="font-size: 0.8rem; color: var(--text-muted);">Shivaji University Main Campus</p>
-                                        <div class="flex-between" style="margin-top: 0.5rem;">
-                                            <span style="font-size: 0.75rem; color: var(--text-muted);"><i class="fas fa-users"></i> 450 REG.</span>
-                                            <a href="#" style="font-size: 0.75rem; font-weight: 700; color: var(--primary); text-decoration: none;">View Details</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div style="display: flex; gap: 1rem; align-items: flex-start;">
-                                    <div style="background: #f5f3ff; padding: 0.5rem; border-radius: 8px; text-align: center; min-width: 60px;">
-                                        <div style="text-transform: uppercase; font-size: 0.75rem; font-weight: 700; color: #8b5cf6;">Nov</div>
-                                        <div style="font-size: 1.25rem; font-weight: 800; color: #8b5cf6;">02</div>
-                                    </div>
-                                    <div style="flex: 1;">
-                                        <p style="font-size: 0.9rem; font-weight: 700;">Robo-War Championship</p>
-                                        <p style="font-size: 0.8rem; color: var(--text-muted);">Willingdon College, Sangli</p>
-                                        <div class="flex-between" style="margin-top: 0.5rem;">
-                                            <span style="font-size: 0.75rem; color: var(--text-muted);"><i class="fas fa-users"></i> 120 REG.</span>
-                                            <a href="#" style="font-size: 0.75rem; font-weight: 700; color: var(--primary); text-decoration: none;">View Details</a>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div id="upcoming-events-list" style="display: flex; flex-direction: column; gap: 1rem;">
+                                <p style="color: var(--text-muted);">Loading events...</p>
                             </div>
                             <button class="btn-primary" style="width: 100%; margin-top: 2rem; background: white; color: var(--text-main); border: 1px solid var(--border-color);">View Calendar</button>
                         </div>
@@ -132,35 +91,56 @@ const AdminPanel = {
                 </div>
             </div>
         `,
-        approvals: `
+        onboarding: `
             <div class="animate-slide">
-                <h1 style="margin-bottom: 2rem;">College Approvals</h1>
+                <div class="flex-between" style="margin-bottom: 2rem;">
+                    <div>
+                        <h1>Add & Onboard Colleges</h1>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">View registered colleges and perform bulk onboarding via Excel</p>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <input type="file" id="bulkExcelUpload" accept=".xlsx, .xls" style="display: none;">
+                        <button class="btn-primary" onclick="document.getElementById('bulkExcelUpload').click()">
+                            <i class="fas fa-file-excel"></i> Bulk Upload Colleges
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Onboarding Confirmation Modal -->
+                <div id="onboardingModal" class="modal-overlay">
+                    <div class="modal-content">
+                        <div style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"><i class="fas fa-file-import"></i></div>
+                        <h2>Confirm Upload</h2>
+                        <p id="onboardingFileInfo">Are you sure you want to onboard colleges from this file?</p>
+                        <div class="modal-actions">
+                            <button class="btn-primary" style="background: var(--text-muted);" onclick="document.getElementById('onboardingModal').style.display='none'">Cancel</button>
+                            <button class="btn-primary" id="confirmOnboardingBtn">Submit & Send Emails</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card">
-                    <div class="card-header">
-                        <h3>Pending Applications</h3>
+                    <div class="flex-between" style="margin-bottom: 1.5rem;">
+                        <h3>Registered Colleges & Coordinators</h3>
+                        <div class="search-box" style="width: 300px;">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Filter colleges...">
+                        </div>
                     </div>
                     <div class="data-table-wrapper">
                         <table class="data-table">
                             <thead>
                                 <tr>
+                                    <th>College Code</th>
                                     <th>College Name</th>
-                                    <th>District</th>
                                     <th>Coordinator</th>
-                                    <th>Applied Date</th>
-                                    <th>Actions</th>
+                                    <th>Email</th>
+                                    <th>City/District</th>
+                                    <th>Status</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>Shivaji Science Institute</strong></td>
-                                    <td><span class="district-badge district-kolhapur">Kolhapur</span></td>
-                                    <td>Dr. A. B. Deshpande</td>
-                                    <td>Oct 12, 2024</td>
-                                    <td class="action-btns">
-                                        <button class="btn-primary" style="background: var(--secondary);">Approve</button>
-                                        <button class="btn-primary" style="background: var(--danger);">Reject</button>
-                                    </td>
-                                </tr>
+                            <tbody id="registered-colleges-body">
+                                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Loading colleges...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -440,6 +420,11 @@ const AdminPanel = {
     init() {
         this.render();
         this.setupEventListeners();
+        if (this.currentPage === 'dashboard') {
+            this.loadDashboardData();
+        } else if (this.currentPage === 'onboarding') {
+            this.loadOnboardingData();
+        }
         console.log("Admin Panel Initialized");
     },
 
@@ -454,6 +439,182 @@ const AdminPanel = {
                 link.classList.add('active');
             }
         });
+
+        if (pageId === 'dashboard') {
+            this.loadDashboardData();
+        } else if (pageId === 'onboarding') {
+            this.loadOnboardingData();
+        }
+    },
+
+    getAuthHeaders() {
+        const token = localStorage.getItem('token');
+        return {
+            'Authorization': token ? `Bearer ${token}` : ''
+        };
+    },
+
+    async loadOnboardingData() {
+        try {
+            const res = await fetch('/api/admin/colleges/registered', {
+                headers: this.getAuthHeaders()
+            });
+            if (res.ok) {
+                const colleges = await res.json();
+                const tbody = document.getElementById('registered-colleges-body');
+                if (tbody) {
+                    if (colleges.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No colleges registered yet.</td></tr>`;
+                    } else {
+                        tbody.innerHTML = colleges.map(c => `
+                            <tr>
+                                <td><code>${c.collegeCode}</code></td>
+                                <td><strong>${c.collegeName}</strong></td>
+                                <td>${c.coordinatorName}</td>
+                                <td>${c.email}</td>
+                                <td>${c.city}, ${c.district}</td>
+                                <td><span class="status-badge status-active">● Registered</span></td>
+                            </tr>
+                        `).join('');
+                    }
+                }
+            }
+            
+            // Re-setup upload listener
+            const uploadInput = document.getElementById('bulkExcelUpload');
+            if (uploadInput) {
+                uploadInput.addEventListener('change', (e) => this.handleOnboardingUpload(e));
+            }
+        } catch (error) {
+            console.error("Error loading onboarding data:", error);
+        }
+    },
+
+    async handleOnboardingUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        // Store file reference
+        this.pendingOnboardingFile = file;
+
+        // Show modal
+        const modal = document.getElementById('onboardingModal');
+        const fileInfo = document.getElementById('onboardingFileInfo');
+        const confirmBtn = document.getElementById('confirmOnboardingBtn');
+
+        if (modal && fileInfo && confirmBtn) {
+            fileInfo.innerHTML = `File: <strong>${file.name}</strong><br><br>This will create college records and send login credentials to all coordinators listed in the sheet.`;
+            modal.style.display = 'flex';
+
+            // Reset listener
+            confirmBtn.onclick = () => this.submitBulkOnboarding();
+        }
+    },
+
+    async submitBulkOnboarding() {
+        const file = this.pendingOnboardingFile;
+        if (!file) return;
+
+        const modal = document.getElementById('onboardingModal');
+        const confirmBtn = document.getElementById('confirmOnboardingBtn');
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            confirmBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+            confirmBtn.disabled = true;
+
+            const res = await fetch('/api/admin/colleges/upload', {
+                method: 'POST',
+                headers: this.getAuthHeaders(),
+                body: formData
+            });
+
+            if (res.ok) {
+                const msg = await res.text();
+                alert(msg);
+                modal.style.display = 'none';
+                this.loadOnboardingData();
+            } else {
+                const err = await res.text();
+                alert("Upload failed: " + err);
+            }
+        } catch (error) {
+            console.error("Error uploading file:", error);
+            alert("Error uploading file: " + error.message);
+        } finally {
+            confirmBtn.innerHTML = `Submit & Send Emails`;
+            confirmBtn.disabled = false;
+            // Clear input
+            document.getElementById('bulkExcelUpload').value = '';
+        }
+    },
+
+    async loadDashboardData() {
+        try {
+            // Stats
+            const statsRes = await fetch('/api/admin/stats', {
+                headers: this.getAuthHeaders()
+            });
+            if (statsRes.ok) {
+                const stats = await statsRes.json();
+                document.getElementById('stat-colleges').textContent = stats.totalColleges || 0;
+                document.getElementById('stat-students').textContent = stats.totalStudents || 0;
+                document.getElementById('stat-upcoming').textContent = stats.upcomingEvents || 0;
+                document.getElementById('stat-past').textContent = stats.pastEvents || 0;
+                document.getElementById('stat-registrations').textContent = stats.totalRegistrations || 0;
+            }
+
+            // Upcoming Events
+            const eventsRes = await fetch('/api/admin/events/upcoming-active', {
+                headers: this.getAuthHeaders()
+            });
+            if (eventsRes.ok) {
+                const events = await eventsRes.json();
+                const eventsList = document.getElementById('upcoming-events-list');
+                if (eventsList) {
+                    if (events.length === 0) {
+                        eventsList.innerHTML = `<p style="font-size: 0.9rem; color: var(--text-muted);">No active upcoming events.</p>`;
+                    } else {
+                        eventsList.innerHTML = events.slice(0, 5).map(event => `
+                            <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                                <div style="background: #eff6ff; padding: 0.5rem; border-radius: 8px; text-align: center; min-width: 60px;">
+                                    <div style="text-transform: uppercase; font-size: 0.75rem; font-weight: 700; color: var(--primary);">${new Date(event.eventDate).toLocaleString('default', { month: 'short' })}</div>
+                                    <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">${new Date(event.eventDate).getDate()}</div>
+                                </div>
+                                <div style="flex: 1;">
+                                    <p style="font-size: 0.9rem; font-weight: 700;">${event.title}</p>
+                                    <p style="font-size: 0.8rem; color: var(--text-muted);">${event.college ? event.college.name : 'University'}</p>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                }
+            }
+
+            // Recent Activities
+            const activitiesRes = await fetch('/api/admin/recent-activities', {
+                headers: this.getAuthHeaders()
+            });
+            if (activitiesRes.ok) {
+                const activities = await activitiesRes.json();
+                const activityList = document.getElementById('activity-list');
+                if (activityList) {
+                    activityList.innerHTML = activities.slice(0, 6).map(activity => `
+                        <div class="recent-activity-item">
+                            <span style="font-size: 0.8rem; color: var(--text-muted); width: 80px;">${new Date(activity.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                            <div style="flex: 1;">
+                                <p style="font-size: 0.9rem; font-weight: 600;">${activity.action}</p>
+                                <small style="color: var(--text-muted);">${activity.details}</small>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+
+        } catch (error) {
+            console.error("Error loading dashboard data:", error);
+        }
     },
 
     render() {
