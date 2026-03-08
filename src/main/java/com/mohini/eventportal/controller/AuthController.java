@@ -56,11 +56,19 @@ public class AuthController {
 
         User user = userRepository.findByUsername(userDetails.getUsername()).get();
 
+        Long collegeId = user.getCollege() != null ? user.getCollege().getId() : null;
+        String collegeName = user.getCollege() != null ? user.getCollege().getName() : null;
+
         return ResponseEntity.ok(new JwtResponse(jwt,
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),
-                roles));
+                roles,
+                user.getFullName(),
+                user.getPhone(),
+                user.getDistrict(),
+                collegeId,
+                collegeName));
     }
 
     @PostMapping("/signup")

@@ -186,11 +186,13 @@ body {
     gap: 1rem;
     box-shadow: var(--shadow-sm);
     transition: var(--transition);
+    cursor: pointer;
 }
 
 .stat-card:hover {
     transform: translateY(-5px);
     box-shadow: var(--shadow-md);
+    border-color: var(--primary);
 }
 
 .stat-icon {
@@ -298,4 +300,27 @@ body {
 
 .animate-slide {
     animation: slideIn 0.4s ease forwards;
+}
+
+/* Checkbox and Form Builder Styles */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: var(--transition);
+}
+
+.checkbox-container:hover {
+    background: var(--bg-main);
+}
+
+.checkbox-container input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+    cursor: pointer;
 }

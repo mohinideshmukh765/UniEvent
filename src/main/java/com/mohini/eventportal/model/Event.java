@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.time.LocalDateTime;
 
@@ -44,10 +45,12 @@ public class Event {
 
     private String posterPath;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "events"})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "college_id")
     private College college;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "password", "college"})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coordinator_id")
     private User coordinator;
