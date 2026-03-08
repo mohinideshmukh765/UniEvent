@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Moderation | UniEvent Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="light-theme">
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <a href="/" class="logo">UniEvent</a>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="approvals.html" class="nav-item"><i class="fas fa-check-double"></i> College Approvals</a>
+                <a href="colleges.html" class="nav-item"><i class="fas fa-university"></i> Manage Colleges</a>
+                <a href="coordinators.html" class="nav-item"><i class="fas fa-user-tie"></i> Coordinators</a>
+                <a href="events.html" class="nav-item"><i class="fas fa-calendar-star"></i> Event Moderation</a>
+                <a href="categories.html" class="nav-item"><i class="fas fa-tags"></i> Categories</a>
+                <a href="students.html" class="nav-item"><i class="fas fa-user-graduate"></i> Students</a>
+                <a href="registrations.html" class="nav-item"><i class="fas fa-ticket-alt"></i> Registrations</a>
+                <a href="posts.html" class="nav-item active"><i class="fas fa-image"></i> Post Moderation</a>
+                <a href="analytics.html" class="nav-item"><i class="fas fa-chart-bar"></i> Analytics</a>
+                <a href="notifications.html" class="nav-item"><i class="fas fa-paper-plane"></i> Notifications</a>
+                <a href="reports.html" class="nav-item"><i class="fas fa-file-pdf"></i> Reports</a>
+                <a href="logs.html" class="nav-item"><i class="fas fa-history"></i> Activity Logs</a>
+                <a href="settings.html" class="nav-item"><i class="fas fa-sliders-h"></i> Settings</a>
+                <a href="ai-insights.html" class="nav-item"><i class="fas fa-brain"></i> AI Insights</a>
+            </nav>
+            <a href="#" id="logoutBtn" class="nav-item" style="margin-top: auto; color: #f87171;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-header">
+                <div>
+                    <h1>Event Post Moderation</h1>
+                    <p style="color: var(--admin-text-muted);">Review photos and highlights posted after events.</p>
+                </div>
+            </header>
+
+            <div class="admin-card">
+                <div class="card-header">
+                    <h3>Pending Review</h3>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-secondary">Approve All</button>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; padding: 1.5rem;">
+                    <div class="admin-card" style="padding: 1rem;">
+                        <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&q=80" style="width: 100%; height: 180px; object-fit: cover; border-radius: 12px; margin-bottom: 1rem;">
+                        <div style="font-weight: 700;">Winners of Tech-Fest 2024</div>
+                        <div style="font-size: 0.8rem; color: var(--admin-text-muted); margin-bottom: 1rem;">Posted by: KIT College</div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-primary" style="flex: 1; font-size: 0.8rem;">Approve</button>
+                            <button class="btn btn-secondary" style="flex: 1; font-size: 0.8rem; color: #ef4444;">Delete</button>
+                        </div>
+                    </div>
+                    <div class="admin-card" style="padding: 1rem;">
+                        <img src="https://images.unsplash.com/photo-1514525253344-7814d2e99a27?w=400&q=80" style="width: 100%; height: 180px; object-fit: cover; border-radius: 12px; margin-bottom: 1rem;">
+                        <div style="font-weight: 700;">Inauguration Ceremony</div>
+                        <div style="font-size: 0.8rem; color: var(--admin-text-muted); margin-bottom: 1rem;">Posted by: Walchand College</div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-primary" style="flex: 1; font-size: 0.8rem;">Approve</button>
+                            <button class="btn btn-secondary" style="flex: 1; font-size: 0.8rem; color: #ef4444;">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="/js/admin-shared.js"></script>
+</body>
+</html>
