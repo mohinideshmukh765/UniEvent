@@ -44,9 +44,8 @@ public class User {
 
     private String district;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "college_id")
-    private College college;
+    @Column(name = "college_id")
+    private String collegeId;
 
     @Builder.Default
     private boolean enabled = true;
@@ -59,6 +58,6 @@ public class User {
     }
 
     public enum Role {
-        ADMIN, COORDINATOR, STUDENT
+        ADMIN, STUDENT
     }
 }

@@ -18,6 +18,6 @@ public class PublicController {
 
     @GetMapping("/colleges")
     public List<College> getAllApprovedColleges() {
-        return collegeRepository.findByStatus(College.CollegeStatus.APPROVED);
+        return collegeRepository.findByEnabled(true);
     }
 }

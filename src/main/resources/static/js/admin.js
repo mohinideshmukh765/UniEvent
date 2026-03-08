@@ -119,6 +119,25 @@ const AdminPanel = {
                     </div>
                 </div>
 
+                <!-- Deactivation Confirmation Modal -->
+                <div id="deactivateModal" class="modal-overlay">
+                    <div class="modal-content" style="max-width: 400px; text-align: left;">
+                        <div style="font-size: 2.5rem; color: var(--danger); margin-bottom: 1rem; text-align: center;"><i class="fas fa-exclamation-triangle"></i></div>
+                        <h2 style="text-align: center;">Deactivate College?</h2>
+                        <p id="deactivateMessage" style="color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.5;"></p>
+                        
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 0.5rem;">Type college name in CAPITAL to confirm:</label>
+                            <input type="text" id="deactivateConfirmInput" class="form-input" placeholder="COLLEGE NAME" style="width: 100%; text-transform: uppercase; padding: 0.8rem; border: 2px solid var(--border-color); border-radius: 8px;">
+                        </div>
+
+                        <div class="modal-actions" style="justify-content: space-between;">
+                            <button class="btn-primary" style="background: #e2e8f0; color: var(--text-main); border: none;" onclick="document.getElementById('deactivateModal').style.display='none'">Cancel</button>
+                            <button class="btn-primary" id="finalDeactivateBtn" style="background: var(--danger); opacity: 0.5; cursor: not-allowed;" disabled>Deactivate Now</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card">
                     <div class="flex-between" style="margin-bottom: 1.5rem;">
                         <h3>Registered Colleges & Coordinators</h3>
@@ -136,7 +155,7 @@ const AdminPanel = {
                                     <th>Coordinator</th>
                                     <th>Email</th>
                                     <th>City/District</th>
-                                    <th>Status</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="registered-colleges-body">
@@ -144,118 +163,6 @@ const AdminPanel = {
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </div>
-        `,
-        colleges: `
-            <div class="animate-slide">
-                <div class="flex-between" style="margin-bottom: 2rem;">
-                    <div>
-                        <h1>Colleges Directory</h1>
-                        <p style="color: var(--text-muted); font-size: 0.9rem;">Manage and monitor affiliated institutions across districts</p>
-                    </div>
-                    <button class="btn-primary"><i class="fas fa-plus"></i> Add New College</button>
-                </div>
-                
-                <div class="card">
-                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
-                        <div class="search-box">
-                            <i class="fas fa-search"></i>
-                            <input type="text" placeholder="Search by name, code or location...">
-                        </div>
-                        <select style="padding: 0.6rem 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
-                            <option>All Districts</option>
-                            <option>Kolhapur</option>
-                            <option>Sangli</option>
-                            <option>Satara</option>
-                        </select>
-                        <select style="padding: 0.6rem 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
-                            <option>All Status</option>
-                            <option>Active</option>
-                            <option>Pending</option>
-                            <option>Disabled</option>
-                        </select>
-                    </div>
-
-                    <div class="data-table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>College Name</th>
-                                    <th>District</th>
-                                    <th>Coordinators</th>
-                                    <th>Total Events</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <div style="display: flex; gap: 1rem; align-items: center;">
-                                            <div style="width: 40px; height: 40px; background: #f1f5f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--primary);"><i class="fas fa-university"></i></div>
-                                            <div>
-                                                <div style="font-weight: 700;">Rajaram College</div>
-                                                <div style="font-size: 0.75rem; color: var(--text-muted);">Code: RC-2023</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>Kolhapur</td>
-                                    <td><div style="display: flex; gap: -10px;"><div style="width: 24px; height: 24px; border-radius: 50%; background: #fbbf24; border: 2px solid white;"></div><div style="width: 24px; height: 24px; border-radius: 50%; background: #f87171; border: 2px solid white; margin-left: -8px;"></div></div></td>
-                                    <td>42</td>
-                                    <td><span class="status-badge status-active">● Active</span></td>
-                                    <td class="action-btns">
-                                        <button style="border: none; background: none; color: var(--text-muted); cursor: pointer;"><i class="fas fa-edit"></i></button>
-                                        <button style="border: none; background: none; color: var(--text-muted); cursor: pointer;"><i class="fas fa-external-link-alt"></i></button>
-                                        <button style="border: none; background: none; color: var(--text-muted); cursor: pointer;"><i class="fas fa-ban"></i></button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <h3>Featured Institutions</h3>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 1.5rem;">
-                    <div class="card" style="padding: 0; overflow: hidden;">
-                        <div style="height: 100px; background: linear-gradient(to right, #4f46e5, #3b82f6);"></div>
-                        <div style="padding: 1.5rem; position: relative;">
-                            <div style="width: 60px; height: 60px; background: white; border-radius: 12px; position: absolute; top: -30px; box-shadow: var(--shadow-md); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--primary);"><i class="fas fa-university"></i></div>
-                            <div style="margin-top: 1.5rem;">
-                                <h4 style="font-weight: 800;">Shivaji Science Institute</h4>
-                                <p style="font-size: 0.8rem; color: var(--text-muted);"><i class="fas fa-map-marker-alt"></i> KOLHAPUR</p>
-                            </div>
-                            <div class="flex-between" style="margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
-                                <div><small style="color: var(--text-muted);">EVENTS</small><div style="font-weight: 800;">128</div></div>
-                                <div><small style="color: var(--text-muted);">RANK</small><div style="font-weight: 800;">#4</div></div>
-                                <span class="status-badge status-active">Active</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `,
-        coordinators: `
-            <div class="animate-slide">
-                <div class="flex-between" style="margin-bottom: 2rem;">
-                    <h1>Coordinator Management</h1>
-                    <button class="btn-primary"><i class="fas fa-plus"></i> Add Coordinator</button>
-                </div>
-                <div class="card">
-                    <table class="data-table">
-                        <thead><tr><th>Name</th><th>College</th><th>Email</th><th>Actions</th></tr></thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>Prof. Rahul Patil</strong></td>
-                                <td>KIT College</td>
-                                <td>rahul@kit.edu</td>
-                                <td class="action-btns">
-                                    <button class="btn-primary" style="background: var(--primary);">Reset Pass</button>
-                                    <button class="btn-primary" style="background: var(--danger);">Deactivate</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </div>
             </div>
         `,
@@ -280,35 +187,6 @@ const AdminPanel = {
                                     <button class="btn-primary" style="background: var(--danger);">Suspend</button>
                                 </td>
                             </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        `,
-        categories: `
-            <div class="animate-slide">
-                <div class="flex-between" style="margin-bottom: 2rem;">
-                    <h1>Event Categories</h1>
-                    <button class="btn-primary">Add Category</button>
-                </div>
-                <div class="card">
-                   <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
-                        <div class="card" style="text-align: center;"><h3>Technical</h3><p>45 Events</p></div>
-                        <div class="card" style="text-align: center;"><h3>Cultural</h3><p>32 Events</p></div>
-                        <div class="card" style="text-align: center;"><h3>Sports</h3><p>28 Events</p></div>
-                   </div>
-                </div>
-            </div>
-        `,
-        students: `
-            <div class="animate-slide">
-                <h1>Student Directory</h1>
-                <div class="card">
-                    <div class="search-box" style="margin-bottom: 1.5rem;"><i class="fas fa-search"></i><input type="text" placeholder="Search globally..."></div>
-                    <table class="data-table">
-                        <thead><tr><th>Name</th><th>College</th><th>District</th><th>Status</th></tr></thead>
-                        <tbody>
-                            <tr><td>Aryan Sharma</td><td>KIT College</td><td>Kolhapur</td><td><span class="status-badge status-active">Active</span></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -466,17 +344,39 @@ const AdminPanel = {
                     if (colleges.length === 0) {
                         tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No colleges registered yet.</td></tr>`;
                     } else {
-                        tbody.innerHTML = colleges.map(c => `
-                            <tr>
-                                <td><code>${c.collegeCode}</code></td>
-                                <td><strong>${c.collegeName}</strong></td>
-                                <td>${c.coordinatorName}</td>
-                                <td>${c.email}</td>
-                                <td>${c.city}, ${c.district}</td>
-                                <td><span class="status-badge status-active">● Registered</span></td>
-                            </tr>
-                        `).join('');
+                        tbody.innerHTML = colleges.map(c => {
+                            const statusLower = (c.status || '').toLowerCase();
+                            const isDeactivated = statusLower === 'disabled' || statusLower === 'deactivated' || statusLower === 'rejected';
+                            const actionText = isDeactivated ? 'Activate' : 'Deactivate';
+                            const actionIcon = isDeactivated ? 'fa-check-circle' : 'fa-ban';
+                            const actionColor = isDeactivated ? 'var(--primary)' : 'var(--danger)';
+                            const btnAction = isDeactivated ? 'activate' : 'deactivate';
+                            const statusLabel = statusLower === 'activated' ? '✅ Active' : statusLower === 'disabled' ? '🚫 Disabled' : (c.status || 'Unknown');
+                            
+                            return `
+                                <tr>
+                                    <td><code>${c.collegeCode}</code></td>
+                                    <td><strong>${c.collegeName}</strong></td>
+                                    <td>${c.coordinatorName}</td>
+                                    <td>${c.email}</td>
+                                    <td>${c.city}, ${c.district}</td>
+                                    <td>
+                                        <button class="btn-primary" style="background: ${actionColor}; font-size: 0.75rem; padding: 0.4rem 0.8rem;" 
+                                                onclick="AdminPanel.showToggleStatusModal('${c.collegeCode}', '${(c.collegeName || '').replace(/'/g, "\\'")}', '${btnAction}')">
+                                            <i class="fas ${actionIcon}"></i> ${actionText}
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('');
                     }
+                }
+            } else {
+                const errorText = await res.text();
+                console.error("Failed to load colleges:", errorText);
+                const tbody = document.getElementById('registered-colleges-body');
+                if (tbody) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: red;">Error loading colleges (${res.status}): ${errorText}</td></tr>`;
                 }
             }
             
@@ -548,6 +448,75 @@ const AdminPanel = {
             // Clear input
             document.getElementById('bulkExcelUpload').value = '';
         }
+    },
+
+    showToggleStatusModal(collegeCode, collegeName, action) {
+        const modal = document.getElementById('deactivateModal');
+        const message = document.getElementById('deactivateMessage');
+        const inputContainer = document.getElementById('deactivateConfirmInput').parentElement;
+        const input = document.getElementById('deactivateConfirmInput');
+        const confirmBtn = document.getElementById('finalDeactivateBtn');
+        const title = modal.querySelector('h2') || { innerHTML: '' };
+
+        if (!modal || !message || !input || !confirmBtn) return;
+
+        if (action === 'deactivate') {
+            title.innerHTML = '<i class="fas fa-ban" style="color: var(--danger);"></i> Deactivate College';
+            message.innerHTML = `This will deactivate <strong>${collegeName}</strong> and disable their coordinator account (<code>${collegeCode.toLowerCase()}</code>). The coordinator will no longer be able to login.`;
+            inputContainer.style.display = 'block';
+            input.value = '';
+            confirmBtn.innerHTML = 'Deactivate Now';
+            confirmBtn.style.background = 'var(--danger)';
+            confirmBtn.disabled = true;
+            confirmBtn.style.opacity = '0.5';
+            confirmBtn.style.cursor = 'not-allowed';
+
+            input.oninput = (e) => {
+                if (e.target.value.toUpperCase() === collegeName.toUpperCase()) {
+                    confirmBtn.disabled = false;
+                    confirmBtn.style.opacity = '1';
+                    confirmBtn.style.cursor = 'pointer';
+                } else {
+                    confirmBtn.disabled = true;
+                    confirmBtn.style.opacity = '0.5';
+                    confirmBtn.style.cursor = 'not-allowed';
+                }
+            };
+        } else {
+            title.innerHTML = '<i class="fas fa-check-circle" style="color: var(--primary);"></i> Activate College';
+            message.innerHTML = `This will re-activate <strong>${collegeName}</strong> and enable their coordinator account (<code>${collegeCode.toLowerCase()}</code>). They will be able to login again.`;
+            inputContainer.style.display = 'none';
+            confirmBtn.innerHTML = 'Activate Now';
+            confirmBtn.style.background = 'var(--primary)';
+            confirmBtn.disabled = false;
+            confirmBtn.style.opacity = '1';
+            confirmBtn.style.cursor = 'pointer';
+        }
+
+        modal.style.display = 'flex';
+
+        confirmBtn.onclick = async () => {
+            try {
+                const label = action === 'deactivate' ? 'Deactivating...' : 'Activating...';
+                confirmBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${label}`;
+                const res = await fetch(`/api/admin/colleges/${action}/${collegeCode}`, {
+                    method: 'POST',
+                    headers: this.getAuthHeaders()
+                });
+
+                if (res.ok) {
+                    alert(await res.text());
+                    modal.style.display = 'none';
+                    this.loadOnboardingData();
+                } else {
+                    alert(`Failed to ${action}: ` + await res.text());
+                }
+            } catch (error) {
+                alert("Error: " + error.message);
+            } finally {
+                confirmBtn.innerHTML = action === 'deactivate' ? 'Deactivate Now' : 'Activate Now';
+            }
+        };
     },
 
     async loadDashboardData() {

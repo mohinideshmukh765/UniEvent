@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -55,59 +56,71 @@ public class AdminController {
                 String email = data.getEmail();
                 String rawPassword = "CO-" + data.getCollegeCode();
 
-                // Skip if college already exists
-                if (collegeRepository.existsByCollegeCode(data.getCollegeCode())) {
-                    skipped++;
-                    continue;
+                // Use existing college if it exists, otherwise prepare to create new
+                com.mohini.eventportal.model.College college = collegeRepository.findByCollegeCode(data.getCollegeCode()).orElse(null);
+
+                // If both college and its coordinator (username) exist, skip
+                if (college == null) {
+                    // Check if username or email already exists for another COLLEGE
+                    if (collegeRepository.existsByUsername(username) || collegeRepository.existsByEmail(email)) {
+                        skipped++;
+                        log.append("College Username/Email already exists: ").append(username).append(" / ").append(email).append("\n");
+                        continue;
+                    }
+                } else {
+                    // College exists, check if it already has coordinator credentials
+                    if (college.getUsername() != null && !college.getUsername().isEmpty()) {
+                        skipped++;
+                        continue;
+                    }
                 }
 
-                // Check if username or email already exists for another user
-                if (userRepository.existsByUsername(username) || userRepository.existsByEmail(email)) {
-                    skipped++;
-                    log.append("User/Email already exists for skipped row: ").append(username).append(" / ").append(email).append("\n");
-                    continue;
-                }
-
-                // Create College
-                com.mohini.eventportal.model.College college = com.mohini.eventportal.model.College.builder()
-                        .collegeCode(data.getCollegeCode())
-                        .name(data.getCollegeName())
-                        .city(data.getCity())
-                        .district(data.getDistrict())
-                        .status(com.mohini.eventportal.model.College.CollegeStatus.APPROVED)
-                        .address("Bulk Uploaded")
-                        .build();
-                college = collegeRepository.save(college);
-
-                // Create Coordinator User
-                User coordinator = User.builder()
-                        .username(username)
-                        .email(email)
-                        .password(passwordEncoder.encode(rawPassword))
-                        .fullName(data.getCoordinatorName())
-                        .phone(data.getPhone())
-                        .role(User.Role.COORDINATOR)
-                        .college(college)
-                        .enabled(true)
-                        .build();
-                userRepository.save(coordinator);
-
-                // Send Email
+                // ATOMIC OPERATION: Try sending email BEFORE saving to DB
                 try {
                     emailService.sendCoordinatorCredentials(email, data.getCoordinatorName(), username, rawPassword);
                 } catch (Exception e) {
                     emailFailures++;
                     log.append("Email failed for ").append(email).append(": ").append(e.getMessage()).append("\n");
-                    System.err.println("Email failed for " + email + ": " + e.getMessage());
+                    continue; // Skip if email fails
                 }
 
-                count++;
+                // If email succeeded, try saving to DB
+                try {
+                    if (college == null) {
+                        college = com.mohini.eventportal.model.College.builder()
+                                .collegeCode(data.getCollegeCode())
+                                .collegeName(data.getCollegeName())
+                                .coordinatorName(data.getCoordinatorName())
+                                .email(email)
+                                .phone(data.getPhone())
+                                .username(username)
+                                .password(passwordEncoder.encode(rawPassword))
+                                .city(data.getCity())
+                                .district(data.getDistrict())
+                                .enabled(true)
+                                .build();
+                    } else {
+                        // Update existing college with coordinator credentials
+                        college.setCoordinatorName(data.getCoordinatorName());
+                        college.setEmail(email);
+                        college.setPhone(data.getPhone());
+                        college.setUsername(username);
+                        college.setPassword(passwordEncoder.encode(rawPassword));
+                        college.setEnabled(true);
+                    }
+                    collegeRepository.save(college);
+                    count++;
+                } catch (Exception e) {
+                    skipped++;
+                    log.append("DB Save failed for row ").append(username).append(": ").append(e.getMessage()).append("\n");
+                    System.err.println("DB Save failed: " + e.getMessage());
+                }
             }
 
-            String result = String.format("Onboarding Complete: %d added, %d skipped (duplicates), %d email failures.", 
+            String result = String.format("Onboarding Complete: %d added successfully, %d skipped, %d email failures (not added).", 
                                          count, skipped, emailFailures);
-            if (emailFailures > 0) {
-                result += "\n\nErrors:\n" + log.toString();
+            if (emailFailures > 0 || skipped > 0) {
+                result += "\n\nDetails:\n" + log.toString();
             }
             return ResponseEntity.ok(result);
         } catch (Exception e) {
@@ -116,22 +129,68 @@ public class AdminController {
         }
     }
 
+    @PostMapping("/colleges/deactivate/{collegeCode}")
+    public ResponseEntity<?> deactivateCollege(@PathVariable("collegeCode") String collegeCode) {
+        try {
+            return collegeRepository.findById(collegeCode).map(college -> {
+                college.setEnabled(false);
+                collegeRepository.save(college);
+                return ResponseEntity.ok("College " + college.getCollegeName() + " has been deactivated.");
+            }).orElse(ResponseEntity.badRequest().body("College not found in database with code: '" + collegeCode + "'"));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("DB Error: " + e.getMessage() + (e.getCause() != null ? " | Cause: " + e.getCause().getMessage() : ""));
+        }
+    }
+
+    @PostMapping("/colleges/activate/{collegeCode}")
+    public ResponseEntity<?> activateCollege(@PathVariable("collegeCode") String collegeCode) {
+        try {
+            return collegeRepository.findById(collegeCode).map(college -> {
+                college.setEnabled(true);
+                collegeRepository.save(college);
+                return ResponseEntity.ok("College " + college.getCollegeName() + " has been activated.");
+            }).orElse(ResponseEntity.badRequest().body("College not found in database with code: '" + collegeCode + "'"));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("DB Error: " + e.getMessage() + (e.getCause() != null ? " | Cause: " + e.getCause().getMessage() : ""));
+        }
+    }
+
     @GetMapping("/colleges/registered")
     public ResponseEntity<?> getRegisteredColleges() {
-        return ResponseEntity.ok(userRepository.findAll().stream()
-                .filter(u -> u.getRole() == User.Role.COORDINATOR)
-                .map(u -> {
+        java.util.List<com.mohini.eventportal.model.College> colleges = collegeRepository.findAll();
+        
+        System.out.println("DEBUG: Found " + colleges.size() + " colleges in DB.");
+        
+        return ResponseEntity.ok(colleges.stream()
+                .map(c -> {
                     Map<String, Object> map = new HashMap<>();
-                    map.put("collegeName", u.getCollege().getName());
-                    map.put("collegeCode", u.getCollege().getCollegeCode());
-                    map.put("coordinatorName", u.getFullName());
-                    map.put("email", u.getEmail());
-                    map.put("phone", u.getPhone());
-                    map.put("district", u.getCollege().getDistrict());
-                    map.put("city", u.getCollege().getCity());
+                    map.put("id", c.getCollegeCode()); // use collegeCode as id
+                    map.put("name", c.getCollegeName()); // frontend uses .name
+                    map.put("collegeName", c.getCollegeName()); // keep for backward compatibility
+                    map.put("collegeCode", c.getCollegeCode());
+                    map.put("district", c.getDistrict());
+                    map.put("city", c.getCity());
+                    map.put("status", Boolean.TRUE.equals(c.getEnabled()) ? "activated" : "disabled");
+                    map.put("coordinatorName", c.getCoordinatorName() != null ? c.getCoordinatorName() : "Not Onboarded");
+                    map.put("email", c.getEmail() != null ? c.getEmail() : "N/A");
+                    map.put("phone", c.getPhone() != null ? c.getPhone() : "N/A");
+                    map.put("username", c.getUsername());
                     return map;
                 })
-                .collect(java.util.stream.Collectors.toList()));
+                .collect(Collectors.toList()));
+    }
+
+    @GetMapping("/debug/all-users")
+    public ResponseEntity<?> getAllUsersDebug() {
+        return ResponseEntity.ok(userRepository.findAll().stream()
+                .map(u -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("username", u.getUsername());
+                    map.put("email", u.getEmail());
+                    map.put("role", u.getRole() != null ? u.getRole().toString() : "null");
+                    return map;
+                })
+                .collect(Collectors.toList()));
     }
 
     @GetMapping("/stats")
@@ -149,10 +208,11 @@ public class AdminController {
 
     @GetMapping("/events/upcoming-active")
     public ResponseEntity<?> getUpcomingActiveEvents() {
-        return ResponseEntity.ok(eventRepository.findByStatusAndEventDateAfter(
-            com.mohini.eventportal.model.Event.EventStatus.PUBLISHED, 
-            java.time.LocalDateTime.now()
-        ));
+        return ResponseEntity.ok(eventRepository.findByStatus(
+            com.mohini.eventportal.model.Event.EventStatus.PUBLISHED
+        ).stream()
+        .filter(e -> e.getEventDate().isAfter(java.time.LocalDateTime.now()))
+        .collect(Collectors.toList()));
     }
 
     @GetMapping("/recent-activities")
@@ -165,20 +225,13 @@ public class AdminController {
         return ResponseEntity.ok(collegeRepository.findAll());
     }
 
-    @PostMapping("/colleges/{id}/status")
-    public ResponseEntity<?> updateCollegeStatus(@PathVariable Long id, @RequestParam com.mohini.eventportal.model.College.CollegeStatus status) {
-        return collegeRepository.findById(id).map(college -> {
-            college.setStatus(status);
+    @PostMapping("/colleges/{collegeCode}/status")
+    public ResponseEntity<?> updateCollegeStatus(@PathVariable("collegeCode") String collegeCode, @RequestParam("status") String status) {
+        return collegeRepository.findById(collegeCode).map(college -> {
+            college.setEnabled(status.equalsIgnoreCase("activated") || status.equalsIgnoreCase("approved"));
             collegeRepository.save(college);
             return ResponseEntity.ok("Status updated successfully");
         }).orElse(ResponseEntity.notFound().build());
-    }
-
-    @GetMapping("/students")
-    public ResponseEntity<?> getAllStudents() {
-        return ResponseEntity.ok(userRepository.findAll().stream()
-                .filter(u -> u.getRole() == User.Role.STUDENT)
-                .collect(java.util.stream.Collectors.toList()));
     }
 
     @GetMapping("/events")
@@ -187,7 +240,7 @@ public class AdminController {
     }
 
     @PostMapping("/events/{id}/status")
-    public ResponseEntity<?> updateEventStatus(@PathVariable Long id, @RequestParam com.mohini.eventportal.model.Event.EventStatus status) {
+    public ResponseEntity<?> updateEventStatus(@PathVariable("id") Long id, @RequestParam("status") com.mohini.eventportal.model.Event.EventStatus status) {
         return eventRepository.findById(id).map(event -> {
             event.setStatus(status);
             eventRepository.save(event);
