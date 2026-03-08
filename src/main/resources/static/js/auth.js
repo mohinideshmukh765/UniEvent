@@ -27,8 +27,8 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
             // Redirect based on role
             const role = data.roles[0];
             setTimeout(() => {
-                if (role === 'ROLE_ADMIN') window.location.href = '/admin/dashboard.html';
-                else if (role === 'ROLE_COORDINATOR') window.location.href = '/coordinator/dashboard.html';
+                if (role === 'ROLE_ADMIN') window.location.href = '/admin/index.html';
+                else if (role === 'ROLE_COORDINATOR') window.location.href = '/coordinator/index.html';
                 else window.location.href = '/student/dashboard.html';
             }, 1000);
         } else {

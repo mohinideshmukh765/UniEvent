@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | UniEvent</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/coordinator.css"> <!-- Reuse layout bases -->
+    <link rel="stylesheet" href="/css/admin.css"> <!-- Admin specifics -->
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" style="border-right-color: var(--primary-light);">
+        <a href="#" class="sidebar-logo" style="color: var(--primary);">
+            <i class="fas fa-shield-alt"></i>
+            <span>UniEvent Admin</span>
+        </a>
+        
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="#" class="nav-link active" data-page="dashboard">
+                    <i class="fas fa-chart-pie"></i> <span>System Overview</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-page="colleges">
+                    <i class="fas fa-university"></i> <span>College Management</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-page="students">
+                    <i class="fas fa-user-graduate"></i> <span>Student Directory</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-page="events">
+                    <i class="fas fa-calendar-check"></i> <span>Event Moderation</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-page="settings">
+                    <i class="fas fa-cogs"></i> <span>Settings</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer" style="padding-top: 2rem; border-top: 1px solid var(--border-color);">
+            <button id="logoutBtn" class="nav-link" style="width: 100%; border: none; background: none; cursor: pointer; color: #ef4444;">
+                <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-wrapper">
+        <header class="topbar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search colleges, events, student records...">
+            </div>
+            
+            <div class="user-profile">
+                <div class="user-info">
+                    <span class="user-name">System Administrator</span>
+                    <span class="user-role">Super Admin</span>
+                </div>
+                <div class="avatar" style="background: var(--primary-light); display: flex; align-items: center; justify-content: center; color: var(--primary-dark); font-weight: bold;">
+                    SA
+                </div>
+            </div>
+        </header>
+
+        <section id="contentArea" class="content-body">
+            <!-- Dynamic content injected here -->
+            <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                <p>Loading Admin Portal...</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Core Script -->
+    <script src="/js/admin.js"></script>
+</body>
+</html>
