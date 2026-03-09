@@ -19,7 +19,4 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     long countByEventDateBefore(java.time.LocalDateTime date);
     List<Event> findByStatusAndEventDateAfter(Event.EventStatus status, java.time.LocalDateTime date);
 
-    List<Event> findByCoordinatorId(Long coordinatorId);
-    long countByCoordinatorId(Long coordinatorId);
-    long countByCoordinatorIdAndStatus(Long coordinatorId, Event.EventStatus status);
 }

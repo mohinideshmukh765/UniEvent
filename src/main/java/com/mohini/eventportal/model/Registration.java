@@ -30,11 +30,18 @@ public class Registration {
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
-    private RegistrationStatus status = RegistrationStatus.REGISTERED;
+    private RegistrationStatus status = RegistrationStatus.PENDING;
 
     private String registrationId; // Unique reference
 
     private LocalDateTime registrationDate;
+
+    // UPI ID used by the team leader for payment
+    private String upiId;
+
+    // JSON string: list of { username, name, email, college, branch, year } for all team members
+    @Column(columnDefinition = "TEXT")
+    private String teamMembersJson;
 
     @PrePersist
     protected void onCreate() {
@@ -45,6 +52,6 @@ public class Registration {
     }
 
     public enum RegistrationStatus {
-        REGISTERED, APPROVED, WAITLISTED, COMPLETED, REJECTED, CANCELLED
+        PENDING, REGISTERED, APPROVED, WAITLISTED, COMPLETED, REJECTED, CANCELLED
     }
 }

@@ -14,4 +14,5 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
     
     long countByEventCollegeCollegeCode(String collegeCode);
     List<Registration> findByEventCollegeCollegeCode(String collegeCode);
+    List<Registration> findByEventCollegeCollegeCodeAndStatus(String collegeCode, Registration.RegistrationStatus status);
 }

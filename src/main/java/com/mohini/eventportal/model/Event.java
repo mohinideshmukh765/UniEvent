@@ -33,6 +33,9 @@ public class Event {
     @NotBlank
     private String category;
 
+    @NotBlank
+    private String organizedBy;
+
     @NotNull
     private LocalDateTime eventDate;
 
@@ -40,6 +43,12 @@ public class Event {
     private String venue;
 
     private int maxParticipants;
+
+    private int minParticipants;
+
+    private double feePerPerson;
+
+    private String qrCodePath; // Path to UPI QR code image
 
     private LocalDateTime registrationDeadline;
 

@@ -1,6 +1,7 @@
 package com.mohini.eventportal.controller;
 
 import com.mohini.eventportal.model.Event;
+import com.mohini.eventportal.repository.NotificationRepository;
 import com.mohini.eventportal.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -8,7 +9,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.util.Map;
 import java.util.Optional;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -30,6 +34,9 @@ public class CoordinatorController {
 
     @Autowired
     PostRepository postRepository;
+
+    @Autowired
+    NotificationRepository notificationRepository;
 
     @GetMapping("/stats")
     @PreAuthorize("hasRole('COORDINATOR')")
@@ -64,6 +71,58 @@ public class CoordinatorController {
         return ResponseEntity.ok(registrationRepository.findByEventCollegeCollegeCode(college.getCollegeCode()));
     }
 
+    @GetMapping("/registrations/pending")
+    @PreAuthorize("hasRole('COORDINATOR')")
+    public ResponseEntity<?> getPendingRegistrations() {
+        com.mohini.eventportal.model.College college = getCurrentCollege();
+        if (college == null) return ResponseEntity.ok(java.util.Collections.emptyList());
+        return ResponseEntity.ok(
+            registrationRepository.findByEventCollegeCollegeCodeAndStatus(
+                college.getCollegeCode(),
+                com.mohini.eventportal.model.Registration.RegistrationStatus.PENDING
+            )
+        );
+    }
+
+    @PostMapping("/registrations/{id}/approve")
+    @PreAuthorize("hasRole('COORDINATOR')")
+    public ResponseEntity<?> approveRegistration(@PathVariable Long id) {
+        return updateRegistrationStatus(id, com.mohini.eventportal.model.Registration.RegistrationStatus.APPROVED);
+    }
+
+    @PostMapping("/registrations/{id}/reject")
+    @PreAuthorize("hasRole('COORDINATOR')")
+    public ResponseEntity<?> rejectRegistration(@PathVariable Long id) {
+        return updateRegistrationStatus(id, com.mohini.eventportal.model.Registration.RegistrationStatus.REJECTED);
+    }
+
+    private ResponseEntity<?> updateRegistrationStatus(Long id, com.mohini.eventportal.model.Registration.RegistrationStatus newStatus) {
+        com.mohini.eventportal.model.College college = getCurrentCollege();
+        if (college == null) return ResponseEntity.badRequest().body("Coordinator not found");
+
+        Optional<com.mohini.eventportal.model.Registration> opt = registrationRepository.findById(id);
+        if (!opt.isPresent()) return ResponseEntity.badRequest().body("Registration not found");
+
+        com.mohini.eventportal.model.Registration reg = opt.get();
+        if (!reg.getEvent().getCollege().getCollegeCode().equals(college.getCollegeCode())) {
+            return ResponseEntity.status(403).body("Unauthorized");
+        }
+        reg.setStatus(newStatus);
+        registrationRepository.save(reg);
+        return ResponseEntity.ok(Map.of("status", newStatus.name()));
+    }
+
+    @GetMapping("/notifications")
+    @PreAuthorize("hasRole('COORDINATOR')")
+    public ResponseEntity<?> getNotifications() {
+        com.mohini.eventportal.model.College college = getCurrentCollege();
+        if (college == null) return ResponseEntity.ok(java.util.Collections.emptyList());
+        // Return notifications targeted at this college
+        return ResponseEntity.ok(
+            notificationRepository.findByTargetAudienceContainingOrderBySentAtDesc("COLLEGE:" + college.getCollegeCode())
+        );
+    }
+
     @GetMapping("/posts")
     public ResponseEntity<?> getPosts() {
         return ResponseEntity.ok(postRepository.findAllByOrderByCreatedAtDesc());
@@ -79,9 +138,12 @@ public class CoordinatorController {
                 .title(eventData.getTitle())
                 .description(eventData.getDescription())
                 .category(eventData.getCategory())
+                .organizedBy(eventData.getOrganizedBy())
                 .eventDate(eventData.getEventDate())
                 .venue(eventData.getVenue())
+                .minParticipants(eventData.getMinParticipants())
                 .maxParticipants(eventData.getMaxParticipants())
+                .feePerPerson(eventData.getFeePerPerson())
                 .registrationDeadline(eventData.getRegistrationDeadline())
                 .college(college)
                 .status(Event.EventStatus.PUBLISHED)
@@ -89,6 +151,35 @@ public class CoordinatorController {
 
         Event saved = eventRepository.save(event);
         return ResponseEntity.ok(saved);
+    }
+
+    @PostMapping("/events/{eventId}/qr")
+    @PreAuthorize("hasRole('COORDINATOR')")
+    public ResponseEntity<?> uploadQrCode(@PathVariable Long eventId, @RequestParam("qr") MultipartFile qrFile) {
+        com.mohini.eventportal.model.College college = getCurrentCollege();
+        if (college == null) return ResponseEntity.badRequest().body("Coordinator not found");
+
+        Optional<Event> optEvent = eventRepository.findById(eventId);
+        if (!optEvent.isPresent()) return ResponseEntity.badRequest().body("Event not found");
+
+        Event event = optEvent.get();
+        if (!event.getCollege().getCollegeCode().equals(college.getCollegeCode())) {
+            return ResponseEntity.status(403).body("Unauthorized");
+        }
+
+        try {
+            File uploadDir = new File("uploads/qr");
+            uploadDir.mkdirs();
+            String filename = eventId + "_" + System.currentTimeMillis() + "_" + qrFile.getOriginalFilename();
+            File dest = new File(uploadDir, filename);
+            qrFile.transferTo(dest);
+            String path = "/uploads/qr/" + filename;
+            event.setQrCodePath(path);
+            eventRepository.save(event);
+            return ResponseEntity.ok(Map.of("qrCodePath", path));
+        } catch (Exception ex) {
+            return ResponseEntity.status(500).body("Failed to upload QR: " + ex.getMessage());
+        }
     }
 
     @PostMapping("/posts")

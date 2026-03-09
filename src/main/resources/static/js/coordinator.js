@@ -70,7 +70,11 @@ const CoordinatorPanel = {
                     <form id="createEventForm" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;" onsubmit="CoordinatorPanel.submitEvent(event)">
                         <div style="grid-column: span 2;">
                             <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Event Title *</label>
-                            <input id="evTitle" type="text" required placeholder="e.g., National Level Robotics Workshop" style="width: 100%; padding: 0.75rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                            <input id="evTitle" type="text" required placeholder="e.g., National Level Robotics Workshop" style="width: 100%; padding: 0.75rem; border-radius: 12px; border: 1px solid var(--border-color);" oninput="CoordinatorPanel.updateFormPreview()">
+                        </div>
+                        <div style="grid-column: span 2;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Organized By *</label>
+                            <input id="evOrganizedBy" type="text" required placeholder="e.g., Computer Science Department" style="width: 100%; padding: 0.75rem; border-radius: 12px; border: 1px solid var(--border-color);" oninput="CoordinatorPanel.updateFormPreview()">
                         </div>
                         <div>
                             <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Event Category *</label>
@@ -83,8 +87,17 @@ const CoordinatorPanel = {
                             </select>
                         </div>
                         <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Minimum Participants *</label>
+                            <input id="evMinParticipants" type="number" required placeholder="e.g., 2" min="1" max="999999" value="1" style="width: 100%; padding: 0.75rem; border-radius: 12px; border: 1px solid var(--border-color);" oninput="CoordinatorPanel.updateFormPreview()">
+                        </div>
+                        <div>
                             <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Maximum Participants *</label>
-                            <input id="evMaxParticipants" type="number" required placeholder="e.g., 500" min="1" max="999999" style="width: 100%; padding: 0.75rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                            <input id="evMaxParticipants" type="number" required placeholder="e.g., 5" min="1" max="999999" style="width: 100%; padding: 0.75rem; border-radius: 12px; border: 1px solid var(--border-color);" oninput="CoordinatorPanel.updateFormPreview()">
+                        </div>
+                        <div style="grid-column: span 2;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Event Fee (Per Person) *</label>
+                            <input id="evFee" type="number" required placeholder="e.g., 100" min="0" max="999999" value="0" style="width: 100%; padding: 0.75rem; border-radius: 12px; border: 1px solid var(--border-color);" oninput="CoordinatorPanel.updateFormPreview()">
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">Set to 0 if the event is free.</span>
                         </div>
                         <div style="grid-column: span 2;">
                             <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Description *</label>
@@ -102,146 +115,76 @@ const CoordinatorPanel = {
                             <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Event Location / Venue *</label>
                             <input id="evVenue" type="text" required placeholder="e.g., Main Auditorium, Block A" style="width: 100%; padding: 0.75rem; border-radius: 12px; border: 1px solid var(--border-color);">
                         </div>
+                        
+                        <!-- Form Builder Section Integrated -->
+                        <div style="grid-column: span 2; margin-top: 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                            <h3 style="margin-bottom: 1.5rem;"><i class="fas fa-cog"></i> Registration Form Configuration</h3>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                                <!-- Configuration Column -->
+                                <div>
+                                    <div style="margin-bottom: 2rem;">
+                                        <h4 style="margin-bottom: 1rem; color: var(--primary);">1. Select Student Details to Collect</h4>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                                            <label class="checkbox-container">
+                                                <input type="checkbox" id="field-name" checked onchange="CoordinatorPanel.updateFormPreview()"> Student Name
+                                            </label>
+                                            <label class="checkbox-container">
+                                                <input type="checkbox" id="field-email" checked onchange="CoordinatorPanel.updateFormPreview()"> Email Address
+                                            </label>
+                                            <label class="checkbox-container">
+                                                <input type="checkbox" id="field-college" checked onchange="CoordinatorPanel.updateFormPreview()"> College Name
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div style="margin-bottom: 2rem;">
+                                        <h4 style="margin-bottom: 1rem; color: var(--primary);">2. Additional Requirements</h4>
+                                        <label class="checkbox-container">
+                                            <input type="checkbox" id="field-payment" onchange="CoordinatorPanel.updateFormPreview()"> Require Payment Screenshot
+                                        </label>
+                                    </div>
+
+                                    <div style="margin-bottom: 2rem;">
+                                        <h4 style="margin-bottom: 1rem; color: var(--primary);">3. Choose Payment Method</h4>
+                                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Select how students will pay the registration fee.</p>
+                                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                            <label class="checkbox-container">
+                                                <input type="radio" name="payment-method" id="payment-none" value="none" checked onchange="CoordinatorPanel.updateFormPreview()"> No Payment Required
+                                            </label>
+                                            <label class="checkbox-container" style="border: 1px solid #16a34a; border-radius: 8px; padding: 0.5rem;">
+                                                <input type="radio" name="payment-method" id="payment-qr" value="qr" onchange="CoordinatorPanel.updateFormPreview()">
+                                                <span style="display: flex; align-items: center; gap: 0.5rem;">
+                                                    <i class="fas fa-qrcode" style="color: #16a34a; font-size: 1.1rem;"></i>
+                                                    <strong>QR Code Payment (UPI)</strong>
+                                                    <span style="font-size:0.7rem; background:#dcfce7; color:#166534; padding:1px 6px; border-radius:9px;">Recommended</span>
+                                                </span>
+                                            </label>
+                                        </div>
+                                        <div id="qr-upload-box" style="display:none; margin-top:1rem; padding:0.75rem; background:#f0fdf4; border-radius:8px; border:1px solid #86efac;">
+                                            <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:0.4rem;">Upload Your UPI QR Code Image</label>
+                                            <input type="file" id="qr-image-input" accept="image/*" style="width:100%; padding:0.4rem;" onchange="CoordinatorPanel.previewQrImage()">
+                                            <div id="qr-preview-thumb" style="margin-top:0.5rem;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Preview Column -->
+                                <div style="background: #f8fafc; border: 2px dashed var(--border-color); border-radius: 12px; padding: 1.5rem;">
+                                    <h4 style="margin-bottom: 1.5rem;"><i class="fas fa-eye"></i> Form Preview (Student View)</h4>
+                                    <div id="registrationFormPreview" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: var(--shadow-sm);">
+                                        <!-- Preview content rendered here -->
+                                        <p style="text-align: center; color: var(--text-muted);">Please fill out the event details first to see the preview.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div id="createEventMsg" style="grid-column: span 2; display: none; padding: 0.75rem; border-radius: 8px; font-weight: 600;"></div>
                         <div style="grid-column: span 2; display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
                             <button type="submit" id="evPublishBtn" class="btn-primary">Publish Event</button>
                         </div>
                     </form>
-                </div>
-            </div>
-        `,
-        'manage-events': `
-            <div class="animate-slide">
-                <div class="flex-between" style="margin-bottom: 2rem;">
-                    <h1>Manage Events</h1>
-                    <button class="btn-primary" onclick="CoordinatorPanel.navigate('create-event')"><i class="fas fa-plus"></i> New Event</button>
-                </div>
-                <div class="card">
-                    <div class="flex-between" style="margin-bottom: 1.5rem;">
-                        <div class="search-box" style="max-width: 300px;">
-                            <i class="fas fa-search"></i>
-                            <input type="text" id="eventSearchInput" onkeyup="CoordinatorPanel.filterEventsTable()" placeholder="Search event title...">
-                        </div>
-                        <div class="gap-1" style="display: flex;">
-                            <select id="eventCategoryFilter" onchange="CoordinatorPanel.filterEventsTable()" style="padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
-                                <option value="all">All Categories</option>
-                                <option value="Technical">Technical</option>
-                                <option value="Cultural">Cultural</option>
-                                <option value="Sports">Sports</option>
-                            </select>
-                            <select id="eventStatusFilter" onchange="CoordinatorPanel.filterEventsTable()" style="padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
-                                <option value="all">All Status</option>
-                                <option value="Active">Active</option>
-                                <option value="Completed">Completed</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="data-table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Event Title</th>
-                                    <th>Category</th>
-                                    <th>Date</th>
-                                    <th>Deadline</th>
-                                    <th>Registrations</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="eventsTableBody">
-                                <!-- Dynamic Events Row Rendered Here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        `,
-        'form-builder': `
-            <div class="animate-slide">
-                <div class="flex-between" style="margin-bottom: 2rem;">
-                    <div>
-                        <h1>Registration Form Builder</h1>
-                        <p style="color: var(--text-muted);">Configure the registration form for students.</p>
-                    </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                    <!-- Configuration Section -->
-                    <div class="card">
-                        <h3 style="margin-bottom: 1.5rem;"><i class="fas fa-cog"></i> Form Configuration</h3>
-                        
-                        <div style="margin-bottom: 2rem;">
-                            <h4 style="margin-bottom: 1rem; color: var(--primary);">1. Select Student Details to Collect</h4>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                                <label class="checkbox-container">
-                                    <input type="checkbox" id="field-name" checked onchange="CoordinatorPanel.updateFormPreview()"> Student Name
-                                </label>
-                                <label class="checkbox-container">
-                                    <input type="checkbox" id="field-email" checked onchange="CoordinatorPanel.updateFormPreview()"> Email Address
-                                </label>
-                                <label class="checkbox-container">
-                                    <input type="checkbox" id="field-college" checked onchange="CoordinatorPanel.updateFormPreview()"> College Name
-                                </label>
-                                <label class="checkbox-container">
-                                    <input type="checkbox" id="field-branch" onchange="CoordinatorPanel.updateFormPreview()"> Branch / Department
-                                </label>
-                                <label class="checkbox-container">
-                                    <input type="checkbox" id="field-year" onchange="CoordinatorPanel.updateFormPreview()"> Student Year
-                                </label>
-                            </div>
-                        </div>
-
-                        <div style="margin-bottom: 2rem;">
-                            <h4 style="margin-bottom: 1rem; color: var(--primary);">2. Select Events for Registration</h4>
-                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Choose which events will appear as radio options.</p>
-                            <div id="eventSelectionList" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 200px; overflow-y: auto; padding-right: 0.5rem;">
-                                <!-- Populated dynamically -->
-                            </div>
-                        </div>
-
-                        <div style="margin-bottom: 2rem;">
-                            <h4 style="margin-bottom: 1rem; color: var(--primary);">3. Additional Requirements</h4>
-                            <label class="checkbox-container">
-                                <input type="checkbox" id="field-payment" onchange="CoordinatorPanel.updateFormPreview()"> Require Payment Screenshot
-                            </label>
-                        </div>
-
-                        <div style="margin-bottom: 2rem;">
-                            <h4 style="margin-bottom: 1rem; color: var(--primary);">4. Choose Payment Method</h4>
-                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Select how students will pay the registration fee.</p>
-                            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                                <label class="checkbox-container">
-                                    <input type="radio" name="payment-method" id="payment-none" value="none" checked onchange="CoordinatorPanel.updateFormPreview()"> No Payment Required
-                                </label>
-                                <label class="checkbox-container">
-                                    <input type="radio" name="payment-method" id="payment-screenshot" value="screenshot" onchange="CoordinatorPanel.updateFormPreview()"> Manual Screenshot Upload
-                                </label>
-                                <label class="checkbox-container" style="border: 1px solid #635bff; border-radius: 8px; padding: 0.5rem;">
-                                    <input type="radio" name="payment-method" id="payment-stripe" value="stripe" onchange="CoordinatorPanel.updateFormPreview()">
-                                    <span style="display: flex; align-items: center; gap: 0.5rem;">
-                                        <svg width="18" height="18" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="60" rx="10" fill="#635bff"/><path d="M29.3 22.8c0-2 1.6-2.8 4.3-2.8 3.8 0 8.5 1.2 8.5 1.2V14s-4.8-1-9.6-1C26 13 20 16.2 20 23.2c0 8.2 10.9 6 10.9 10.8 0 2.3-2 3.2-4.7 3.2-4 0-9.2-1.8-9.2-1.8v7.4s4.6 1.2 9.2 1.2c6.7 0 13-3.4 13-10.6 0-8.4-10.9-6.6-10.9-10.6z" fill="white"/></svg>
-                                        <strong>Stripe Gateway</strong>
-                                        <span style="font-size:0.7rem; background:#ede9fe; color:#5b21b6; padding:1px 6px; border-radius:9px;">Recommended</span>
-                                    </span>
-                                </label>
-                            </div>
-                            <div id="stripe-amount-box" style="display:none; margin-top:1rem; padding:0.75rem; background:#f5f3ff; border-radius:8px; border:1px solid #c4b5fd;">
-                                <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:0.4rem;">Registration Fee (INR)</label>
-                                <input type="number" id="stripe-amount" min="1" value="299" style="width:100%; padding:0.5rem; border-radius:8px; border:1px solid #ddd;" onchange="CoordinatorPanel.updateFormPreview()">
-                            </div>
-                        </div>
-
-                        <button class="btn-primary" style="width: 100%;" onclick="alert('Form configuration saved!')">Save Configuration</button>
-                    </div>
-
-                    <!-- Preview Section -->
-                    <div class="card" style="background: #f8fafc; border: 2px dashed var(--border-color);">
-                        <h3 style="margin-bottom: 1.5rem;"><i class="fas fa-eye"></i> Form Preview (Student View)</h3>
-                        <div id="registrationFormPreview" style="background: white; padding: 2rem; border-radius: 12px; box-shadow: var(--shadow-sm);">
-                            <!-- Preview content rendered here -->
-                        </div>
-                    </div>
                 </div>
             </div>
         `,
@@ -357,14 +300,12 @@ const CoordinatorPanel = {
         `,
         'notifications': `
              <div class="animate-slide">
-                <h1>Notifications</h1>
-                <div class="card">
-                    <h3>Send New Notification</h3>
-                    <form style="margin-top: 1.5rem;">
-                        <input type="text" placeholder="Title: Hackathon update" style="width: 100%; padding: 0.75rem; margin-bottom: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
-                        <textarea rows="3" placeholder="Message content..." style="width: 100%; padding: 0.75rem; border-radius: 12px; border: 1px solid var(--border-color);"></textarea>
-                        <button class="btn-primary" style="margin-top: 1rem;">Send to Registered Students</button>
-                    </form>
+                <div class="flex-between" style="margin-bottom: 2rem;">
+                    <h1>Notifications &amp; Pending Approvals</h1>
+                    <button class="btn-primary" onclick="CoordinatorPanel.loadPendingRegistrations()" style="background: var(--secondary);"><i class="fas fa-sync-alt"></i> Refresh</button>
+                </div>
+                <div id="pendingRegsContainer" class="card">
+                    <p style="text-align: center; color: var(--text-muted);">Loading pending registrations...</p>
                 </div>
             </div>
         `,
@@ -508,8 +449,9 @@ const CoordinatorPanel = {
                 coordinatorName: e.coordinator ? e.coordinator.fullName : "",
                 coordinatorMobile: e.coordinator ? e.coordinator.phone : "",
                 photos: 0,
-                minParticipants: 1, // Default
-                maxParticipants: e.maxParticipants
+                minParticipants: e.minParticipants || 1, // Handle if backend doesn't have it yet
+                maxParticipants: e.maxParticipants || 1,
+                feePerPerson: e.feePerPerson || 0
             }));
 
             this.data.registrations = regs.map(r => ({
@@ -618,7 +560,79 @@ const CoordinatorPanel = {
                 this.populateProfileData();
             } else if (this.currentPage === 'posts') {
                 this.renderPosts();
+            } else if (this.currentPage === 'notifications') {
+                this.loadPendingRegistrations();
             }
+        }
+    },
+
+    async loadPendingRegistrations() {
+        const container = document.getElementById('pendingRegsContainer');
+        if (!container) return;
+        const token = localStorage.getItem('token');
+        try {
+            const res = await fetch('/api/coordinator/registrations/pending', { headers: { 'Authorization': `Bearer ${token}` } });
+            const regs = await res.json();
+            if (!Array.isArray(regs) || regs.length === 0) {
+                container.innerHTML = `<div style="padding: 2rem; text-align: center; color: var(--text-muted);"><i class="fas fa-check-circle" style="font-size: 2rem; color: #10b981; display: block; margin-bottom: 0.5rem;"></i>No pending registrations — all caught up!</div>`;
+                return;
+            }
+            container.innerHTML = regs.map(r => {
+                const student = r.student ? (r.student.fullName || r.student.username) : 'Unknown';
+                const event = r.event ? r.event.title : 'Unknown Event';
+                const upi = r.upiId || 'N/A';
+                const regId = r.registrationId || r.id;
+                const date = r.registrationDate ? new Date(r.registrationDate).toLocaleString() : 'N/A';
+                return `
+                    <div style="padding: 1.25rem; border-radius: 12px; border: 1px solid #fde68a; background: #fffbeb; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                <span style="background: #fef3c7; color: #92400e; font-size:0.7rem; font-weight:700; padding:2px 8px; border-radius:20px;">PENDING</span>
+                                <span style="font-size: 0.75rem; color: var(--text-muted);">${date}</span>
+                            </div>
+                            <p style="margin: 0 0 0.25rem; font-weight: 700;">${student} &rarr; ${event}</p>
+                            <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted);">Reg ID: ${regId} &nbsp;|&nbsp; UPI: <strong>${upi}</strong></p>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn-primary" onclick="CoordinatorPanel.coordinatorApproveReg(${r.id})" style="background: #10b981; padding: 0.5rem 1rem; font-size: 0.82rem;"><i class="fas fa-check"></i> Approve</button>
+                            <button class="btn-primary" onclick="CoordinatorPanel.coordinatorRejectReg(${r.id})" style="background: #ef4444; padding: 0.5rem 1rem; font-size: 0.82rem;"><i class="fas fa-times"></i> Reject</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } catch (err) {
+            container.innerHTML = `<p style="color: red; padding: 1rem;">Failed to load pending registrations.</p>`;
+        }
+    },
+
+    async coordinatorApproveReg(regId) {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`/api/coordinator/registrations/${regId}/approve`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+        if (res.ok) { alert('✅ Registration Approved!'); this.loadPendingRegistrations(); }
+        else { alert('Failed to approve.'); }
+    },
+
+    async coordinatorRejectReg(regId) {
+        if (!confirm('Are you sure you want to reject this registration?')) return;
+        const token = localStorage.getItem('token');
+        const res = await fetch(`/api/coordinator/registrations/${regId}/reject`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+        if (res.ok) { alert('❌ Registration Rejected.'); this.loadPendingRegistrations(); }
+        else { alert('Failed to reject.'); }
+    },
+
+    previewQrImage() {
+        const input = document.getElementById('qr-image-input');
+        const thumb = document.getElementById('qr-preview-thumb');
+        if (!input || !thumb) return;
+        const file = input.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                thumb.innerHTML = `<img src="${e.target.result}" style="max-width: 150px; max-height: 150px; border-radius: 8px; border: 2px solid #16a34a;">`;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            thumb.innerHTML = '';
         }
     },
 
@@ -781,7 +795,10 @@ const CoordinatorPanel = {
         const payload = {
             title: document.getElementById('evTitle').value,
             category: document.getElementById('evCategory').value,
-            maxParticipants: parseInt(document.getElementById('evMaxParticipants').value),
+            organizedBy: document.getElementById('evOrganizedBy').value,
+            minParticipants: parseInt(document.getElementById('evMinParticipants').value) || 1,
+            maxParticipants: parseInt(document.getElementById('evMaxParticipants').value) || 1,
+            feePerPerson: parseFloat(document.getElementById('evFee').value) || 0,
             description: document.getElementById('evDescription').value,
             registrationDeadline: document.getElementById('evRegDeadline').value + 'T23:59:59',
             eventDate: document.getElementById('evDate').value + 'T08:00:00',
@@ -808,11 +825,32 @@ const CoordinatorPanel = {
                     registrations: 0,
                     status: this.calculateEventStatus(created.eventDate, created.registrationDeadline),
                     description: created.description,
-                    maxParticipants: created.maxParticipants,
-                    minParticipants: 1
+                    maxParticipants: created.maxParticipants || parseInt(document.getElementById('evMaxParticipants').value) || 1,
+                    minParticipants: created.minParticipants || parseInt(document.getElementById('evMinParticipants').value) || 1,
+                    feePerPerson: created.feePerPerson || parseFloat(document.getElementById('evFee').value) || 0,
+                    qrCodePath: null
                 });
                 this.data.stats.totalEvents++;
                 this.data.stats.presentEvents++;
+
+                // Upload QR code if QR payment was selected
+                const paymentMethod = document.querySelector('input[name="payment-method"]:checked')?.value;
+                if (paymentMethod === 'qr') {
+                    const qrFile = document.getElementById('qr-image-input')?.files[0];
+                    if (qrFile) {
+                        const formData = new FormData();
+                        formData.append('qr', qrFile);
+                        const token = localStorage.getItem('token');
+                        fetch(`/api/coordinator/events/${created.id}/qr`, {
+                            method: 'POST',
+                            headers: { 'Authorization': `Bearer ${token}` },
+                            body: formData
+                        }).then(r => r.json()).then(data => {
+                            const ev = this.data.events.find(e => e.id === created.id);
+                            if (ev && data.qrCodePath) ev.qrCodePath = data.qrCodePath;
+                        }).catch(err => console.warn('QR upload failed:', err));
+                    }
+                }
 
                 if (msg) {
                     msg.style.display = 'block';
@@ -1214,58 +1252,79 @@ const CoordinatorPanel = {
             name: document.getElementById('field-name')?.checked,
             email: document.getElementById('field-email')?.checked,
             college: document.getElementById('field-college')?.checked,
-            branch: document.getElementById('field-branch')?.checked,
-            year: document.getElementById('field-year')?.checked,
             payment: document.getElementById('field-payment')?.checked
         };
 
         const paymentMethod = document.querySelector('input[name="payment-method"]:checked')?.value || 'none';
-        const stripeAmountBox = document.getElementById('stripe-amount-box');
-        if (stripeAmountBox) stripeAmountBox.style.display = (paymentMethod === 'stripe') ? 'block' : 'none';
-        const amount = document.getElementById('stripe-amount')?.value || '299';
+        const qrUploadBox = document.getElementById('qr-upload-box');
+        if (qrUploadBox) qrUploadBox.style.display = (paymentMethod === 'qr') ? 'block' : 'none';
 
-        const selectedEventName = document.querySelector('.event-choice:checked')?.value;
-        const event = this.data.events.find(ev => ev.name === selectedEventName);
+        let eventName = "New Event";
+        let minParticipants = 1;
+        let maxParticipants = 1;
+        let feePerPerson = 0;
 
-        if (!event) {
-            preview.innerHTML = `<p style="color: red; text-align: center;">Please select an event for the form.</p>`;
-            return;
+        if (this.currentPage === 'create-event') {
+            eventName = document.getElementById('evTitle')?.value || "New Event";
+            minParticipants = parseInt(document.getElementById('evMinParticipants')?.value) || 1;
+            maxParticipants = parseInt(document.getElementById('evMaxParticipants')?.value) || 1;
+            feePerPerson = parseFloat(document.getElementById('evFee')?.value) || 0;
+        } else {
+            const selectedEventName = document.querySelector('.event-choice:checked')?.value;
+            const event = this.data.events.find(ev => ev.name === selectedEventName);
+            if (!event) {
+                preview.innerHTML = `<p style="color: red; text-align: center;">Please select an event for the form.</p>`;
+                return;
+            }
+            eventName = event.name;
+            minParticipants = event.minParticipants || 1;
+            maxParticipants = event.maxParticipants || 1;
+            feePerPerson = event.feePerPerson || 0;
         }
+
+        const feeLabel = feePerPerson > 0
+            ? `<span style="display: inline-block; margin-top: 0.4rem; background: #ecfdf5; color: #065f46; font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 20px;">&#8377;${feePerPerson} / person</span>`
+            : `<span style="display: inline-block; margin-top: 0.4rem; background: #f0fdf4; color: #15803d; font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 20px;">Free Event</span>`;
 
         let html = `
             <div style="text-align: center; margin-bottom: 2rem;">
                 <h4 style="margin-bottom: 0.25rem;">Event Registration Form</h4>
-                <p style="font-size: 0.9rem; color: var(--primary); font-weight: 600;">${event.name}</p>
-                <p style="font-size: 0.75rem; color: var(--text-muted);">Team Size: ${event.minParticipants} to ${event.maxParticipants}</p>
+                <p style="font-size: 0.9rem; color: var(--primary); font-weight: 600;">${eventName}</p>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Team Size: ${minParticipants} to ${maxParticipants}</p>
+                ${feeLabel}
             </div>
             <div style="display: grid; gap: 1.5rem;">
         `;
 
-        for (let i = 1; i <= event.maxParticipants; i++) {
-            const isRequired = i <= event.minParticipants;
+        if (feePerPerson > 0) {
+            html += `
+                <div style="padding: 1rem; background: #fefce8; border: 1px solid #fde68a; border-radius: 12px; display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fas fa-receipt" style="color: #d97706; font-size: 1.2rem;"></i>
+                    <div>
+                        <p style="margin: 0; font-size: 0.85rem; font-weight: 700; color: #92400e;">Registration Fee: &#8377;${feePerPerson} per person</p>
+                        <p style="margin: 0; font-size: 0.72rem; color: #b45309;">Total for ${maxParticipants} member(s): &#8377;${(feePerPerson * maxParticipants).toFixed(0)}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        for (let i = 1; i <= maxParticipants; i++) {
+            const isRequired = i <= minParticipants;
+            const isLeader = i === 1;
             html += `
                 <div style="padding: 1rem; border: 1px solid var(--border-color); border-radius: 12px; background: ${isRequired ? '#fdf2f8' : '#fff'};">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
-                        <h5 style="margin: 0; color: #1f2937;">Student ${i} ${i === 1 ? '(Leader)' : ''}</h5>
+                        <h5 style="margin: 0; color: #1f2937;">Student ${i} ${isLeader ? '(Leader)' : ''}</h5>
                         <span style="font-size: 0.7rem; font-weight: 700; color: ${isRequired ? '#ec4899' : '#64748b'};">
                             ${isRequired ? 'REQUIRED' : 'OPTIONAL'}
                         </span>
                     </div>
                     <div style="display: grid; gap: 0.75rem;">
+                        <div><label style="font-size: 0.8rem; font-weight: 600; color: #6366f1;">Portal Username *</label><input type="text" disabled placeholder="Must match UniEvent account" style="width: 100%; padding: 0.4rem; border: 1px solid #a5b4fc;"></div>
                         ${fields.name ? `<div><label style="font-size: 0.8rem;">Full Name</label><input type="text" disabled style="width: 100%; padding: 0.4rem; border: 1px solid #ddd;"></div>` : ''}
                         ${fields.email ? `<div><label style="font-size: 0.8rem;">Email Address</label><input type="email" disabled style="width: 100%; padding: 0.4rem; border: 1px solid #ddd;"></div>` : ''}
                         ${fields.college ? `<div><label style="font-size: 0.8rem;">College Name</label><input type="text" disabled style="width: 100%; padding: 0.4rem; border: 1px solid #ddd;"></div>` : ''}
-                        ${fields.branch ? `<div><label style="font-size: 0.8rem;">Branch / Dept</label><input type="text" disabled style="width: 100%; padding: 0.4rem; border: 1px solid #ddd;"></div>` : ''}
-                        ${fields.year ? `
-                            <div>
-                                <label style="font-size: 0.8rem;">Year</label>
-                                <select disabled style="width: 100%; padding: 0.4rem; border: 1px solid #ddd;">
-                                    <option>FY</option>
-                                    <option>SY</option>
-                                    <option>TY</option>
-                                    <option>Final Year</option>
-                                </select>
-                            </div>` : ''}
+                        ${isLeader && paymentMethod === 'qr' && feePerPerson > 0 ? `<div><label style="font-size: 0.8rem; font-weight: 600; color: #d97706;">UPI Transaction ID *</label><input type="text" disabled placeholder="Enter UPI ID used for payment" style="width: 100%; padding: 0.4rem; border: 1px solid #fbbf24; background: #fefce8;"></div>` : ''}
                     </div>
                 </div>
             `;
@@ -1279,16 +1338,14 @@ const CoordinatorPanel = {
                     <p style="font-size: 0.7rem; color: var(--text-muted);">Required for registration</p>
                 </div>
             `;
-        } else if (paymentMethod === 'stripe') {
+        } else if (paymentMethod === 'qr' && feePerPerson > 0) {
             html += `
-                <div style="margin-top: 1.5rem; padding: 1.5rem; border: 2px solid #635bff; border-radius: 12px; background: #f5f3ff; text-align: center;">
-                    <p style="font-size: 0.85rem; color: #5b21b6; font-weight: 600; margin-bottom: 0.75rem;">Registration Fee: \u20b9${amount}</p>
-                    <button onclick="CoordinatorPanel.openStripe(${amount})" type="button"
-                        style="background: #635bff; color: white; border: none; padding: 0.65rem 2rem; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem;">
-                        <svg width="16" height="16" viewBox="0 0 60 60" fill="none"><rect width="60" height="60" rx="10" fill="white"/><path d="M29.3 22.8c0-2 1.6-2.8 4.3-2.8 3.8 0 8.5 1.2 8.5 1.2V14s-4.8-1-9.6-1C26 13 20 16.2 20 23.2c0 8.2 10.9 6 10.9 10.8 0 2.3-2 3.2-4.7 3.2-4 0-9.2-1.8-9.2-1.8v7.4s4.6 1.2 9.2 1.2c6.7 0 13-3.4 13-10.6 0-8.4-10.9-6.6-10.9-10.6z" fill="#635bff"/></svg>
-                        Pay with Stripe
-                    </button>
-                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.5rem;">Secure payment powered by Stripe</p>
+                <div style="margin-top: 1.5rem; padding: 1.5rem; border: 2px solid #16a34a; border-radius: 12px; background: #f0fdf4; text-align: center;">
+                    <p style="font-size: 0.85rem; color: #166534; font-weight: 700; margin-bottom: 0.75rem;">&#128179; Pay &#8377;${feePerPerson} per person via UPI</p>
+                    <div style="width: 120px; height: 120px; margin: 0 auto 0.75rem; background: #e2e8f0; display: flex; align-items: center; justify-content: center; border-radius: 8px; border: 2px dashed #16a34a;">
+                        <i class="fas fa-qrcode" style="font-size: 3rem; color: #16a34a;"></i>
+                    </div>
+                    <p style="font-size: 0.75rem; color: #166534;">Scan QR &amp; pay, then enter your UPI Transaction ID above</p>
                 </div>
             `;
         }
