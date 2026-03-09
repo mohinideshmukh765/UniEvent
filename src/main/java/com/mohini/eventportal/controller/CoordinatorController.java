@@ -141,6 +141,8 @@ public class CoordinatorController {
                 .organizedBy(eventData.getOrganizedBy())
                 .eventDate(eventData.getEventDate())
                 .venue(eventData.getVenue())
+                .coordinatorName(eventData.getCoordinatorName())
+                .coordinatorMobile(eventData.getCoordinatorMobile())
                 .minParticipants(eventData.getMinParticipants())
                 .maxParticipants(eventData.getMaxParticipants())
                 .feePerPerson(eventData.getFeePerPerson())

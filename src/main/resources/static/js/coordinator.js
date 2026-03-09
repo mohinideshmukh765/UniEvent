@@ -115,6 +115,14 @@ const CoordinatorPanel = {
                             <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Event Location / Venue *</label>
                             <input id="evVenue" type="text" required placeholder="e.g., Main Auditorium, Block A" style="width: 100%; padding: 0.75rem; border-radius: 12px; border: 1px solid var(--border-color);">
                         </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Event Coordinator Name *</label>
+                            <input id="evCoordinatorName" type="text" required placeholder="e.g., Jane Doe" style="width: 100%; padding: 0.75rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Contact (Mobile Number) *</label>
+                            <input id="evCoordinatorMobile" type="tel" required placeholder="e.g., 9876543210" pattern="[0-9]{10}" style="width: 100%; padding: 0.75rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                        </div>
                         
                         <!-- Form Builder Section Integrated -->
                         <div style="grid-column: span 2; margin-top: 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
@@ -802,7 +810,9 @@ const CoordinatorPanel = {
             description: document.getElementById('evDescription').value,
             registrationDeadline: document.getElementById('evRegDeadline').value + 'T23:59:59',
             eventDate: document.getElementById('evDate').value + 'T08:00:00',
-            venue: document.getElementById('evVenue').value
+            venue: document.getElementById('evVenue').value,
+            coordinatorName: document.getElementById('evCoordinatorName').value,
+            coordinatorMobile: document.getElementById('evCoordinatorMobile').value
         };
 
         try {
@@ -828,6 +838,8 @@ const CoordinatorPanel = {
                     maxParticipants: created.maxParticipants || parseInt(document.getElementById('evMaxParticipants').value) || 1,
                     minParticipants: created.minParticipants || parseInt(document.getElementById('evMinParticipants').value) || 1,
                     feePerPerson: created.feePerPerson || parseFloat(document.getElementById('evFee').value) || 0,
+                    coordinatorName: created.coordinatorName || document.getElementById('evCoordinatorName').value,
+                    coordinatorMobile: created.coordinatorMobile || document.getElementById('evCoordinatorMobile').value,
                     qrCodePath: null
                 });
                 this.data.stats.totalEvents++;

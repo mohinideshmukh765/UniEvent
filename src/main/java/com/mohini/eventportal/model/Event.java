@@ -42,6 +42,12 @@ public class Event {
     @NotBlank
     private String venue;
 
+    @NotBlank
+    private String coordinatorName;
+
+    @NotBlank
+    private String coordinatorMobile;
+
     private int maxParticipants;
 
     private int minParticipants;
