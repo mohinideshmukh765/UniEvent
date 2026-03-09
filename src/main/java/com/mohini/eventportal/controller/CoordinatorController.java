@@ -46,10 +46,12 @@ public class CoordinatorController {
             return ResponseEntity.ok(new com.mohini.eventportal.dto.DashboardStats(0, 0, 0, 0));
         }
 
-        String collegeCode = college.getCollegeCode();
+        Integer collegeCode = college.getCollegeCode();
         long totalEvents = eventRepository.countByCollegeCollegeCode(collegeCode);
-        long presentEvents = eventRepository.countByCollegeCollegeCodeAndStatus(collegeCode, com.mohini.eventportal.model.Event.EventStatus.PUBLISHED);
-        long pastEvents = eventRepository.countByCollegeCollegeCodeAndStatus(collegeCode, com.mohini.eventportal.model.Event.EventStatus.COMPLETED);
+        long presentEvents = eventRepository.findByCollegeCollegeCode(collegeCode).stream()
+                .filter(e -> e.getEventDate().isAfter(java.time.LocalDateTime.now())).count();
+        long pastEvents = eventRepository.findByCollegeCollegeCode(collegeCode).stream()
+                .filter(e -> e.getEventDate().isBefore(java.time.LocalDateTime.now())).count();
         long totalRegistrations = registrationRepository.countByEventCollegeCollegeCode(collegeCode);
 
         return ResponseEntity.ok(new com.mohini.eventportal.dto.DashboardStats(totalEvents, presentEvents, pastEvents, totalRegistrations));
@@ -68,7 +70,24 @@ public class CoordinatorController {
     public ResponseEntity<?> getRegistrations() {
         com.mohini.eventportal.model.College college = getCurrentCollege();
         if (college == null) return ResponseEntity.ok(java.util.Collections.emptyList());
-        return ResponseEntity.ok(registrationRepository.findByEventCollegeCollegeCode(college.getCollegeCode()));
+        
+        java.util.List<com.mohini.eventportal.model.Registration> rawRegs = registrationRepository.findByEventCollegeCollegeCode(college.getCollegeCode());
+        java.util.List<Map<String, Object>> dtos = new java.util.ArrayList<>();
+        java.util.Set<String> seenGroups = new java.util.HashSet<>();
+        for (com.mohini.eventportal.model.Registration r : rawRegs) {
+            if (r.getGroupId() != null && !seenGroups.add(r.getGroupId())) continue;
+            Map<String, Object> dto = new java.util.HashMap<>();
+            dto.put("id", r.getGroupId()); 
+            Map<String, Object> studentDto = new java.util.HashMap<>();
+            studentDto.put("fullName", r.getUsername()); 
+            dto.put("student", studentDto);
+            Map<String, Object> eventDto = new java.util.HashMap<>();
+            eventDto.put("title", r.getEvent() != null ? r.getEvent().getTitle() : "Unknown");
+            dto.put("event", eventDto);
+            dto.put("registrationDate", null);
+            dtos.add(dto);
+        }
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/registrations/pending")
@@ -76,40 +95,68 @@ public class CoordinatorController {
     public ResponseEntity<?> getPendingRegistrations() {
         com.mohini.eventportal.model.College college = getCurrentCollege();
         if (college == null) return ResponseEntity.ok(java.util.Collections.emptyList());
-        return ResponseEntity.ok(
-            registrationRepository.findByEventCollegeCollegeCodeAndStatus(
-                college.getCollegeCode(),
-                com.mohini.eventportal.model.Registration.RegistrationStatus.PENDING
-            )
-        );
+        
+        java.util.List<com.mohini.eventportal.model.Registration> rawRegs = registrationRepository.findByEventCollegeCollegeCodeAndStatus(college.getCollegeCode(), "PENDING");
+        java.util.List<Map<String, Object>> dtos = new java.util.ArrayList<>();
+        java.util.Set<String> seenGroups = new java.util.HashSet<>();
+        for (com.mohini.eventportal.model.Registration r : rawRegs) {
+            if (r.getGroupId() != null && !seenGroups.add(r.getGroupId())) continue;
+            
+            Map<String, Object> dto = new java.util.HashMap<>();
+            dto.put("id", r.getGroupId()); 
+            
+            Map<String, Object> studentDto = new java.util.HashMap<>();
+            studentDto.put("fullName", r.getUsername()); 
+            studentDto.put("username", r.getUsername());
+            dto.put("student", studentDto);
+            
+            Map<String, Object> eventDto = new java.util.HashMap<>();
+            eventDto.put("title", r.getEvent() != null ? r.getEvent().getTitle() : "Unknown");
+            dto.put("event", eventDto);
+            
+            dto.put("upiId", r.getTransactionId());
+            dto.put("registrationId", r.getGroupId());
+            dto.put("registrationDate", null); 
+            
+            dtos.add(dto);
+        }
+        return ResponseEntity.ok(dtos);
     }
 
     @PostMapping("/registrations/{id}/approve")
     @PreAuthorize("hasRole('COORDINATOR')")
-    public ResponseEntity<?> approveRegistration(@PathVariable Long id) {
-        return updateRegistrationStatus(id, com.mohini.eventportal.model.Registration.RegistrationStatus.APPROVED);
+    public ResponseEntity<?> approveRegistration(@PathVariable String id) {
+        return updateRegistrationStatus(id, "APPROVED");
     }
 
     @PostMapping("/registrations/{id}/reject")
     @PreAuthorize("hasRole('COORDINATOR')")
-    public ResponseEntity<?> rejectRegistration(@PathVariable Long id) {
-        return updateRegistrationStatus(id, com.mohini.eventportal.model.Registration.RegistrationStatus.REJECTED);
+    public ResponseEntity<?> rejectRegistration(@PathVariable String id) {
+        return updateRegistrationStatus(id, "DENIED");
     }
 
-    private ResponseEntity<?> updateRegistrationStatus(Long id, com.mohini.eventportal.model.Registration.RegistrationStatus newStatus) {
+    @org.springframework.transaction.annotation.Transactional
+    protected ResponseEntity<?> updateRegistrationStatus(String groupId, String newStatus) {
         com.mohini.eventportal.model.College college = getCurrentCollege();
         if (college == null) return ResponseEntity.badRequest().body("Coordinator not found");
 
-        Optional<com.mohini.eventportal.model.Registration> opt = registrationRepository.findById(id);
-        if (!opt.isPresent()) return ResponseEntity.badRequest().body("Registration not found");
+        java.util.List<com.mohini.eventportal.model.Registration> regs = registrationRepository.findByGroupId(groupId);
+        if (regs.isEmpty()) return ResponseEntity.badRequest().body("Registration not found");
 
-        com.mohini.eventportal.model.Registration reg = opt.get();
-        if (!reg.getEvent().getCollege().getCollegeCode().equals(college.getCollegeCode())) {
+        if (!regs.get(0).getEvent().getCollege().getCollegeCode().equals(college.getCollegeCode())) {
             return ResponseEntity.status(403).body("Unauthorized");
         }
-        reg.setStatus(newStatus);
-        registrationRepository.save(reg);
-        return ResponseEntity.ok(Map.of("status", newStatus.name()));
+        
+        if ("DENIED".equals(newStatus)) {
+             registrationRepository.deleteByGroupId(groupId);
+             return ResponseEntity.ok(Map.of("status", "DENIED"));
+        } else {
+             for (com.mohini.eventportal.model.Registration reg : regs) {
+                 reg.setStatus(newStatus);
+             }
+             registrationRepository.saveAll(regs);
+             return ResponseEntity.ok(Map.of("status", newStatus));
+        }
     }
 
     @GetMapping("/notifications")
@@ -161,7 +208,7 @@ public class CoordinatorController {
         com.mohini.eventportal.model.College college = getCurrentCollege();
         if (college == null) return ResponseEntity.badRequest().body("Coordinator not found");
 
-        Optional<Event> optEvent = eventRepository.findById(eventId);
+        Optional<Event> optEvent = eventRepository.findById(eventId.intValue());
         if (!optEvent.isPresent()) return ResponseEntity.badRequest().body("Event not found");
 
         Event event = optEvent.get();
@@ -229,7 +276,7 @@ public class CoordinatorController {
         com.mohini.eventportal.model.College college = getCurrentCollege();
         if (college == null) return ResponseEntity.badRequest().body("Coordinator profile not found");
 
-        Optional<Event> optionalEvent = eventRepository.findById(eventId);
+        Optional<Event> optionalEvent = eventRepository.findById(eventId.intValue());
         if (!optionalEvent.isPresent()) {
             return ResponseEntity.badRequest().body("Event not found");
         }
@@ -250,12 +297,11 @@ public class CoordinatorController {
             if (deadlineStr != null && !deadlineStr.isEmpty()) {
                 event.setRegistrationDeadline(java.time.LocalDateTime.parse(deadlineStr));
             }
-        } catch (java.time.format.DateTimeParseException e) {
-            return ResponseEntity.badRequest().body("Invalid date format. Expected ISO-8601 (e.g. YYYY-MM-DDTHH:mm:ss). Passed: " + e.getParsedString());
+            Event saved = eventRepository.save(event);
+            return ResponseEntity.ok(saved);
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body("Invalid date format: " + ex.getMessage());
         }
-
-        Event saved = eventRepository.save(event);
-        return ResponseEntity.ok(saved);
     }
 
     @PutMapping("/profile")

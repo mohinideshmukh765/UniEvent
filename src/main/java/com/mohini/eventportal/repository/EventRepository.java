@@ -7,13 +7,13 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface EventRepository extends JpaRepository<Event, Long> {
-    List<Event> findByCollegeCollegeCode(String collegeCode);
+public interface EventRepository extends JpaRepository<Event, Integer> {
+    List<Event> findByCollegeCollegeCode(Integer collegeCode);
     List<Event> findByCategory(String category);
     List<Event> findByStatus(Event.EventStatus status);
 
-    long countByCollegeCollegeCode(String collegeCode);
-    long countByCollegeCollegeCodeAndStatus(String collegeCode, Event.EventStatus status);
+    long countByCollegeCollegeCode(Integer collegeCode);
+    long countByCollegeCollegeCodeAndStatus(Integer collegeCode, Event.EventStatus status);
 
     long countByEventDateAfter(java.time.LocalDateTime date);
     long countByEventDateBefore(java.time.LocalDateTime date);

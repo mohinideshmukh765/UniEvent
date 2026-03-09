@@ -55,7 +55,7 @@ public class StudentController {
             return ResponseEntity.badRequest().body("Invalid eventId");
         }
 
-        Optional<Event> eventOpt = eventRepository.findById(eventId);
+        Optional<Event> eventOpt = eventRepository.findById(eventId.intValue());
         if (!eventOpt.isPresent()) return ResponseEntity.badRequest().body("Event not found");
         Event event = eventOpt.get();
 
@@ -64,8 +64,8 @@ public class StudentController {
             return ResponseEntity.badRequest().body("Registration deadline has passed");
         }
 
-        // Check if already registered
-        if (registrationRepository.existsByStudentIdAndEventId(leader.getId(), eventId)) {
+        // Check if leader already registered
+        if (registrationRepository.existsByUsernameAndEventId(leader.getUsername(), eventId.intValue())) {
             return ResponseEntity.badRequest().body("You have already registered for this event");
         }
 
@@ -103,31 +103,35 @@ public class StudentController {
             return ResponseEntity.badRequest().body("The following portal usernames are not registered: " + String.join(", ", invalidUsernames));
         }
 
-        // Build teamMembersJson
+        // Build group ID and transaction context
         String upiId = body.containsKey("upiId") ? body.get("upiId").toString() : null;
-        String teamJson = buildTeamJson(teamMembers);
+        String groupId = "GROUP-" + System.currentTimeMillis();
 
-        // Create registration (PENDING)
-        Registration registration = Registration.builder()
-                .student(leader)
-                .event(event)
-                .upiId(upiId)
-                .teamMembersJson(teamJson)
-                .status(Registration.RegistrationStatus.PENDING)
-                .build();
+        List<Registration> registrationsToSave = new ArrayList<>();
+        for (Map<String, String> member : teamMembers) {
+            Registration reg = Registration.builder()
+                    .event(event)
+                    .username(member.get("username"))
+                    .transactionId(upiId)
+                    .groupId(groupId)
+                    .status("PENDING")
+                    // qrcode could be populated here if there's an upload logic later
+                    .build();
+            registrationsToSave.add(reg);
+        }
 
-        Registration saved = registrationRepository.save(registration);
+        registrationRepository.saveAll(registrationsToSave);
 
         // Fire notification to coordinator's college
-        String collegeCode = event.getCollege() != null ? event.getCollege().getCollegeCode() : "UNKNOWN";
+        Integer collegeCode = event.getCollege() != null ? event.getCollege().getCollegeCode() : 0;
         String notifTitle = "New Registration Pending Approval";
         String notifMsg = String.format(
-            "Student '%s' registered for '%s'. Team: %d member(s). UPI: %s. Registration ID: %s",
+            "Student '%s' registered for '%s'. Team: %d member(s). UPI: %s. Group ID: %s",
             leader.getFullName() != null ? leader.getFullName() : leader.getUsername(),
             event.getTitle(),
             count,
             upiId != null ? upiId : "N/A",
-            saved.getRegistrationId()
+            groupId
         );
 
         Notification notification = Notification.builder()
@@ -138,34 +142,13 @@ public class StudentController {
         notificationRepository.save(notification);
 
         return ResponseEntity.ok(Map.of(
-            "registrationId", saved.getRegistrationId(),
-            "status", saved.getStatus().name(),
+            "registrationId", groupId,
+            "status", "PENDING",
             "message", "Registration submitted! Awaiting coordinator approval."
         ));
     }
 
-    private String buildTeamJson(List<Map<String, String>> members) {
-        // Simple manual JSON build to avoid Jackson dependency injection complexity
-        StringBuilder sb = new StringBuilder("[");
-        for (int i = 0; i < members.size(); i++) {
-            Map<String, String> m = members.get(i);
-            sb.append("{");
-            sb.append("\"username\":\"").append(esc(m.get("username"))).append("\",");
-            sb.append("\"name\":\"").append(esc(m.get("name"))).append("\",");
-            sb.append("\"email\":\"").append(esc(m.get("email"))).append("\",");
-            sb.append("\"college\":\"").append(esc(m.get("college"))).append("\",");
-            sb.append("\"branch\":\"").append(esc(m.get("branch"))).append("\",");
-            sb.append("\"year\":\"").append(esc(m.get("year"))).append("\"");
-            sb.append("}");
-            if (i < members.size() - 1) sb.append(",");
-        }
-        sb.append("]");
-        return sb.toString();
-    }
 
-    private String esc(String s) {
-        return s == null ? "" : s.replace("\"", "\\\"");
-    }
 
     private String getCurrentUsername() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();

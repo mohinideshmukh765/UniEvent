@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "posts")
+@Table(name = "afterpost", schema = "public")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,25 +18,32 @@ import java.time.LocalDateTime;
 public class Post {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(columnDefinition = "TEXT")
-    private String caption;
-
-    private String images; // JSON or comma-separated URLs
-
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "events"})
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "college_id")
-    private College college;
-
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "coordinator", "college"})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     private Event event;
 
+    @Lob
+    @Column(name = "photo")
+    private byte[] photo;
+
+    @Column(columnDefinition = "TEXT", name = "event_description")
+    private String caption; // mapped to event_description
+
+    @Column(name = "feedback_form_link")
+    private String feedbackFormLink; 
+
+    // college_id doesn't exist in afterpost table, so mark it transient
+    @Transient
+    private College college;
+
+    // createdAt doesn't exist in afterpost table, so mark it transient
+    @Transient
     private LocalDateTime createdAt;
+    
+    // images doesn't exist in afterpost, we use 'photo' instead.
+    @Transient
+    private String images;
 
     @PrePersist
     protected void onCreate() {

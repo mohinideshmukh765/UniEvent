@@ -5,53 +5,49 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import java.io.Serializable;
 
 @Entity
-@Table(name = "registrations")
+@Table(name = "registration", schema = "public")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@IdClass(Registration.RegistrationId.class)
 public class Registration {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "student_id")
-    private User student;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     private Event event;
 
-    @Builder.Default
-    @Enumerated(EnumType.STRING)
-    private RegistrationStatus status = RegistrationStatus.PENDING;
+    @Id
+    @Column(name = "username", length = 100)
+    private String username;
 
-    private String registrationId; // Unique reference
+    @Column(name = "transactionid", length = 100)
+    private String transactionId;
 
-    private LocalDateTime registrationDate;
+    @Column(name = "group_id", length = 50)
+    private String groupId;
 
-    // UPI ID used by the team leader for payment
-    private String upiId;
+    @Lob
+    @Column(name = "qrcode")
+    private byte[] qrcode;
 
-    // JSON string: list of { username, name, email, college, branch, year } for all team members
-    @Column(columnDefinition = "TEXT")
-    private String teamMembersJson;
-
-    @PrePersist
-    protected void onCreate() {
-        registrationDate = LocalDateTime.now();
-        if (registrationId == null) {
-            registrationId = "REG-" + System.currentTimeMillis();
-        }
-    }
+    @Column(name = "status", length = 20)
+    private String status;
 
     public enum RegistrationStatus {
-        PENDING, REGISTERED, APPROVED, WAITLISTED, COMPLETED, REJECTED, CANCELLED
+        PENDING, APPROVED, DENIED
+    }
+
+    // Composite primary key to satisfy Hibernate (since DB has no PK)
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RegistrationId implements Serializable {
+        private Integer event; // Must match the type of Event's ID (which is Integer now)
+        private String username;
     }
 }

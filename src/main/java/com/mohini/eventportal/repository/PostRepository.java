@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PostRepository extends JpaRepository<Post, Long> {
-    List<Post> findAllByOrderByCreatedAtDesc();
+public interface PostRepository extends JpaRepository<Post, Integer> {
+    java.util.Optional<Post> findByEventId(Integer eventId);
 }

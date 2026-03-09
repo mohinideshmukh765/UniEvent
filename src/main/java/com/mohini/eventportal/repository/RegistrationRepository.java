@@ -7,12 +7,15 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface RegistrationRepository extends JpaRepository<Registration, Long> {
-    List<Registration> findByStudentId(Long studentId);
-    List<Registration> findByEventId(Long eventId);
-    boolean existsByStudentIdAndEventId(Long studentId, Long eventId);
+public interface RegistrationRepository extends JpaRepository<Registration, Registration.RegistrationId> {
+    List<Registration> findByUsername(String username);
+    List<Registration> findByEventId(Integer eventId);
+    boolean existsByUsernameAndEventId(String username, Integer eventId);
     
-    long countByEventCollegeCollegeCode(String collegeCode);
-    List<Registration> findByEventCollegeCollegeCode(String collegeCode);
-    List<Registration> findByEventCollegeCollegeCodeAndStatus(String collegeCode, Registration.RegistrationStatus status);
+    long countByEventCollegeCollegeCode(Integer collegeCode);
+    List<Registration> findByEventCollegeCollegeCode(Integer collegeCode);
+    List<Registration> findByEventCollegeCollegeCodeAndStatus(Integer collegeCode, String status);
+    
+    List<Registration> findByGroupId(String groupId);
+    void deleteByGroupId(String groupId);
 }

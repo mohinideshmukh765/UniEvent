@@ -143,7 +143,7 @@ const AdminPanel = {
                         <h3>Registered Colleges & Coordinators</h3>
                         <div class="search-box" style="width: 300px;">
                             <i class="fas fa-search"></i>
-                            <input type="text" placeholder="Filter colleges...">
+                            <input type="text" id="collegeSearchInput" placeholder="Filter colleges..." onkeyup="AdminPanel.filterColleges()">
                         </div>
                     </div>
                     <div class="data-table-wrapper">
@@ -168,41 +168,153 @@ const AdminPanel = {
         `,
         events: `
             <div class="animate-slide">
-                <h1>Event Moderation</h1>
-                <div class="stats-grid" style="margin: 2rem 0;">
-                    <div class="stat-card"><h3>Live Events</h3><p>24</p></div>
-                    <div class="stat-card"><h3>Pending Review</h3><p>8</p></div>
+                <div class="flex-between" style="margin-bottom: 2rem;">
+                    <h1>Event Moderation</h1>
                 </div>
+                
+                <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 2rem;">
+                    <div class="stat-card" id="tab-upcoming" style="cursor: pointer; border: 2px solid var(--primary); background: #f0fdf4;" onclick="AdminPanel.setEventTab('upcoming')">
+                        <div class="stat-icon" style="background: #dcfce7; color: #16a34a;"><i class="fas fa-calendar-alt"></i></div>
+                        <div class="stat-info">
+                            <h3 style="color: #16a34a;">Upcoming Events</h3>
+                            <p id="count-upcoming" style="color: #15803d;">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" id="tab-past" style="cursor: pointer; opacity: 0.6; transition: opacity 0.3s;" onclick="AdminPanel.setEventTab('past')">
+                        <div class="stat-icon" style="background: #f3f4f6; color: #4b5563;"><i class="fas fa-history"></i></div>
+                        <div class="stat-info">
+                            <h3 style="color: #4b5563;">Past Events</h3>
+                            <p id="count-past" style="color: #374151;">0</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card">
-                    <table class="data-table">
-                        <thead><tr><th>Title</th><th>College</th><th>District</th><th>Status</th><th>Actions</th></tr></thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>Hackathon 2024</strong></td>
-                                <td>WCE Sangli</td>
-                                <td>Sangli</td>
-                                <td><span class="status-badge status-active">Live</span></td>
-                                <td class="action-btns">
-                                    <button class="btn-primary">View</button>
-                                    <button class="btn-primary" style="background: var(--danger);">Suspend</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="flex-between" style="margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                        <h3 id="table-title">Upcoming Events</h3>
+                        <div style="display: flex; gap: 1rem; align-items: center;">
+                            <div class="search-box">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <select id="filter-district" style="border: none; outline: none; background: transparent; padding-left: 0.5rem;" onchange="AdminPanel.renderModerationEvents()">
+                                    <option value="ALL">All Districts</option>
+                                    <option value="Kolhapur">Kolhapur</option>
+                                    <option value="Sangli">Sangli</option>
+                                    <option value="Satara">Satara</option>
+                                </select>
+                            </div>
+                            <div class="search-box">
+                                <i class="fas fa-tags"></i>
+                                <select id="filter-category" style="border: none; outline: none; background: transparent; padding-left: 0.5rem;" onchange="AdminPanel.renderModerationEvents()">
+                                    <option value="ALL">All Categories</option>
+                                    <option value="Hackathon">Hackathon</option>
+                                    <option value="Project Competition">Project Competition</option>
+                                    <option value="Coding Competition">Coding Competition</option>
+                                    <option value="Electrical related">Electrical related</option>
+                                    <option value="Civil related">Civil related</option>
+                                    <option value="Idea Pitching">Idea Pitching</option>
+                                    <option value="Business Competition">Business Competition</option>
+                                    <option value="Cultural Competition">Cultural Competition</option>
+                                    <option value="Debate Competition">Debate Competition</option>
+                                    <option value="Group Discussion">Group Discussion</option>
+                                    <option value="Others">Others</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="data-table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Event Date</th>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>College</th>
+                                    <th>District</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="moderation-events-body">
+                                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Loading events...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- View Post Modal -->
+                <div id="viewPostModal" class="modal-overlay" style="display: none; align-items: center; justify-content: center; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000;">
+                    <div class="modal-content" style="background: white; padding: 2rem; border-radius: 12px; max-width: 500px; width: 100%; text-align: left; position: relative;">
+                        <button onclick="document.getElementById('viewPostModal').style.display='none'" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+                        <h2 style="margin-bottom: 1rem; color: var(--text-main);"><i class="fas fa-image" style="color: var(--primary);"></i> Event Post</h2>
+                        <div id="postContentArea" style="min-height: 100px; display: flex; flex-direction: column; gap: 1rem;">
+                            <p style="color: var(--text-muted); text-align: center;">Loading post data...</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         `,
         registrations: `
             <div class="animate-slide">
-                <h1>Registration Monitoring</h1>
+                <div class="flex-between" style="margin-bottom: 2rem;">
+                    <h1>Registration Monitoring</h1>
+                </div>
+                
                 <div class="card">
-                    <div class="flex-between"><h3>Live Ticker</h3><button class="btn-primary">Export CSV</button></div>
-                    <table class="data-table" style="margin-top: 1.5rem;">
-                        <thead><tr><th>Event</th><th>Student</th><th>Time</th></tr></thead>
-                        <tbody>
-                            <tr><td>AI Workshop</td><td>Sameer K.</td><td>10 mins ago</td></tr>
-                        </tbody>
-                    </table>
+                    <div class="flex-between" style="margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                        <h3>All Registrations</h3>
+                        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                            <div class="search-box">
+                                <i class="fas fa-university"></i>
+                                <select id="reg-filter-college" style="border: none; outline: none; background: transparent; padding-left: 0.5rem;" onchange="AdminPanel.renderRegistrations()">
+                                    <option value="ALL">All Colleges</option>
+                                </select>
+                            </div>
+                            <div class="search-box">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <select id="reg-filter-district" style="border: none; outline: none; background: transparent; padding-left: 0.5rem;" onchange="AdminPanel.renderRegistrations()">
+                                    <option value="ALL">All Districts</option>
+                                    <option value="Kolhapur">Kolhapur</option>
+                                    <option value="Sangli">Sangli</option>
+                                    <option value="Satara">Satara</option>
+                                </select>
+                            </div>
+                            <div class="search-box">
+                                <i class="fas fa-tags"></i>
+                                <select id="reg-filter-category" style="border: none; outline: none; background: transparent; padding-left: 0.5rem;" onchange="AdminPanel.renderRegistrations()">
+                                    <option value="ALL">All Categories</option>
+                                    <option value="Hackathon">Hackathon</option>
+                                    <option value="Project Competition">Project Competition</option>
+                                    <option value="Coding Competition">Coding Competition</option>
+                                    <option value="Electrical related">Electrical related</option>
+                                    <option value="Civil related">Civil related</option>
+                                    <option value="Idea Pitching">Idea Pitching</option>
+                                    <option value="Business Competition">Business Competition</option>
+                                    <option value="Cultural Competition">Cultural Competition</option>
+                                    <option value="Debate Competition">Debate Competition</option>
+                                    <option value="Group Discussion">Group Discussion</option>
+                                    <option value="Others">Others</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="data-table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Student Name</th>
+                                    <th>Student College</th>
+                                    <th>Event Name</th>
+                                    <th>Hosting College</th>
+                                    <th>District</th>
+                                    <th>Category</th>
+                                </tr>
+                            </thead>
+                            <tbody id="registrations-body">
+                                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Loading registrations...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         `,
@@ -230,18 +342,6 @@ const AdminPanel = {
                 </div>
             </div>
         `,
-        notifications: `
-            <div class="animate-slide">
-                <h1>Global Notifications</h1>
-                <div class="card">
-                    <form style="display: flex; flex-direction: column; gap: 1rem;">
-                        <input type="text" class="form-input" placeholder="Announcement Title" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border-color);">
-                        <textarea placeholder="Message content..." style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border-color); height: 100px;"></textarea>
-                        <button class="btn-primary">Blast Notification</button>
-                    </form>
-                </div>
-            </div>
-        `,
         reports: `
             <div class="animate-slide">
                 <h1>System Reports</h1>
@@ -249,31 +349,6 @@ const AdminPanel = {
                     <div class="card"><h4>Event Reports</h4><button class="btn-primary">PDF</button></div>
                     <div class="card"><h4>Student Stats</h4><button class="btn-primary">CSV</button></div>
                     <div class="card"><h4>College Activity</h4><button class="btn-primary">Export</button></div>
-                </div>
-            </div>
-        `,
-        logs: `
-            <div class="animate-slide">
-                <h1>Activity Logs</h1>
-                <div class="card">
-                    <table class="data-table">
-                        <thead><tr><th>Time</th><th>User</th><th>Action</th></tr></thead>
-                        <tbody>
-                            <tr><td>10:45</td><td>Admin</td><td>Updated System Rules</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        `,
-        settings: `
-            <div class="animate-slide">
-                <h1>System Settings</h1>
-                <div class="card">
-                    <h3>General Platform Configuration</h3>
-                    <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
-                        <div class="flex-between"><span>Max Image Size</span><input type="text" value="5MB"></div>
-                        <div class="flex-between"><span>Maintenance Mode</span><input type="checkbox"></div>
-                    </div>
                 </div>
             </div>
         `,
@@ -318,10 +393,14 @@ const AdminPanel = {
             }
         });
 
-        if (pageId === 'dashboard') {
-            this.loadDashboardData();
-        } else if (pageId === 'onboarding') {
+        if (pageId === 'onboarding') {
             this.loadOnboardingData();
+        } else if (pageId === 'dashboard') {
+            this.loadDashboardData();
+        } else if (pageId === 'events') {
+            this.loadModerationEventsData();
+        } else if (pageId === 'registrations') {
+            this.loadRegistrationsData();
         }
     },
 
@@ -331,6 +410,12 @@ const AdminPanel = {
             'Authorization': token ? `Bearer ${token}` : ''
         };
     },
+
+    // State Variables
+    pendingOnboardingFile: null,
+    allModerationEvents: [],
+    allRegistrations: [],
+    currentEventTab: 'upcoming', // 'upcoming' or 'past'
 
     async loadOnboardingData() {
         try {
@@ -584,6 +669,270 @@ const AdminPanel = {
         } catch (error) {
             console.error("Error loading dashboard data:", error);
         }
+    },
+
+    filterColleges() {
+        const input = document.getElementById('collegeSearchInput');
+        if (!input) return;
+        const filter = input.value.toUpperCase();
+        const tbody = document.getElementById('registered-colleges-body');
+        if (!tbody) return;
+        const trs = tbody.getElementsByTagName('tr');
+        for (let i = 0; i < trs.length; i++) {
+            const tdCode = trs[i].getElementsByTagName('td')[0]; // collegeCode
+            const tdName = trs[i].getElementsByTagName('td')[1]; // collegeName
+            if (tdCode || tdName) {
+                const txtCode = tdCode ? (tdCode.textContent || tdCode.innerText) : "";
+                const txtName = tdName ? (tdName.textContent || tdName.innerText) : "";
+                if (txtCode.toUpperCase().indexOf(filter) > -1 || txtName.toUpperCase().indexOf(filter) > -1) {
+                    trs[i].style.display = "";
+                } else {
+                    trs[i].style.display = "none";
+                }
+            }
+        }
+    },
+
+    setEventTab(tabStr) {
+        this.currentEventTab = tabStr;
+        
+        const upTab = document.getElementById('tab-upcoming');
+        const pastTab = document.getElementById('tab-past');
+        const title = document.getElementById('table-title');
+        
+        if (tabStr === 'upcoming') {
+            if(upTab) { upTab.style.border = '2px solid var(--primary)'; upTab.style.opacity = '1'; upTab.style.background = '#f0fdf4'; }
+            if(pastTab) { pastTab.style.border = 'none'; pastTab.style.opacity = '0.6'; pastTab.style.background = '#fff'; }
+            if(title) title.textContent = "Upcoming Events";
+        } else {
+            if(pastTab) { pastTab.style.border = '2px solid var(--primary)'; pastTab.style.opacity = '1'; pastTab.style.background = '#f0fdf4'; }
+            if(upTab) { upTab.style.border = 'none'; upTab.style.opacity = '0.6'; upTab.style.background = '#fff'; }
+            if(title) title.textContent = "Past Events";
+        }
+        
+        this.renderModerationEvents(); // re-filter
+    },
+
+    async loadModerationEventsData() {
+        try {
+            const res = await fetch('/api/admin/events', { headers: this.getAuthHeaders() });
+            if (res.ok) {
+                this.allModerationEvents = await res.json();
+                
+                // Render lists
+                this.renderModerationEvents();
+            } else {
+                console.error("Failed to fetch events");
+                const tbody = document.getElementById('moderation-events-body');
+                if(tbody) tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: red;">Failed to load events. Server returned ${res.status}</td></tr>`;
+            }
+        } catch(error) {
+            console.error(error);
+        }
+    },
+
+    renderModerationEvents() {
+        const tbody = document.getElementById('moderation-events-body');
+        if (!tbody) return;
+
+        const catFilter = document.getElementById('filter-category')?.value || 'ALL';
+        const distFilter = document.getElementById('filter-district')?.value || 'ALL';
+        const now = new Date();
+
+        // 1. Filter by Tab (Upcoming vs Past)
+        let filtered = this.allModerationEvents.filter(e => {
+            const edate = new Date(e.eventDate);
+            if (this.currentEventTab === 'upcoming') return edate >= now;
+            else return edate < now;
+        });
+
+        // Update counts
+        const allUpcoming = this.allModerationEvents.filter(e => new Date(e.eventDate) >= now).length;
+        const allPast = this.allModerationEvents.filter(e => new Date(e.eventDate) < now).length;
+        
+        const countUp = document.getElementById('count-upcoming');
+        const countPast = document.getElementById('count-past');
+        if (countUp) countUp.textContent = allUpcoming;
+        if (countPast) countPast.textContent = allPast;
+
+        // 2. Filter by Category
+        if (catFilter !== 'ALL') {
+            filtered = filtered.filter(e => e.category === catFilter);
+        }
+
+        // 3. Filter by District
+        if (distFilter !== 'ALL') {
+            filtered = filtered.filter(e => e.college && e.college.district === distFilter);
+        }
+
+        // Render to Table
+        if (filtered.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">No events found matching these filters.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = filtered.map(e => {
+            const dateObj = new Date(e.eventDate);
+            const dateStr = dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            // Map EventStatus to colors manually since we don't have the status constants
+            let statusColor = "gray"; 
+            if(e.status === 'PUBLISHED') statusColor = 'green';
+            if(e.status === 'DRAFT') statusColor = 'orange';
+
+            return `
+                <tr>
+                    <td style="font-size: 0.85rem; color: var(--text-muted);">
+                        <i class="far fa-calendar"></i> ${dateStr}
+                    </td>
+                    <td><strong style="color: var(--text-main);">${e.title}</strong></td>
+                    <td><span style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">${e.category || 'N/A'}</span></td>
+                    <td>${e.college ? e.college.name : 'Unknown'}</td>
+                    <td>${e.college ? e.college.district : 'N/A'}</td>
+                    <td>
+                        <span style="background: ${statusColor}; color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">
+                            ${e.status || 'UNKNOWN'}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn-primary" style="background: var(--navy-sidebar); font-size: 0.75rem; padding: 0.4rem 0.8rem;" onclick="AdminPanel.viewEventPost(${e.id})">
+                            <i class="fas fa-eye"></i> View Post
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    },
+
+    async viewEventPost(eventId) {
+        const modal = document.getElementById('viewPostModal');
+        const contentArea = document.getElementById('postContentArea');
+        if (!modal || !contentArea) return;
+
+        modal.style.display = 'flex';
+        contentArea.innerHTML = `<p style="color: var(--text-muted); text-align: center;"><i class="fas fa-spinner fa-spin"></i> Fetching post...</p>`;
+
+        try {
+            const res = await fetch(`/api/admin/events/${eventId}/post`, { headers: this.getAuthHeaders() });
+            if (res.ok) {
+                const post = await res.json();
+                let imageHtml = '';
+                if (post.images) {
+                    imageHtml = `<img src="${post.images}" style="width: 100%; border-radius: 8px; margin-bottom: 1rem; border: 1px solid var(--border-color); object-fit: cover; max-height: 300px;" alt="Post Image">`;
+                }
+
+                contentArea.innerHTML = `
+                    ${imageHtml}
+                    <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                        <p style="font-size: 0.95rem; color: var(--text-main); white-space: pre-wrap; line-height: 1.5;">${post.caption || '<em>No caption provided.</em>'}</p>
+                    </div>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); text-align: right; margin-top: 0.5rem;">
+                        Posted: ${new Date(post.createdAt || Date.now()).toLocaleDateString()}
+                    </p>
+                `;
+            } else if (res.status === 404) {
+                contentArea.innerHTML = `
+                    <div style="text-align: center; padding: 2rem 0;">
+                        <i class="fas fa-folder-open" style="font-size: 3rem; color: #e2e8f0; margin-bottom: 1rem;"></i>
+                        <h3 style="color: var(--text-muted);">No Post Available</h3>
+                        <p style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.5rem;">The coordinator has not created a post for this event yet.</p>
+                    </div>
+                `;
+            } else {
+                contentArea.innerHTML = `<p style="color: var(--danger); text-align: center;">Error loading post: Server returned ${res.status}</p>`;
+            }
+        } catch (error) {
+            console.error("Error viewing post:", error);
+            contentArea.innerHTML = `<p style="color: var(--danger); text-align: center;">An unexpected error occurred.</p>`;
+        }
+    },
+
+    async loadRegistrationsData() {
+        try {
+            const res = await fetch('/api/admin/registrations', { headers: this.getAuthHeaders() });
+            if (res.ok) {
+                this.allRegistrations = await res.json();
+                
+                // Extract unique colleges to populate the filter
+                const colleges = new Set();
+                this.allRegistrations.forEach(r => {
+                    if (r.event && r.event.college && r.event.college.name) {
+                        colleges.add(r.event.college.name);
+                    }
+                });
+                
+                const cSelect = document.getElementById('reg-filter-college');
+                if (cSelect) {
+                    cSelect.innerHTML = '<option value="ALL">All Colleges</option>';
+                    Array.from(colleges).sort().forEach(c => {
+                        const opt = document.createElement('option');
+                        opt.value = c;
+                        opt.textContent = c;
+                        cSelect.appendChild(opt);
+                    });
+                }
+
+                // Render lists
+                this.renderRegistrations();
+            } else {
+                console.error("Failed to fetch registrations");
+                const tbody = document.getElementById('registrations-body');
+                if(tbody) tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: red;">Failed to load registrations. Server returned ${res.status}</td></tr>`;
+            }
+        } catch(error) {
+            console.error(error);
+        }
+    },
+
+    renderRegistrations() {
+        const tbody = document.getElementById('registrations-body');
+        if (!tbody) return;
+
+        const catFilter = document.getElementById('reg-filter-category')?.value || 'ALL';
+        const distFilter = document.getElementById('reg-filter-district')?.value || 'ALL';
+        const colFilter = document.getElementById('reg-filter-college')?.value || 'ALL';
+
+        let filtered = this.allRegistrations;
+
+        // Apply Category Filter
+        if (catFilter !== 'ALL') {
+            filtered = filtered.filter(r => r.event && r.event.category === catFilter);
+        }
+
+        // Apply District Filter
+        if (distFilter !== 'ALL') {
+            filtered = filtered.filter(r => r.event && r.event.college && r.event.college.district === distFilter);
+        }
+
+        // Apply College Filter
+        if (colFilter !== 'ALL') {
+            filtered = filtered.filter(r => r.event && r.event.college && r.event.college.name === colFilter);
+        }
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">No registrations found matching these filters.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = filtered.map(r => {
+            const studentName = r.student ? (r.student.fullName || r.student.username) : 'N/A';
+            const studentCollegeInfo = r.student && r.student.college ? r.student.college.name : 'Unknown';
+            const eventName = r.event ? r.event.title : 'N/A';
+            const hostingCollege = r.event && r.event.college ? r.event.college.name : 'Unknown';
+            const district = r.event && r.event.college ? r.event.college.district : 'N/A';
+            const category = r.event ? r.event.category : 'N/A';
+
+            return `
+                <tr>
+                    <td><strong>${studentName}</strong></td>
+                    <td><span style="font-size: 0.85rem; color: var(--text-muted);">${studentCollegeInfo}</span></td>
+                    <td><strong style="color: var(--primary);">${eventName}</strong></td>
+                    <td>${hostingCollege}</td>
+                    <td>${district}</td>
+                    <td><span style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">${category}</span></td>
+                </tr>
+            `;
+        }).join('');
     },
 
     render() {

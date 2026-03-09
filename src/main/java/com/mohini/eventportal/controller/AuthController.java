@@ -65,12 +65,12 @@ public class AuthController {
 
         if (roles.contains("ROLE_COORDINATOR")) {
             com.mohini.eventportal.model.College college = collegeRepository.findByUsername(username).get();
-            userId = college.getCollegeCode();
+            userId = String.valueOf(college.getCollegeCode());
             email = college.getEmail();
             fullName = college.getCoordinatorName();
             phone = college.getPhone();
             district = college.getDistrict();
-            collegeId = college.getCollegeCode();
+            collegeId = String.valueOf(college.getCollegeCode());
             collegeName = college.getCollegeName();
         } else {
             User user = userRepository.findByUsername(username).get();
@@ -79,11 +79,18 @@ public class AuthController {
             fullName = user.getFullName();
             phone = user.getPhone();
             district = user.getDistrict();
-            if (user.getCollegeId() != null) {
-                collegeId = user.getCollegeId();
-                com.mohini.eventportal.model.College c = collegeRepository.findById(collegeId).orElse(null);
-                if (c != null) {
-                    collegeName = c.getCollegeName();
+            if (user.getCollegeId() != null && !user.getCollegeId().isEmpty()) {
+                try {
+                    Integer collegeCode = Integer.valueOf(user.getCollegeId());
+                    collegeId = user.getCollegeId();
+                    com.mohini.eventportal.model.College c = collegeRepository.findById(collegeCode).orElse(null);
+                    if (c != null) {
+                        collegeName = c.getCollegeName();
+                    }
+                } catch (NumberFormatException e) {
+                    // Handle the case where collegeId is not a valid integer
+                    // Log the error or set collegeId/collegeName to null/default
+                    System.err.println("Invalid collegeId format for user " + user.getUsername() + ": " + user.getCollegeId());
                 }
             }
         }

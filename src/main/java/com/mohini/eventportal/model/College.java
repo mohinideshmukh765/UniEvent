@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "colleges")
+@Table(name = "colleges", schema = "public")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,7 +19,7 @@ public class College {
 
     @Id
     @Column(name = "college_code")
-    private String collegeCode;
+    private Integer collegeCode;
 
     @NotBlank
     @Column(name = "name")
@@ -31,6 +31,7 @@ public class College {
     @Column(name = "phone")
     private String phone;
 
+    @NotBlank
     @Column(name = "email")
     private String email;
 
@@ -40,9 +41,10 @@ public class College {
     @Column(name = "district")
     private String district;
 
-    @Column(name = "username", unique = true)
+    @Transient
     private String username;
 
+    @NotBlank
     @Column(name = "password")
     private String password;
 
