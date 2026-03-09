@@ -19,7 +19,7 @@ public class College {
 
     @Id
     @Column(name = "college_code")
-    private Integer collegeCode;
+    private String collegeCode;
 
     @NotBlank
     @Column(name = "name")
@@ -41,7 +41,7 @@ public class College {
     @Column(name = "district")
     private String district;
 
-    @Transient
+    @Column(name = "username", unique = true)
     private String username;
 
     @NotBlank

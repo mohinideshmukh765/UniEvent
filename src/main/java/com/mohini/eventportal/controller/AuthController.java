@@ -79,18 +79,13 @@ public class AuthController {
             fullName = user.getFullName();
             phone = user.getPhone();
             district = user.getDistrict();
-            if (user.getCollegeId() != null && !user.getCollegeId().isEmpty()) {
-                try {
-                    Integer collegeCode = Integer.valueOf(user.getCollegeId());
-                    collegeId = user.getCollegeId();
-                    com.mohini.eventportal.model.College c = collegeRepository.findById(collegeCode).orElse(null);
-                    if (c != null) {
-                        collegeName = c.getCollegeName();
-                    }
-                } catch (NumberFormatException e) {
-                    // Handle the case where collegeId is not a valid integer
-                    // Log the error or set collegeId/collegeName to null/default
-                    System.err.println("Invalid collegeId format for user " + user.getUsername() + ": " + user.getCollegeId());
+            if (user.getCollege() != null && !user.getCollege().isEmpty()) {
+                collegeName = user.getCollege();
+            } else if (user.getCollegeId() != null && !user.getCollegeId().isEmpty()) {
+                collegeId = user.getCollegeId();
+                com.mohini.eventportal.model.College c = collegeRepository.findById(collegeId).orElse(null);
+                if (c != null) {
+                    collegeName = c.getCollegeName();
                 }
             }
         }
@@ -129,6 +124,7 @@ public class AuthController {
                 .fullName(signUpRequest.getFullName())
                 .phone(signUpRequest.getPhone())
                 .district(signUpRequest.getDistrict())
+                .college(signUpRequest.getCollege())
                 .build();
 
         String strRole = signUpRequest.getRole();

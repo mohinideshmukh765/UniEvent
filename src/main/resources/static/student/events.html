@@ -1,1 +1,917 @@
-﻿<!DOCTYPE html> <html lang="en"> <head>     <meta charset="UTF-8">     <meta name="viewport" content="width=device-width, initial-scale=1.0">     <title>Browse Events | UniEvent Portal</title>     <link rel="stylesheet" href="/css/style.css">     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">     <style>         :root { --sidebar-width: 280px; }         .student-layout { display: grid; grid-template-columns: var(--sidebar-width) 1fr; min-height: 100vh; background: #f8fafc; }         .student-sidebar { background: white; border-right: 1px solid var(--glass-border); padding: 2rem 1.5rem; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }         .student-main { padding: 2rem 3rem; }         .sidebar-nav { margin-top: 2rem; flex: 1; }         .nav-link { display: flex; align-items: center; gap: 1rem; padding: 0.875rem 1.25rem; color: var(--text-muted); text-decoration: none; border-radius: 12px; margin-bottom: 0.5rem; font-weight: 500; transition: var(--transition); }         .nav-link:hover, .nav-link.active { background: rgba(79, 70, 229, 0.08); color: var(--primary); }         .nav-link i { width: 20px; font-size: 1.1rem; }         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }         .search-box { position: relative; width: 400px; }         .search-box i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }         .search-box input { padding-left: 3rem; }                  .events-layout { display: grid; grid-template-columns: 280px 1fr; gap: 2.5rem; }         .filters-aside { background: white; padding: 1.5rem; border-radius: 20px; border: 1px solid var(--glass-border); height: fit-content; }         .filter-group { margin-bottom: 1.5rem; }         .filter-group h4 { margin-bottom: 1rem; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }         .filter-option { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; cursor: pointer; font-size: 0.935rem; }         .filter-option input { width: 18px; height: 18px; border-radius: 4px; border: 2px solid var(--glass-border); cursor: pointer; }                  .events-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem; }         .event-card { background: white; border-radius: 24px; overflow: hidden; border: 1px solid var(--glass-border); transition: var(--transition); }         .event-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); }         .event-card .img-container { height: 200px; background-size: cover; background-position: center; position: relative; }         .event-card .price-tag { position: absolute; top: 1rem; right: 1rem; background: white; padding: 0.4rem 0.8rem; border-radius: 10px; font-weight: 700; color: var(--primary); box-shadow: var(--shadow-sm); }         .event-card .category-tag { position: absolute; top: 1rem; left: 1rem; background: var(--primary); color: white; padding: 0.4rem 0.8rem; border-radius: 10px; font-weight: 600; font-size: 0.75rem; }         .event-card .content { padding: 1.5rem; }                  .profile-footer { margin-top: auto; display: flex; align-items: center; gap: 1rem; padding-top: 2rem; border-top: 1px solid var(--glass-border); }         .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; }     </style> </head> <body class="light-theme">     <div class="student-layout">         <!-- Sidebar -->         <aside class="student-sidebar">             <a href="/" class="logo" style="margin-left: 1.25rem;">UniEvent</a>                          <nav class="sidebar-nav">                 <a href="/student/dashboard.html" class="nav-link">                     <i class="fas fa-th-large"></i> Dashboard                 </a>                 <a href="/student/events.html" class="nav-link active">                     <i class="fas fa-search"></i> Browse Events                 </a>                 <a href="/student/my-registrations.html" class="nav-link">                     <i class="fas fa-ticket-alt"></i> My Registrations                 </a>                 <a href="/student/certificates.html" class="nav-link">                     <i class="fas fa-certificate"></i> Certificates                 </a>                 <a href="/student/recommendations.html" class="nav-link">                     <i class="fas fa-magic"></i> AI Recommendations                 </a>             </nav>              <div class="profile-footer">                                  <div style="flex: 1;">                     <div class="student-name" style="font-weight: 600; font-size: 0.9rem;">Aryan Sharma</div>                     <div style="font-size: 0.75rem; color: var(--text-muted);">Computer Science</div>                 </div>                 <a href="#" class="logout-btn" style="color: var(--text-muted);"><i class="fas fa-sign-out-alt"></i></a>             </div>         </aside>          <!-- Main Content -->         <main class="student-main">             <header class="top-bar">                 <div class="search-box">                     <i class="fas fa-search"></i>                     <input type="text" class="form-input" placeholder="Search events, workshops, or clubs...">                 </div>                 <div style="display: flex; align-items: center; gap: 1.5rem;">                     <span style="color: var(--text-muted); font-size: 0.9rem;">Sort by: <strong>Earliest First</strong> <i class="fas fa-chevron-down"></i></span>                                          <a href="/student/profile.html" class="avatar" style="width: 44px; height: 44px; text-decoration: none;">AS</a>                 </div>             </header>              <div class="events-layout fade-in">                 <aside class="filters-aside">                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">                         <h3 style="font-size: 1.1rem;">Filters</h3>                         <a href="#" class="link-primary" style="font-size: 0.8rem;">Clear all</a>                     </div>                      <div class="filter-group">                         <h4>District</h4>                         <label class="filter-option"><input type="checkbox" checked> Kolhapur</label>                         <label class="filter-option"><input type="checkbox"> Sangli</label>                         <label class="filter-option"><input type="checkbox"> Satara</label>                     </div>                      <div class="filter-group">                         <h4>Category</h4>                         <label class="filter-option"><input type="checkbox" value="Hackathon"> Hackathon</label>                         <label class="filter-option"><input type="checkbox" value="Project Competition"> Project Competition</label>                         <label class="filter-option"><input type="checkbox" value="Coding Competition"> Coding Competition</label>                         <label class="filter-option"><input type="checkbox" value="Electrical related"> Electrical related</label>                         <label class="filter-option"><input type="checkbox" value="Civil related"> Civil related</label>                         <label class="filter-option"><input type="checkbox" value="Idea Pitching"> Idea Pitching</label>                         <label class="filter-option"><input type="checkbox" value="Business Competition"> Business Competition</label>                         <label class="filter-option"><input type="checkbox" value="Cultural Competition"> Cultural Competition</label>                         <label class="filter-option"><input type="checkbox" value="Debate Competition"> Debate Competition</label>                         <label class="filter-option"><input type="checkbox" value="Group Discussion"> Group Discussion</label>                         <label class="filter-option"><input type="checkbox" value="Others"> Others</label>                     </div>                      <div class="filter-group">                         <h4>Fee</h4>                         <div style="display: flex; gap: 0.5rem;">                             <button class="btn btn-secondary active" style="flex: 1; padding: 0.5rem;">Free</button>                             <button class="btn btn-secondary" style="flex: 1; padding: 0.5rem;">Paid</button>                         </div>                     </div>                      <div class="filter-group">                         <h4>Event Date</h4>                         <div style="display: flex; gap: 0.5rem; align-items: center;">                             <input type="date" class="form-input" style="flex: 1; padding: 0.5rem; font-size: 0.8rem;" title="From Date">                             <span style="color: var(--text-muted); font-size: 0.85rem;">to</span>                             <input type="date" class="form-input" style="flex: 1; padding: 0.5rem; font-size: 0.8rem;" title="To Date">                         </div>                     </div>                 </aside>                  <div class="events-content">                     <div style="margin-bottom: 2rem;">                         <h2 style="font-family: 'Outfit'; font-size: 2rem;">Explore Events</h2>                         <p style="color: var(--text-muted);">Showing 24 upcoming events in Maharashtra</p>                     </div>                      <div class="events-grid" id="eventsGrid">                         <!-- Populated by JS -->                     </div>                      <!-- Pagination -->                     <div style="margin-top: 4rem; display: flex; justify-content: center; gap: 0.5rem;">                         <button class="btn btn-secondary" style="width: 40px; height: 40px; padding: 0; justify-content: center;"><i class="fas fa-chevron-left"></i></button>                         <button class="btn btn-primary" style="width: 40px; height: 40px; padding: 0; justify-content: center;">1</button>                         <button class="btn btn-secondary" style="width: 40px; height: 40px; padding: 0; justify-content: center;">2</button>                         <button class="btn btn-secondary" style="width: 40px; height: 40px; padding: 0; justify-content: center;">3</button>                         <button class="btn btn-secondary" style="width: 40px; height: 40px; padding: 0; justify-content: center;"><i class="fas fa-chevron-right"></i></button>                     </div>                 </div>             </div>         </main>     </div>      <script src="/js/student.js"></script>     <script>         document.addEventListener('DOMContentLoaded', () => {             const grid = document.getElementById('eventsGrid');             grid.innerHTML = mockEvents.map(event => `                 <div class="event-card">                     <div class="img-container" style="background-image: url('${event.image}')">                         <span class="category-tag">${event.category}</span>                         <span class="price-tag">${event.price}</span>                     </div>                     <div class="content">                         <h3 style="margin-bottom: 0.5rem;">${event.title}</h3>                         <div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">                             <i class="fas fa-map-marker-alt" style="color: var(--primary);"></i> ${event.college}                         </div>                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; font-size: 0.85rem;">                             <div>                                 <div style="color: var(--text-muted);">Event Date</div>                                 <div style="font-weight: 600;"><i class="fas fa-calendar"></i> ${event.date}</div>                             </div>                             <div>                                 <div style="color: var(--text-muted);">Deadline</div>                                 <div style="font-weight: 600; color: #ef4444;"><i class="fas fa-clock"></i> ${event.deadline}</div>                             </div>                         </div>                         <a href="/student/event-details.html?id=${event.id}" class="btn btn-primary" style="width: 100%; justify-content: center;">Register Now <i class="fas fa-arrow-right"></i></a>                     </div>                 </div>             `).join('');         });     </script> </body> </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Events | UniEvent Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --sidebar-width: 260px; }
+        body { font-family: 'Inter', sans-serif; background: #f1f5f9; margin: 0; }
+
+        /* Layout */
+        .student-layout { display: grid; grid-template-columns: var(--sidebar-width) 1fr; min-height: 100vh; }
+        .student-sidebar { background: white; border-right: 1px solid #e2e8f0; padding: 1.5rem 1rem; position: sticky; top: 0; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; }
+        .student-main { padding: 2rem; background: #f8fafc; }
+
+        /* Browse Content Layout */
+        .browse-container { display: grid; grid-template-columns: 280px 1fr; gap: 2rem; align-items: flex-start; }
+        
+        /* Filters Sidebar */
+        .filters-sidebar { background: white; border-radius: 20px; border: 1px solid #e2e8f0; padding: 1.5rem; position: sticky; top: 2rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .filter-section { margin-bottom: 2rem; }
+        .filter-section:last-child { margin-bottom: 0; }
+        .filter-section h3 { font-size: 0.95rem; font-weight: 700; color: #1e293b; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .filter-section h3 i { color: #4f46e5; }
+        
+        .filter-options { display: flex; flex-direction: column; gap: 0.5rem; }
+        .filter-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0.8rem; border-radius: 12px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; font-size: 0.9rem; color: #475569; }
+        .filter-item:hover { background: #f1f5f9; color: #4f46e5; }
+        .filter-item.active { background: #ede9fe; color: #4f46e5; border-color: #c4b5fd; font-weight: 600; }
+        
+        .date-range-input { width: 100%; padding: 0.6rem; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.85rem; outline: none; transition: border-color 0.2s; margin-top: 0.5rem; color: #475569; }
+        .date-range-input:focus { border-color: #4f46e5; }
+
+        .district-select { width: 100%; padding: 0.6rem; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.85rem; outline: none; background: white; cursor: pointer; color: #475569; }
+
+        .btn-reset-filters { margin-top: 1rem; width: 100%; padding: 0.6rem; background: #f1f5f9; color: #64748b; border: none; border-radius: 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-reset-filters:hover { background: #e2e8f0; color: #1e293b; }
+
+        /* Sidebar */
+        .logo { font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 700; color: #4f46e5; text-decoration: none; display: block; margin-bottom: 2rem; padding-left: 0.75rem; }
+        .nav-link { display: flex; align-items: center; gap: 0.875rem; padding: 0.75rem 1rem; color: #64748b; text-decoration: none; border-radius: 10px; margin-bottom: 0.35rem; font-weight: 500; font-size: 0.9rem; transition: all 0.2s; }
+        .nav-link:hover, .nav-link.active { background: #ede9fe; color: #4f46e5; }
+        .nav-link i { width: 18px; text-align: center; }
+        .profile-footer { margin-top: auto; padding-top: 1.5rem; border-top: 1px solid #e2e8f0; display: flex; align-items: center; gap: 0.75rem; }
+        .avatar-sm { width: 38px; height: 38px; border-radius: 50%; background: #4f46e5; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+
+        /* Top bar */
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .search-container { position: relative; }
+        .search-container i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+        .search-input { padding: 0.7rem 1rem 0.7rem 2.75rem; border: 1px solid #e2e8f0; border-radius: 12px; width: 340px; font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
+        .search-input:focus { border-color: #4f46e5; }
+
+        /* Filter bar */
+        .filter-bar { display: flex; gap: 0.75rem; margin-bottom: 2rem; flex-wrap: wrap; align-items: center; }
+        .filter-chip { padding: 0.5rem 1rem; border: 1px solid #e2e8f0; border-radius: 50px; background: white; font-size: 0.85rem; font-weight: 500; cursor: pointer; color: #475569; transition: all 0.2s; }
+        .filter-chip:hover, .filter-chip.active { background: #4f46e5; color: white; border-color: #4f46e5; }
+
+        /* Event cards grid */
+        .events-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 1.5rem; }
+        .event-card { background: white; border-radius: 20px; overflow: hidden; border: 1px solid #e2e8f0; transition: all 0.25s; }
+        .event-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+
+        /* Event image */
+        .event-img { height: 190px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .event-img img { width: 100%; height: 100%; object-fit: cover; }
+        .event-img .no-photo { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.8); }
+        .event-img .no-photo i { font-size: 2.5rem; }
+        .category-badge { position: absolute; top: 1rem; left: 1rem; background: white; color: #4f46e5; padding: 0.3rem 0.75rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700; }
+        .fee-badge { position: absolute; top: 1rem; right: 1rem; padding: 0.3rem 0.75rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700; }
+        .fee-badge.free { background: #dcfce7; color: #16a34a; }
+        .fee-badge.paid { background: #fef3c7; color: #d97706; }
+
+        /* Event card body */
+        .event-body { padding: 1.25rem; }
+        .event-title { font-size: 1rem; font-weight: 700; margin: 0 0 0.5rem; color: #1e293b; }
+        .event-college { font-size: 0.82rem; color: #64748b; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.4rem; }
+        .event-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem; }
+        .meta-item { font-size: 0.8rem; }
+        .meta-label { color: #94a3b8; margin-bottom: 0.2rem; }
+        .meta-value { font-weight: 600; color: #334155; }
+        .deadline-value { color: #ef4444 !important; }
+        .past-deadline { background: #fef2f2; border-radius: 6px; padding: 0.4rem 0.6rem; font-size: 0.75rem; color: #ef4444; font-weight: 600; margin-bottom: 1rem; }
+
+        /* Register button */
+        .btn-register { display: block; width: 100%; padding: 0.75rem; background: #4f46e5; color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 0.9rem; cursor: pointer; text-align: center; transition: all 0.2s; }
+        .btn-register:hover { background: #4338ca; }
+        .btn-register:disabled { background: #94a3b8; cursor: not-allowed; }
+
+        /* Loading / empty states */
+        .loading-state { text-align: center; padding: 4rem 2rem; color: #64748b; }
+        .loading-state i { font-size: 3rem; margin-bottom: 1rem; color: #4f46e5; }
+        .empty-state { text-align: center; padding: 4rem 2rem; color: #64748b; }
+
+        /* --- REGISTRATION MODAL --- */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: none; overflow-y: auto; padding: 2rem; }
+        .modal-overlay.active { display: flex; align-items: flex-start; justify-content: center; }
+        .modal { background: white; border-radius: 24px; max-width: 620px; width: 100%; margin: auto; overflow: hidden; }
+        .modal-header { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; padding: 1.5rem 2rem; position: relative; }
+        .modal-header h2 { margin: 0 0 0.35rem; font-size: 1.25rem; }
+        .modal-header p { margin: 0; opacity: 0.85; font-size: 0.85rem; }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.2); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
+        .modal-body { padding: 1.75rem 2rem; }
+        .modal-footer { padding: 1rem 2rem 1.75rem; display: flex; gap: 1rem; }
+
+        /* Form inside modal */
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label { display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 0.4rem; }
+        .form-control { width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.9rem; box-sizing: border-box; transition: border-color 0.2s; }
+        .form-control:focus { border-color: #4f46e5; outline: none; }
+
+        /* Payment section */
+        .payment-section { background: #fef9ec; border: 1px solid #fde68a; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem; }
+        .payment-section h4 { margin: 0 0 0.75rem; color: #92400e; font-size: 0.95rem; }
+        .qr-image { max-width: 200px; border-radius: 10px; border: 2px solid #4f46e5; margin-top: 0.5rem; }
+
+        /* Team members */
+        .team-info { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 10px; padding: 0.75rem 1rem; font-size: 0.82rem; color: #0369a1; margin-bottom: 1.25rem; }
+
+        /* Submit / Cancel */
+        .btn-submit { flex: 1; padding: 0.75rem; background: #4f46e5; color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
+        .btn-submit:hover { background: #4338ca; }
+        .btn-submit:disabled { background: #94a3b8; cursor: not-allowed; }
+        .btn-cancel { padding: 0.75rem 1.5rem; background: #f1f5f9; color: #64748b; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; }
+
+        /* Result message in modal */
+        .modal-result { padding: 0.75rem 1rem; border-radius: 10px; font-weight: 600; font-size: 0.9rem; margin-bottom: 1rem; display: none; }
+        .modal-result.success { background: #dcfce7; color: #16a34a; }
+        .modal-result.error { background: #fee2e2; color: #dc2626; }
+
+        /* Card enhancement styles */
+        .organized-by-badge { font-size: 0.75rem; color: #6366f1; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.25rem; }
+        .event-desc-snippet { font-size: 0.85rem; color: #64748b; line-height: 1.5; margin-bottom: 1.25rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-clamp: 2; overflow: hidden; }
+        .coordinator-info { padding-top: 1rem; border-top: 1px solid #f1f5f9; margin-bottom: 1.25rem; }
+        .coord-label { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin-bottom: 0.35rem; }
+        .coord-details { display: flex; justify-content: space-between; align-items: center; }
+        .coord-name { font-size: 0.85rem; font-weight: 600; color: #1e293b; }
+        .coord-contact { font-size: 0.85rem; color: #4f46e5; text-decoration: none; font-weight: 600; transition: color 0.15s; }
+        .coord-contact:hover { color: #4338ca; }
+    </style>
+</head>
+<body>
+<div class="student-layout">
+    <!-- Sidebar -->
+    <aside class="student-sidebar">
+        <a href="/" class="logo">UniEvent</a>
+        <nav class="sidebar-nav">
+            <a href="/student/dashboard.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a href="/student/events.html" class="nav-link active"><i class="fas fa-search"></i> Browse Events</a>
+            <a href="/student/my-registrations.html" class="nav-link"><i class="fas fa-ticket-alt"></i> My Registrations</a>
+            <a href="/student/certificates.html" class="nav-link"><i class="fas fa-certificate"></i> Certificates</a>
+            <a href="/student/recommendations.html" class="nav-link"><i class="fas fa-magic"></i> AI Recommendations</a>
+        </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="student-main">
+        <div class="top-bar">
+            <div>
+                <h1 style="font-family:'Outfit';font-size:1.75rem;margin:0 0 0.25rem;">Explore Events</h1>
+                <p style="color:#64748b;margin:0;" id="eventCount">Loading events...</p>
+            </div>
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search events..." oninput="filterEvents()">
+            </div>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <a href="/student/notifications.html" class="btn btn-secondary filter-chip" style="width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                    <i class="fas fa-bell" style="margin: 0;"></i>
+                </a>
+                <a href="/student/profile.html" class="avatar-sm" id="headerAvatar" style="text-decoration: none;">S</a>
+                <a href="#" class="btn btn-secondary filter-chip" id="headerLogoutBtn" style="width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%;" title="Logout">
+                    <i class="fas fa-sign-out-alt" style="margin: 0;"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="browse-container">
+            <!-- Advanced Filters Sidebar -->
+            <aside class="filters-sidebar">
+                <div class="filter-section">
+                    <h3><i class="fas fa-layer-group"></i> Category</h3>
+                    <div class="filter-options" id="categoryOptions">
+                        <div class="filter-item active" data-cat="All" onclick="setFilter('cat', 'All', this)">All Categories</div>
+                        <div class="filter-item" data-cat="Technical" onclick="setFilter('cat', 'Technical', this)">Technical</div>
+                        <div class="filter-item" data-cat="Cultural" onclick="setFilter('cat', 'Cultural', this)">Cultural</div>
+                        <div class="filter-item" data-cat="Sports" onclick="setFilter('cat', 'Sports', this)">Sports</div>
+                        <div class="filter-item" data-cat="Workshop" onclick="setFilter('cat', 'Workshop', this)">Workshop</div>
+                        <div class="filter-item" data-cat="Hackathon" onclick="setFilter('cat', 'Hackathon', this)">Hackathon</div>
+                        <div class="filter-item" data-cat="Project Competition" onclick="setFilter('cat', 'Project Competition', this)">Project Competition</div>
+                        <div class="filter-item" data-cat="Coding Competition" onclick="setFilter('cat', 'Coding Competition', this)">Coding Competition</div>
+                        <div class="filter-item" data-cat="Electrical related" onclick="setFilter('cat', 'Electrical related', this)">Electrical related</div>
+                        <div class="filter-item" data-cat="Civil related" onclick="setFilter('cat', 'Civil related', this)">Civil related</div>
+                        <div class="filter-item" data-cat="Idea Pitching" onclick="setFilter('cat', 'Idea Pitching', this)">Idea Pitching</div>
+                        <div class="filter-item" data-cat="Business Competition" onclick="setFilter('cat', 'Business Competition', this)">Business Competition</div>
+                        <div class="filter-item" data-cat="Debate Competition" onclick="setFilter('cat', 'Debate Competition', this)">Debate Competition</div>
+                        <div class="filter-item" data-cat="Group Discussion" onclick="setFilter('cat', 'Group Discussion', this)">Group Discussion</div>
+                        <div class="filter-item" data-cat="Seminar/Webinar" onclick="setFilter('cat', 'Seminar/Webinar', this)">Seminar/Webinar</div>
+                        <div class="filter-item" data-cat="Others" onclick="setFilter('cat', 'Others', this)">Others</div>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <h3><i class="fas fa-map-marker-alt"></i> District</h3>
+                    <select id="districtFilter" class="district-select" onchange="filterEvents()">
+                        <option value="All">All Districts</option>
+                        <!-- Districts dynamically added -->
+                    </select>
+                </div>
+
+                <div class="filter-section">
+                    <h3><i class="fas fa-calendar-alt"></i> Event Date Range</h3>
+                    <div style="display:flex; flex-direction:column; gap:0.5rem;">
+                        <div>
+                            <label style="font-size:0.75rem; color:#94a3b8;">From:</label>
+                            <input type="date" id="dateFrom" class="date-range-input" onchange="filterEvents()">
+                        </div>
+                        <div>
+                            <label style="font-size:0.75rem; color:#94a3b8;">To:</label>
+                            <input type="date" id="dateTo" class="date-range-input" onchange="filterEvents()">
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-reset-filters" onclick="resetAllFilters()">
+                    <i class="fas fa-undo"></i> Reset Filters
+                </button>
+            </aside>
+
+            <!-- Events List -->
+            <div id="eventsGrid" class="events-grid">
+                <div class="loading-state" style="grid-column:1/-1;">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading events from database...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- ===== REGISTRATION MODAL ===== -->
+<div class="modal-overlay" id="regModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 id="modalEventTitle">Register for Event</h2>
+            <p id="modalEventCollege"></p>
+            <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-result" id="modalResult"></div>
+
+            <!-- Photo Gallery -->
+            <div id="modalGallery" style="display:none; margin-bottom:1.25rem;">
+                <h4 style="font-size:0.9rem; margin-bottom:0.75rem; color:#475569;">Event Gallery</h4>
+                <div id="galleryGrid" style="display:flex; overflow-x:auto; gap:0.75rem; padding-bottom:0.5rem;">
+                    <!-- Photos rendered here -->
+                </div>
+            </div>
+
+            <!-- Event info strip -->
+            <div style="background:#f8fafc;border-radius:10px;padding:1rem;margin-bottom:1.25rem;display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-size:0.82rem;">
+                <div><span style="color:#94a3b8;">Date:</span> <strong id="mDate">-</strong></div>
+                <div><span style="color:#94a3b8;">Venue:</span> <strong id="mVenue">-</strong></div>
+                <div><span style="color:#94a3b8;">Participants:</span> <strong id="mParticipants">-</strong></div>
+                <div><span style="color:#94a3b8;">Fee:</span> <strong id="mFee">-</strong></div>
+            </div>
+
+            <form id="regForm" onsubmit="submitRegistration(event)">
+                <!-- Team members info -->
+                <div class="team-info" id="teamInfo">
+                    <i class="fas fa-info-circle"></i> This event requires <strong id="teamRange">1</strong> participant(s). Add usernames of all team members below (including yourself).
+                </div>
+
+                <!-- Dynamic team members list -->
+                <div class="form-group">
+                    <label class="form-label">Team Members (Usernames) *</label>
+                    <div id="teamMembersList">
+                        <!-- Dynamically rendered -->
+                    </div>
+                    <button type="button" id="addMemberBtn" onclick="addMemberField()" style="margin-top:0.5rem;font-size:0.82rem;background:none;border:1px dashed #94a3b8;border-radius:8px;padding:0.4rem 0.75rem;cursor:pointer;color:#64748b;">
+                        <i class="fas fa-plus"></i> Add Member
+                    </button>
+                </div>
+
+
+                <!-- Payment section (shown if feePerPerson > 0) -->
+                <div class="payment-section" id="paymentSection" style="display:none;">
+                    <h4><i class="fas fa-rupee-sign"></i> Payment Required — <span id="feeAmount"></span></h4>
+                    <p style="font-size:0.82rem;color:#92400e;margin:0 0 1rem;">Scan the QR code below and upload the payment screenshot.</p>
+                    <img id="eventQrImage" class="qr-image" src="" alt="QR Code" style="display:none;">
+                    <p id="noQrMsg" style="font-size:0.82rem;color:#64748b;display:none;">QR code not yet uploaded by coordinator.</p>
+
+                    <div class="form-group" style="margin-top:1rem;margin-bottom:0.75rem;">
+                        <label class="form-label">Transaction / UPI Reference ID *</label>
+                        <input type="text" id="inputTransactionId" class="form-control" placeholder="e.g. UPI123456789" oninput="updateSubmitBtnState()">
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="form-label">Payment Screenshot *</label>
+                        <input type="file" id="inputPaymentScreenshot" class="form-control" accept="image/*" onchange="updateSubmitBtnState()">
+                    </div>
+                </div>
+
+                <input type="hidden" id="hiddenEventId">
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" type="button" onclick="closeModal()">Cancel</button>
+            <button class="btn-submit" type="submit" form="regForm" id="submitBtn">
+                <i class="fas fa-paper-plane"></i> Submit Registration
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="/js/student.js"></script>
+<script>
+    let allEvents = [];
+    let filters = {
+        cat: 'All',
+        district: 'All',
+        dateFrom: null,
+        dateTo: null
+    };
+    let currentEvent = null;
+    let memberCount = 1;
+    let verifiedMembers = {}; // Track {idx: boolean}
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    // ──────────────────────────────────────────
+    // Init
+    // ──────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Set sidebar name
+        const name = user.fullName || user.username || 'Student';
+        document.querySelectorAll('.student-name').forEach(el => el.textContent = name);
+        const initials = name.trim().split(' ').map(n => n[0] || '').join('').toUpperCase().slice(0,2) || 'ST';
+        const si = document.getElementById('headerAvatar');
+        if (si) si.textContent = initials;
+
+        const logoutBtn = document.getElementById('headerLogoutBtn');
+        if (logoutBtn) {
+            logoutBtn.onclick = (e) => {
+                e.preventDefault();
+                localStorage.clear();
+                window.location.href = '/login.html';
+            };
+        }
+
+        await loadEvents();
+    });
+
+    // ──────────────────────────────────────────
+    // Load events from API
+    // ──────────────────────────────────────────
+    async function loadEvents() {
+        const grid = document.getElementById('eventsGrid');
+        try {
+            const res = await fetch('/api/public/events');
+            if (!res.ok) throw new Error('API error');
+            allEvents = await res.json();
+            populateDistricts();
+            renderEvents(allEvents);
+        } catch (err) {
+            grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+                <i class="fas fa-exclamation-triangle" style="font-size:2.5rem;color:#ef4444;margin-bottom:1rem;"></i>
+                <p>Failed to load events. Please try again later.</p>
+            </div>`;
+        }
+    }
+
+    // ──────────────────────────────────────────
+    // Render event cards
+    // ──────────────────────────────────────────
+    function renderEvents(events) {
+        const grid = document.getElementById('eventsGrid');
+        const countEl = document.getElementById('eventCount');
+        countEl.textContent = `Showing ${events.length} event${events.length !== 1 ? 's' : ''}`;
+
+        if (events.length === 0) {
+            grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+                <i class="fas fa-calendar-times" style="font-size:3rem;color:#94a3b8;margin-bottom:1rem;"></i>
+                <p>No events found. Check back soon!</p>
+            </div>`;
+            return;
+        }
+
+        grid.innerHTML = events.map(e => {
+            const now = new Date();
+            const eventDate = e.eventDate ? new Date(e.eventDate) : null;
+            const deadline = e.registrationDeadline ? new Date(e.registrationDeadline) : null;
+            const isPast = eventDate && eventDate < now;
+            const isDeadlinePassed = deadline && deadline < now;
+            const isFree = !e.feePerPerson || e.feePerPerson === 0;
+            const college = e.college ? e.college.collegeName : 'Unknown College';
+            const district = e.college ? e.college.district : '';
+
+            const imgHtml = e.thumbnailUrl
+                ? `<img src="${e.thumbnailUrl}" alt="${e.title}" onerror="this.src='${e.qrCodePath || ''}'; this.onerror=function(){this.parentNode.innerHTML='<div class=no-photo><i class=fas fa-image></i><span>${e.category}</span></div>'}">`
+                : (e.qrCodePath 
+                    ? `<img src="${e.qrCodePath}" alt="${e.title}" onerror="this.parentNode.innerHTML='<div class=no-photo><i class=fas fa-image></i><span>${e.category}</span></div>'">`
+                    : `<div class="no-photo"><i class="fas fa-image"></i><span>${e.category || 'Event'}</span></div>`);
+
+            const formattedDate = eventDate ? eventDate.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'}) : 'TBA';
+            const formattedDeadline = deadline ? deadline.toLocaleDateString('en-IN', {day:'2-digit', month:'short'}) : 'Open';
+
+            const participants = e.minParticipants === e.maxParticipants
+                ? `${e.minParticipants}`
+                : `${e.minParticipants}–${e.maxParticipants}`;
+
+            return `
+            <div class="event-card" data-category="${e.category || ''}" data-id="${e.id}">
+                <div class="event-img">
+                    ${imgHtml}
+                    <span class="category-badge">${e.category || 'General'}</span>
+                    <span class="fee-badge ${isFree ? 'free' : 'paid'}">${isFree ? 'Free' : '₹' + e.feePerPerson}</span>
+                </div>
+                <div class="event-body">
+                    <div class="organized-by-badge"><i class="fas fa-building"></i> ${e.organizedBy || 'Unit'}</div>
+                    <h3 class="event-title">${e.title}</h3>
+                    <div class="event-college">
+                        <i class="fas fa-university"></i>
+                        ${college}${district ? ', ' + district : ''}
+                    </div>
+                    
+                    <p class="event-desc-snippet">${e.description ? (e.description.length > 100 ? e.description.substring(0, 100) + '...' : e.description) : 'No description available.'}</p>
+
+                    <div class="event-meta">
+                        <div class="meta-item">
+                            <div class="meta-label"><i class="fas fa-calendar"></i> Event Date</div>
+                            <div class="meta-value">${formattedDate}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label"><i class="fas fa-clock"></i> Deadline</div>
+                            <div class="meta-value deadline-value">${formattedDeadline}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label"><i class="fas fa-map-marker-alt"></i> Venue</div>
+                            <div class="meta-value" style="font-size:0.75rem;">${e.venue || 'TBA'}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label"><i class="fas fa-users"></i> Team Size</div>
+                            <div class="meta-value">${participants}</div>
+                        </div>
+                    </div>
+
+                    <div class="coordinator-info">
+                        <div class="coord-label">Coordinator</div>
+                        <div class="coord-details">
+                            <span class="coord-name"><i class="fas fa-user-tie"></i> ${e.coordinatorName || 'Professor'}</span>
+                            <a href="tel:${e.coordinatorMobile || ''}" class="coord-contact"><i class="fas fa-phone"></i> ${e.coordinatorMobile || 'Contact'}</a>
+                        </div>
+                    </div>
+
+                    ${isDeadlinePassed && !isPast ? '<div class="past-deadline"><i class="fas fa-exclamation-circle"></i> Registration closed</div>' : ''}
+                    ${isPast ? '<div class="past-deadline"><i class="fas fa-flag-checkered"></i> Event ended</div>' : ''}
+                    <button class="btn-register" onclick="openModal(${e.id})" ${isDeadlinePassed || isPast ? 'disabled' : ''}>
+                        ${isDeadlinePassed || isPast ? 'Registration Closed' : '<i class="fas fa-paper-plane"></i> Register Now'}
+                    </button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function populateDistricts() {
+        const select = document.getElementById('districtFilter');
+        const districts = [...new Set(allEvents.map(e => e.college ? e.college.district : '').filter(d => d))].sort();
+        districts.forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = d;
+            opt.textContent = d;
+            select.appendChild(opt);
+        });
+    }
+
+    // ──────────────────────────────────────────
+    // Filters
+    // ──────────────────────────────────────────
+    function setFilter(type, value, el) {
+        if (type === 'cat') {
+            document.querySelectorAll('#categoryOptions .filter-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            filters.cat = value;
+        }
+        filterEvents();
+    }
+
+    function resetAllFilters() {
+        // Reset state
+        filters = { cat: 'All', district: 'All', dateFrom: null, dateTo: null };
+        
+        // Reset UI
+        document.getElementById('searchInput').value = '';
+        document.querySelectorAll('#categoryOptions .filter-item').forEach(i => i.classList.remove('active'));
+        document.querySelector('#categoryOptions .filter-item[data-cat="All"]').classList.add('active');
+        document.getElementById('districtFilter').value = 'All';
+        document.getElementById('dateFrom').value = '';
+        document.getElementById('dateTo').value = '';
+        
+        filterEvents();
+    }
+
+    function filterEvents() {
+        const query = (document.getElementById('searchInput').value || '').toLowerCase();
+        
+        // Update range state from inputs
+        filters.district = document.getElementById('districtFilter').value;
+        filters.dateFrom = document.getElementById('dateFrom').value ? new Date(document.getElementById('dateFrom').value) : null;
+        filters.dateTo = document.getElementById('dateTo').value ? new Date(document.getElementById('dateTo').value) : null;
+
+        const filtered = allEvents.filter(e => {
+            // Category match
+            const matchCat = filters.cat === 'All' || e.category === filters.cat;
+            
+            // District match
+            const eDistrict = e.college ? e.college.district : '';
+            const matchDistrict = filters.district === 'All' || eDistrict === filters.district;
+            
+            // Date range match
+            let matchDate = true;
+            if (e.eventDate) {
+                const ed = new Date(e.eventDate);
+                if (filters.dateFrom && ed < filters.dateFrom) matchDate = false;
+                if (filters.dateTo) {
+                    const endDay = new Date(filters.dateTo);
+                    endDay.setHours(23, 59, 59, 999);
+                    if (ed > endDay) matchDate = false;
+                }
+            } else if (filters.dateFrom || filters.dateTo) {
+                matchDate = false;
+            }
+
+            // Search match
+            const college = e.college ? e.college.collegeName : '';
+            const matchSearch = !query ||
+                (e.title || '').toLowerCase().includes(query) ||
+                (e.description || '').toLowerCase().includes(query) ||
+                college.toLowerCase().includes(query) ||
+                (e.category || '').toLowerCase().includes(query);
+                
+            return matchCat && matchDistrict && matchDate && matchSearch;
+        });
+        renderEvents(filtered);
+    }
+
+    // ──────────────────────────────────────────
+    // Modal open / close
+    // ──────────────────────────────────────────
+    async function openModal(eventId) {
+        if (!token || !user.roles || !user.roles.includes('ROLE_STUDENT')) {
+            alert('Please log in as a student to register for events.');
+            window.location.href = '/login.html';
+            return;
+        }
+
+        // Fetch full event details
+        const res = await fetch(`/api/public/events/${eventId}`);
+        if (!res.ok) { alert('Could not load event details.'); return; }
+        currentEvent = await res.json();
+
+        // Fill modal header
+        document.getElementById('modalEventTitle').textContent = currentEvent.title;
+        document.getElementById('modalEventCollege').textContent =
+            currentEvent.college ? currentEvent.college.collegeName : '';
+
+        const eventDate = currentEvent.eventDate ? new Date(currentEvent.eventDate).toLocaleString('en-IN', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'TBA';
+        document.getElementById('mDate').textContent = eventDate;
+        document.getElementById('mVenue').textContent = currentEvent.venue || 'TBA';
+        document.getElementById('mParticipants').textContent = currentEvent.minParticipants === currentEvent.maxParticipants
+            ? currentEvent.minParticipants : `${currentEvent.minParticipants}–${currentEvent.maxParticipants}`;
+        document.getElementById('mFee').textContent = currentEvent.feePerPerson > 0 ? `₹${currentEvent.feePerPerson}/person` : 'Free';
+        document.getElementById('hiddenEventId').value = eventId;
+
+        // Team range hint
+        document.getElementById('teamRange').textContent =
+            currentEvent.minParticipants === currentEvent.maxParticipants
+                ? currentEvent.minParticipants
+                : `${currentEvent.minParticipants}–${currentEvent.maxParticipants}`;
+
+        // Reset team members — auto-fill current user
+        memberCount = 1;
+        verifiedMembers = {};
+        const list = document.getElementById('teamMembersList');
+        list.innerHTML = '';
+        addMemberField(user.username || '', true);
+        
+        // Initial button state
+        updateSubmitBtnState();
+
+        document.getElementById('addMemberBtn').style.display =
+            currentEvent.maxParticipants > 1 ? 'block' : 'none';
+
+        // Verify the lead member (the logged in student) immediately
+        verifyMember(user.username, 'lead', true);
+
+        // Fetch and show gallery
+        const gallery = document.getElementById('modalGallery');
+        const galleryGrid = document.getElementById('galleryGrid');
+        gallery.style.display = 'none';
+        galleryGrid.innerHTML = '';
+        try {
+            const pRes = await fetch(`/api/public/events/${eventId}/photos`);
+            if (pRes.ok) {
+                const photos = await pRes.json();
+                if (photos.length > 0) {
+                    gallery.style.display = 'block';
+                    galleryGrid.innerHTML = photos.map(url => `
+                        <img src="${url}" style="height:80px; width:80px; object-fit:cover; border-radius:8px; cursor:zoom-in; border:1px solid #e2e8f0;"
+                             onclick="window.open('${url}', '_blank')">
+                    `).join('');
+                }
+            }
+        } catch (e) { console.warn('Gallery load failed', e); }
+
+        // Payment
+        const paySection = document.getElementById('paymentSection');
+        if (currentEvent.feePerPerson > 0 || currentEvent.requiresPayment) {
+            paySection.style.display = 'block';
+            document.getElementById('feeAmount').textContent = currentEvent.feePerPerson > 0 ? `₹${currentEvent.feePerPerson}/person` : 'Required';
+            const qrImg = document.getElementById('eventQrImage');
+            const noQr = document.getElementById('noQrMsg');
+            if (currentEvent.qrCodePath) {
+                qrImg.src = currentEvent.qrCodePath;
+                qrImg.style.display = 'block';
+                noQr.style.display = 'none';
+            } else {
+                qrImg.style.display = 'none';
+                noQr.style.display = 'block';
+            }
+        } else {
+            paySection.style.display = 'none';
+        }
+
+        // Clear result message
+        const res2 = document.getElementById('modalResult');
+        res2.style.display = 'none';
+        res2.className = 'modal-result';
+        document.getElementById('submitBtn').disabled = false;
+
+        document.getElementById('regModal').classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('regModal').classList.remove('active');
+        currentEvent = null;
+    }
+
+    document.getElementById('regModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+
+    // ──────────────────────────────────────────
+    // Team member fields
+    // ──────────────────────────────────────────
+    function addMemberField(defaultVal = '', isFirst = false) {
+        if (!currentEvent) return;
+        
+        // Count existing member rows
+        const currentCount = document.querySelectorAll('.member-row').length;
+        if (currentCount >= currentEvent.maxParticipants) {
+            alert(`Maximum ${currentEvent.maxParticipants} participants allowed.`);
+            return;
+        }
+
+        const list = document.getElementById('teamMembersList');
+        const idx = isFirst ? 'lead' : Date.now();
+        const div = document.createElement('div');
+        div.className = 'member-row';
+        div.style.cssText = 'display:flex; flex-direction:column; gap:0.25rem; margin-bottom:1rem; border-bottom:1px solid #f1f5f9; padding-bottom:1rem;';
+        div.id = `memberRow_${idx}`;
+        div.innerHTML = `
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+                <div style="flex-grow: 1;">
+                    <label class="form-label" style="font-size:0.75rem; color:#64748b; margin-bottom:0.2rem; display:block;">Username ${isFirst ? '(Lead)' : ''} *</label>
+                    <input type="text" class="form-control member-input" id="member_${idx}"
+                        placeholder="Enter username" value="${defaultVal}" 
+                        ${isFirst ? 'readonly style="background:#f1f5f9; font-weight:600;"' : `oninput="onUsernameInput('${idx}')"`}>
+                </div>
+                ${!isFirst ? `<button type="button" onclick="removeMember('${idx}')" style="margin-top:1.25rem; background:#fee2e2;border:none;border-radius:8px;padding:0.5rem 0.75rem;cursor:pointer;color:#dc2626;height:38px;">
+                    <i class="fas fa-trash"></i>
+                </button>` : ''}
+            </div>
+            
+            <div id="memberDetails_${idx}" style="display:none; margin-top:0.75rem; padding:0.85rem; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+                    <div id="rowName_${idx}" style="display:none;">
+                        <label style="font-size:0.7rem; color:#64748b; font-weight:600; display:block;">Full Name</label>
+                        <p id="labelName_${idx}" style="font-size:0.82rem; margin:0; color:#1e293b; font-weight:500;">-</p>
+                    </div>
+                    <div id="rowPhone_${idx}" style="display:none;">
+                        <label style="font-size:0.7rem; color:#64748b; font-weight:600; display:block;">Phone</label>
+                        <p id="labelPhone_${idx}" style="font-size:0.82rem; margin:0; color:#1e293b; font-weight:500;">-</p>
+                    </div>
+                    <div id="rowCollege_${idx}" style="display:none; grid-column:span 2;">
+                        <label style="font-size:0.7rem; color:#64748b; font-weight:600; display:block;">College Name</label>
+                        <p id="labelCollege_${idx}" style="font-size:0.82rem; margin:0; color:#1e293b; font-weight:500;">-</p>
+                    </div>
+                    <div id="rowEmail_${idx}" style="display:none; grid-column:span 2;">
+                        <label style="font-size:0.7rem; color:#64748b; font-weight:600; display:block;">Email Address</label>
+                        <p id="labelEmail_${idx}" style="font-size:0.82rem; margin:0; color:#1e293b; font-weight:500;">-</p>
+                    </div>
+                </div>
+            </div>
+            <div id="memberStatus_${idx}" style="font-size:0.72rem; margin-top:0.25rem; margin-left:0.55rem; display:none;"></div>
+        `;
+        list.appendChild(div);
+        
+        if (defaultVal) {
+            verifyMember(defaultVal, idx, isFirst);
+        } else {
+            verifiedMembers[idx] = false;
+            updateSubmitBtnState();
+        }
+
+        // Hide add button if limit reached
+        if (document.querySelectorAll('.member-row').length >= currentEvent.maxParticipants) {
+            document.getElementById('addMemberBtn').style.display = 'none';
+        }
+    }
+
+    let debounceTimers = {};
+    function onUsernameInput(idx) {
+        if (debounceTimers[idx]) clearTimeout(debounceTimers[idx]);
+        verifiedMembers[idx] = false;
+        updateSubmitBtnState();
+        
+        const val = document.getElementById(`member_${idx}`).value.trim();
+        if (!val) {
+            const statusEl = document.getElementById(`memberStatus_${idx}`);
+            if (statusEl) statusEl.style.display = 'none';
+            const detailsDiv = document.getElementById(`memberDetails_${idx}`);
+            if (detailsDiv) detailsDiv.style.display = 'none';
+            return;
+        }
+
+        debounceTimers[idx] = setTimeout(() => {
+            verifyMember(val, idx, false);
+        }, 500);
+    }
+
+    async function verifyMember(username, idx, isLead = false) {
+        if (!username) {
+            verifiedMembers[idx] = false;
+            updateSubmitBtnState();
+            return;
+        }
+        const statusEl = document.getElementById(`memberStatus_${idx}`);
+        if (!statusEl) return;
+        
+        statusEl.style.display = 'block';
+        statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+        statusEl.style.color = '#64748b';
+
+        try {
+            const res = await fetch(`/api/public/users/${username}`);
+            if (res.ok) {
+                const data = await res.json();
+                
+                // Populate and show detail fields
+                const detailsDiv = document.getElementById(`memberDetails_${idx}`);
+                if (detailsDiv) {
+                    detailsDiv.style.display = 'block';
+                    
+                    const updateField = (suffix, value, required) => {
+                        const row = document.getElementById(`row${suffix}_${idx}`);
+                        const label = document.getElementById(`label${suffix}_${idx}`);
+                        if (row && label) {
+                            row.style.display = required ? 'block' : 'none';
+                            label.textContent = value || 'N/A';
+                        }
+                    };
+
+                    updateField('Name', data.fullName, currentEvent.requiresName);
+                    updateField('Email', data.email, currentEvent.requiresEmail);
+                    updateField('College', data.college, currentEvent.requiresCollege);
+                    updateField('Phone', data.phone, currentEvent.requiresPhone);
+                }
+
+                statusEl.innerHTML = `<i class="fas fa-check-circle" style="color:#16a34a;"></i> Verified: ${data.fullName}`;
+                statusEl.style.color = '#16a34a';
+                verifiedMembers[idx] = true;
+            } else {
+                const msg = res.status === 404 ? 'User is not registered on portal' : 'Error verifying user';
+                statusEl.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${msg}`;
+                statusEl.style.color = '#ef4444';
+                verifiedMembers[idx] = false;
+                const detailsDiv = document.getElementById(`memberDetails_${idx}`);
+                if (detailsDiv) detailsDiv.style.display = 'none';
+            }
+        } catch (err) {
+            statusEl.innerHTML = `<i class="fas fa-wifi"></i> Network error`;
+            statusEl.style.color = '#ef4444';
+            verifiedMembers[idx] = false;
+        }
+        updateSubmitBtnState();
+    }
+
+    function removeMember(idx) {
+        const row = document.getElementById(`memberRow_${idx}`);
+        if (row) row.remove();
+        delete verifiedMembers[idx];
+        updateSubmitBtnState();
+        
+        // Show add button again
+        if (document.querySelectorAll('.member-row').length < currentEvent.maxParticipants) {
+            document.getElementById('addMemberBtn').style.display = 'block';
+        }
+    }
+
+    function updateSubmitBtnState() {
+        if (!currentEvent) return;
+        const submitBtn = document.getElementById('submitBtn');
+        
+        // 1. All member fields must be verified
+        const allVerified = Object.values(verifiedMembers).every(v => v === true);
+        
+        // 2. Member count must be within [min, max]
+        const rows = document.querySelectorAll('.member-row');
+        const count = rows.length;
+        const countValid = count >= currentEvent.minParticipants && count <= currentEvent.maxParticipants;
+        
+        // 3. Payment details if required
+        let paymentValid = true;
+        if (currentEvent.feePerPerson > 0 || currentEvent.requiresPayment) {
+            const tid = document.getElementById('inputTransactionId').value.trim();
+            const screenshot = document.getElementById('inputPaymentScreenshot').files[0];
+            paymentValid = (tid.length > 0 && screenshot);
+        }
+        
+        // 4. Verification ensures all required data is fetched
+        const overallValid = allVerified && countValid && paymentValid;
+        submitBtn.disabled = !overallValid;
+        submitBtn.style.opacity = overallValid ? '1' : '0.5';
+        submitBtn.style.cursor = overallValid ? 'pointer' : 'not-allowed';
+    }
+
+    // ──────────────────────────────────────────
+    // Submit registration
+    // ──────────────────────────────────────────
+    async function submitRegistration(e) {
+        e.preventDefault();
+        const resultEl = document.getElementById('modalResult');
+        const submitBtn = document.getElementById('submitBtn');
+        resultEl.style.display = 'none';
+
+        // Gather team members
+        const memberInputs = document.querySelectorAll('.member-input');
+        const teamMembers = Array.from(memberInputs).map(i => i.value.trim()).filter(v => v);
+
+        if (teamMembers.length === 0) {
+            showModalError('Please enter at least one team member username.');
+            return;
+        }
+        if (currentEvent.minParticipants > 1 && teamMembers.length < currentEvent.minParticipants) {
+            showModalError(`Minimum ${currentEvent.minParticipants} participants required.`);
+            return;
+        }
+        if (teamMembers.length > currentEvent.maxParticipants) {
+            showModalError(`Maximum ${currentEvent.maxParticipants} participants allowed.`);
+            return;
+        }
+
+        // Build FormData
+        const formData = new FormData();
+        formData.append('eventId', document.getElementById('hiddenEventId').value);
+        formData.append('teamMembers', JSON.stringify(teamMembers));
+
+        // Payment
+        const isPaid = currentEvent.feePerPerson > 0 || currentEvent.requiresPayment;
+        if (isPaid) {
+            const tid = document.getElementById('inputTransactionId').value.trim();
+            const screenshot = document.getElementById('inputPaymentScreenshot').files[0];
+            if (!tid) { showModalError('Transaction ID is required for paid events.'); return; }
+            if (!screenshot) { showModalError('Payment screenshot is required.'); return; }
+            formData.append('transactionId', tid);
+            formData.append('qrcode', screenshot);
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+        try {
+            const res = await fetch('/api/student/register', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+            });
+            const data = await res.json();
+            if (res.ok) {
+                resultEl.textContent = `✅ Registration successful! Your Group ID: ${data.groupId}. Awaiting coordinator approval.`;
+                resultEl.className = 'modal-result success';
+                resultEl.style.display = 'block';
+                submitBtn.style.display = 'none';
+            } else {
+                showModalError(data.message || data || 'Registration failed. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Registration';
+            }
+        } catch (err) {
+            showModalError('Network error. Please check your connection.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Registration';
+        }
+    }
+
+    function showModalError(msg) {
+        const el = document.getElementById('modalResult');
+        el.textContent = '❌ ' + msg;
+        el.className = 'modal-result error';
+        el.style.display = 'block';
+    }
+</script>
+</body>
+</html>

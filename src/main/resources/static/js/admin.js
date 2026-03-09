@@ -206,17 +206,21 @@ const AdminPanel = {
                                 <i class="fas fa-tags"></i>
                                 <select id="filter-category" style="border: none; outline: none; background: transparent; padding-left: 0.5rem;" onchange="AdminPanel.renderModerationEvents()">
                                     <option value="ALL">All Categories</option>
-                                    <option value="Hackathon">Hackathon</option>
-                                    <option value="Project Competition">Project Competition</option>
-                                    <option value="Coding Competition">Coding Competition</option>
-                                    <option value="Electrical related">Electrical related</option>
-                                    <option value="Civil related">Civil related</option>
-                                    <option value="Idea Pitching">Idea Pitching</option>
-                                    <option value="Business Competition">Business Competition</option>
-                                    <option value="Cultural Competition">Cultural Competition</option>
-                                    <option value="Debate Competition">Debate Competition</option>
-                                    <option value="Group Discussion">Group Discussion</option>
-                                    <option value="Others">Others</option>
+                                    <option>Technical</option>
+                                    <option>Cultural</option>
+                                    <option>Sports</option>
+                                    <option>Workshop</option>
+                                    <option>Hackathon</option>
+                                    <option>Project Competition</option>
+                                    <option>Coding Competition</option>
+                                    <option>Electrical related</option>
+                                    <option>Civil related</option>
+                                    <option>Idea Pitching</option>
+                                    <option>Business Competition</option>
+                                    <option>Debate Competition</option>
+                                    <option>Group Discussion</option>
+                                    <option>Seminar/Webinar</option>
+                                    <option>Others</option>
                                 </select>
                             </div>
                         </div>
@@ -282,17 +286,21 @@ const AdminPanel = {
                                 <i class="fas fa-tags"></i>
                                 <select id="reg-filter-category" style="border: none; outline: none; background: transparent; padding-left: 0.5rem;" onchange="AdminPanel.renderRegistrations()">
                                     <option value="ALL">All Categories</option>
-                                    <option value="Hackathon">Hackathon</option>
-                                    <option value="Project Competition">Project Competition</option>
-                                    <option value="Coding Competition">Coding Competition</option>
-                                    <option value="Electrical related">Electrical related</option>
-                                    <option value="Civil related">Civil related</option>
-                                    <option value="Idea Pitching">Idea Pitching</option>
-                                    <option value="Business Competition">Business Competition</option>
-                                    <option value="Cultural Competition">Cultural Competition</option>
-                                    <option value="Debate Competition">Debate Competition</option>
-                                    <option value="Group Discussion">Group Discussion</option>
-                                    <option value="Others">Others</option>
+                                    <option>Technical</option>
+                                    <option>Cultural</option>
+                                    <option>Sports</option>
+                                    <option>Workshop</option>
+                                    <option>Hackathon</option>
+                                    <option>Project Competition</option>
+                                    <option>Coding Competition</option>
+                                    <option>Electrical related</option>
+                                    <option>Civil related</option>
+                                    <option>Idea Pitching</option>
+                                    <option>Business Competition</option>
+                                    <option>Debate Competition</option>
+                                    <option>Group Discussion</option>
+                                    <option>Seminar/Webinar</option>
+                                    <option>Others</option>
                                 </select>
                             </div>
                         </div>

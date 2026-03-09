@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.time.LocalDateTime;
 
@@ -18,35 +17,30 @@ import java.time.LocalDateTime;
 public class Post {
 
     @Id
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "coordinator", "college"})
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(name = "event_id")
+    private Integer id;
+
+    @MapsId
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     private Event event;
 
-    @Lob
-    @Column(name = "photo")
-    private byte[] photo;
+    @Column(columnDefinition = "TEXT", name = "photo")
+    private String photo;
 
     @Column(columnDefinition = "TEXT", name = "event_description")
-    private String caption; // mapped to event_description
+    private String caption;
 
     @Column(name = "feedback_form_link")
-    private String feedbackFormLink; 
+    private String feedbackFormLink;
 
-    // college_id doesn't exist in afterpost table, so mark it transient
     @Transient
     private College college;
 
-    // createdAt doesn't exist in afterpost table, so mark it transient
-    @Transient
-    private LocalDateTime createdAt;
-    
-    // images doesn't exist in afterpost, we use 'photo' instead.
+    @Column(name = "created_at")
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
+
     @Transient
     private String images;
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-    }
 }

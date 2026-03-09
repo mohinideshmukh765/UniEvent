@@ -65,24 +65,40 @@ public class Event {
     @Column(name = "event_fee_per_person")
     private double feePerPerson;
 
-    // This column does not exist in the public.event SQL table schema provided by the user. 
-    // We'll mark it Transient so Hibernate ignores it, OR if they need it, they might need to add it later.
-    @Transient
-    private String qrCodePath; 
+    @Column(name = "qrcode_path")
+    private String qrCodePath;
+
+    @Column(name = "photos_folder_path")
+    private String photosFolderPath;
 
     @Column(name = "registration_deadline")
     private LocalDateTime registrationDeadline;
 
-    // This column does not exist in the public.event schema provided. Marking transient.
-    @Transient 
-    private String posterPath;
+    @Builder.Default
+    @Column(name = "requires_name")
+    private boolean requiresName = true;
+
+    @Builder.Default
+    @Column(name = "requires_email")
+    private boolean requiresEmail = true;
+
+    @Builder.Default
+    @Column(name = "requires_college")
+    private boolean requiresCollege = true;
+
+    @Builder.Default
+    @Column(name = "requires_phone")
+    private boolean requiresPhone = true;
+
+    @Builder.Default
+    @Column(name = "requires_payment")
+    private boolean requiresPayment = false;
+
+
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "events"})
     @ManyToOne(fetch = FetchType.LAZY)
-    // There is no college_id in the event table schema provided. 
-    // We mark this transient or ignore unless they add it to the table mapping.
-    @JoinColumn(name = "college_id")
-    @Transient
+    @JoinColumn(name = "college_code")
     private College college;
 
     @Builder.Default

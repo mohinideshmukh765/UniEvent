@@ -60,7 +60,7 @@ public class AdminController {
                 String rawPassword = "CO-" + data.getCollegeCode();
 
                 // Use existing college if it exists, otherwise prepare to create new
-                com.mohini.eventportal.model.College college = collegeRepository.findByCollegeCode(Integer.valueOf(data.getCollegeCode())).orElse(null);
+                com.mohini.eventportal.model.College college = collegeRepository.findByCollegeCode(data.getCollegeCode()).orElse(null);
 
                 // If both college and its coordinator (username) exist, skip
                 if (college == null) {
@@ -91,7 +91,7 @@ public class AdminController {
                 try {
                     if (college == null) {
                         college = com.mohini.eventportal.model.College.builder()
-                                .collegeCode(Integer.valueOf(data.getCollegeCode()))
+                                .collegeCode(data.getCollegeCode())
                                 .collegeName(data.getCollegeName())
                                 .coordinatorName(data.getCoordinatorName())
                                 .email(email)
@@ -134,7 +134,7 @@ public class AdminController {
     @PostMapping("/colleges/deactivate/{collegeCode}")
     public ResponseEntity<?> deactivateCollege(@PathVariable("collegeCode") String collegeCode) {
         try {
-            return collegeRepository.findById(Integer.valueOf(collegeCode)).map(college -> {
+            return collegeRepository.findById(collegeCode).map(college -> {
                 college.setEnabled(false);
                 collegeRepository.save(college);
                 return ResponseEntity.ok("College " + college.getCollegeName() + " has been deactivated.");
@@ -147,7 +147,7 @@ public class AdminController {
     @PostMapping("/colleges/activate/{collegeCode}")
     public ResponseEntity<?> activateCollege(@PathVariable("collegeCode") String collegeCode) {
         try {
-            return collegeRepository.findById(Integer.valueOf(collegeCode)).map(college -> {
+            return collegeRepository.findById(collegeCode).map(college -> {
                 college.setEnabled(true);
                 collegeRepository.save(college);
                 return ResponseEntity.ok("College " + college.getCollegeName() + " has been activated.");
@@ -210,11 +210,7 @@ public class AdminController {
 
     @GetMapping("/events/upcoming-active")
     public ResponseEntity<?> getUpcomingActiveEvents() {
-        return ResponseEntity.ok(eventRepository.findByStatus(
-            com.mohini.eventportal.model.Event.EventStatus.PUBLISHED
-        ).stream()
-        .filter(e -> e.getEventDate().isAfter(java.time.LocalDateTime.now()))
-        .collect(Collectors.toList()));
+        return ResponseEntity.ok(eventRepository.findUpcomingEvents(java.time.LocalDateTime.now()));
     }
 
     @GetMapping("/recent-activities")
@@ -229,7 +225,7 @@ public class AdminController {
 
     @PostMapping("/colleges/{collegeCode}/status")
     public ResponseEntity<?> updateCollegeStatus(@PathVariable("collegeCode") String collegeCode, @RequestParam("status") String status) {
-        return collegeRepository.findById(Integer.valueOf(collegeCode)).map(college -> {
+        return collegeRepository.findById(collegeCode).map(college -> {
             college.setEnabled(status.equalsIgnoreCase("activated") || status.equalsIgnoreCase("approved"));
             collegeRepository.save(college);
             return ResponseEntity.ok("Status updated successfully");
@@ -251,8 +247,9 @@ public class AdminController {
     }
 
     @GetMapping("/events/{eventId}/post")
-    public ResponseEntity<?> getEventPost(@PathVariable("eventId") Long eventId) {
-        return postRepository.findByEventId(eventId.intValue())
+    public ResponseEntity<?> getEventPost(@PathVariable("eventId") Integer eventId) {
+        return eventRepository.findById(eventId)
+                .flatMap(event -> postRepository.findByEvent(event))
                 .map(post -> ResponseEntity.ok(post))
                 .orElse(ResponseEntity.notFound().build());
     }

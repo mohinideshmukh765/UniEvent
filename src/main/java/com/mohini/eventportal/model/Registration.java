@@ -31,12 +31,24 @@ public class Registration {
     @Column(name = "group_id", length = 50)
     private String groupId;
 
-    @Lob
-    @Column(name = "qrcode")
+    @Column(name = "qrcode", columnDefinition = "bytea")
     private byte[] qrcode;
 
     @Column(name = "status", length = 20)
     private String status;
+
+    @Column(name = "registration_date")
+    private java.time.LocalDateTime registrationDate;
+
+    @Column(name = "reason", length = 500)
+    private String reason;
+
+    @PrePersist
+    protected void onCreate() {
+        if (registrationDate == null) {
+            registrationDate = java.time.LocalDateTime.now();
+        }
+    }
 
     public enum RegistrationStatus {
         PENDING, APPROVED, DENIED

@@ -44,8 +44,10 @@ public class User {
 
     private String district;
 
-    @Column(name = "college_id")
+    @Column(name = "college_code")
     private String collegeId;
+
+    private String college;
 
     @Builder.Default
     private boolean enabled = true;

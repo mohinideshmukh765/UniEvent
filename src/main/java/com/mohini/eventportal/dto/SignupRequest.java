@@ -30,4 +30,6 @@ public class SignupRequest {
     private String district;
 
     private Long collegeId;
+
+    private String college;
 }

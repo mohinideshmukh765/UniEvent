@@ -1,1 +1,235 @@
-﻿<!DOCTYPE html> <html lang="en"> <head>     <meta charset="UTF-8">     <meta name="viewport" content="width=device-width, initial-scale=1.0">     <title>My Profile | UniEvent Portal</title>     <link rel="stylesheet" href="/css/style.css">     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">     <style>         :root { --sidebar-width: 280px; }         .student-layout { display: grid; grid-template-columns: var(--sidebar-width) 1fr; min-height: 100vh; background: #f8fafc; }         .student-sidebar { background: white; border-right: 1px solid var(--glass-border); padding: 2rem 1.5rem; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }         .student-main { padding: 4rem; display: flex; justify-content: center; }         .nav-link { display: flex; align-items: center; gap: 1rem; padding: 0.875rem 1.25rem; color: var(--text-muted); text-decoration: none; border-radius: 12px; margin-bottom: 0.5rem; font-weight: 500; transition: var(--transition); }         .nav-link:hover, .nav-link.active { background: rgba(79, 70, 229, 0.08); color: var(--primary); }                  .profile-card { background: white; width: 100%; max-width: 900px; border-radius: 40px; border: 1px solid var(--glass-border); overflow: hidden; box-shadow: var(--shadow-xl); }         .profile-header-bg { height: 160px; background: linear-gradient(135deg, var(--primary), var(--secondary)); }         .profile-info-section { padding: 0 4rem 4rem; position: relative; }         .profile-avatar-large { width: 150px; height: 150px; border-radius: 40px; border: 8px solid white; background: var(--secondary); color: white; display: flex; align-items: center; justify-content: center; font-size: 4rem; font-weight: 800; position: absolute; top: -75px; box-shadow: var(--shadow-lg); font-family: 'Outfit'; }                  .profile-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 100px; }                  .profile-footer { margin-top: auto; display: flex; align-items: center; gap: 1rem; padding-top: 2rem; border-top: 1px solid var(--glass-border); }         .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; }     </style> </head> <body class="light-theme">     <div class="student-layout">         <aside class="student-sidebar">             <a href="/" class="logo" style="margin-left: 1.25rem;">UniEvent</a>             <nav class="sidebar-nav" style="margin-top: 2rem; flex: 1;">                 <a href="/student/dashboard.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>                 <a href="/student/events.html" class="nav-link"><i class="fas fa-search"></i> Browse Events</a>                 <a href="/student/my-registrations.html" class="nav-link"><i class="fas fa-ticket-alt"></i> My Registrations</a>                  <a href="/student/certificates.html" class="nav-link"><i class="fas fa-certificate"></i> Certificates</a>                 <a href="/student/recommendations.html" class="nav-link"><i class="fas fa-magic"></i> AI Recommendations</a>             </nav>             <div class="profile-footer">                                  <div style="flex: 1;">                     <div class="student-name" style="font-weight: 600; font-size: 0.9rem;">Aryan Sharma</div>                     <div style="font-size: 0.75rem; color: var(--text-muted);">Computer Science</div>                 </div>                 <a href="#" class="logout-btn" style="color: var(--text-muted);"><i class="fas fa-sign-out-alt"></i></a>             </div>         </aside>          <main class="student-main">             <div class="profile-card fade-in">                 <div class="profile-header-bg"></div>                 <div class="profile-info-section">                     <div class="profile-avatar-large">AS</div>                                          <div class="profile-form-grid">                         <div class="form-group">                             <label>Full Name</label>                             <input type="text" class="form-input" id="profileName" value="Aryan Sharma">                         </div>                         <div class="form-group">                             <label>Email Address</label>                             <input type="email" class="form-input" id="profileEmail" value="aryan@university.edu" readonly>                         </div>                         <div class="form-group">                             <label>University / College</label>                             <select class="form-input">                                 <option>KIT College of Engineering</option>                                 <option>Shivaji University</option>                                 <option selected>WCE Sangli</option>                             </select>                         </div>                         <div class="form-group">                             <label>Phone Number</label>                             <input type="tel" class="form-input" value="+91 9876543210">                         </div>                         <div class="form-group">                             <label>District</label>                             <select class="form-input">                                 <option selected>Kolhapur</option>                                 <option>Sangli</option>                                 <option>Satara</option>                             </select>                         </div>                         <div class="form-group">                             <label>Current Sem / Year</label>                             <input type="text" class="form-input" value="TY - B.Tech (CS)">                         </div>                     </div>                      <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--bg-soft); display: flex; justify-content: space-between; align-items: center;">                         <button class="link-primary" style="font-size: 0.95rem; font-weight: 600; color: #ef4444;"><i class="fas fa-lock"></i> Change Password</button>                         <button class="btn btn-primary" style="padding: 1rem 3rem;">Save Changes</button>                     </div>                 </div>             </div>         </main>     </div>      <script src="/js/student.js"></script>     <script>         document.addEventListener('DOMContentLoaded', () => {             const user = JSON.parse(localStorage.getItem('user'));             document.getElementById('profileName').value = user.fullName || user.username;             document.getElementById('profileEmail').value = user.email;         });     </script> </body> </html>
+<!DOCTYPE html> <html lang="en"> <head>     <meta charset="UTF-8">     <meta name="viewport" content="width=device-width, initial-scale=1.0">     <title>My Profile | UniEvent Portal</title>     <link rel="stylesheet" href="/css/style.css">     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">     <style>         :root { --sidebar-width: 280px; }         .student-layout { display: grid; grid-template-columns: var(--sidebar-width) 1fr; min-height: 100vh; background: #f8fafc; }         .student-sidebar { background: white; border-right: 1px solid var(--glass-border); padding: 2rem 1.5rem; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }         .student-main { padding: 4rem; display: flex; justify-content: center; }         .nav-link { display: flex; align-items: center; gap: 1rem; padding: 0.875rem 1.25rem; color: var(--text-muted); text-decoration: none; border-radius: 12px; margin-bottom: 0.5rem; font-weight: 500; transition: var(--transition); }         .nav-link:hover, .nav-link.active { background: rgba(79, 70, 229, 0.08); color: var(--primary); }                  .profile-card { background: white; width: 100%; max-width: 900px; border-radius: 40px; border: 1px solid var(--glass-border); overflow: hidden; box-shadow: var(--shadow-xl); }         .profile-header-bg { height: 160px; background: linear-gradient(135deg, var(--primary), var(--secondary)); }         .profile-info-section { padding: 0 4rem 4rem; position: relative; }         .profile-avatar-large { width: 150px; height: 150px; border-radius: 40px; border: 8px solid white; background: var(--secondary); color: white; display: flex; align-items: center; justify-content: center; font-size: 4rem; font-weight: 800; position: absolute; top: -75px; box-shadow: var(--shadow-lg); font-family: 'Outfit'; }                  .profile-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 100px; }                  .profile-footer { margin-top: auto; display: flex; align-items: center; gap: 1rem; padding-top: 2rem; border-top: 1px solid var(--glass-border); }         .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; }     </style> </head> <body class="light-theme">     <div class="student-layout">         <aside class="student-sidebar">             <a href="/" class="logo" style="margin-left: 1.25rem;">UniEvent</a>             <nav class="sidebar-nav" style="margin-top: 2rem; flex: 1;">                 <a href="/student/dashboard.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>                 <a href="/student/events.html" class="nav-link"><i class="fas fa-search"></i> Browse Events</a>                 <a href="/student/my-registrations.html" class="nav-link"><i class="fas fa-ticket-alt"></i> My Registrations</a>                  <a href="/student/certificates.html" class="nav-link"><i class="fas fa-certificate"></i> Certificates</a>                 <a href="/student/recommendations.html" class="nav-link"><i class="fas fa-magic"></i> AI Recommendations</a>             </nav>
+        </aside>
+
+        <main class="student-main" style="display: flex; flex-direction: column; width: 100%;">
+            <header class="top-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; width: 100%;">
+                <div style="flex: 1;"></div>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <a href="/student/notifications.html" class="btn btn-secondary" style="border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-bell"></i>
+                    </a>
+                    <a href="/student/profile.html" class="avatar" id="headerAvatar" style="width: 44px; height: 44px; text-decoration: none;">S</a>
+                    <a href="#" class="btn btn-secondary" id="headerLogoutBtn" style="border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center;" title="Logout">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
+                </div>
+            </header>
+
+            <div class="profile-card fade-in" style="margin: 0 auto;">                 <div class="profile-header-bg"></div>                 <div class="profile-info-section">                     <div class="profile-avatar-large" id="mainAvatar">S</div>
+                    
+                    <div id="profileAlert" style="margin-top: 100px; padding: 1rem; border-radius: 8px; font-weight: 500; display: none;"></div>
+
+                    <form id="profileForm">
+                        <div class="profile-form-grid" style="margin-top: 20px;">
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" class="form-control" id="profileFullName" readonly style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; color: #64748b;">
+                            </div>
+                            <div class="form-group">
+                                <label>Email Address</label>
+                                <input type="email" class="form-control" id="profileEmail" readonly style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; color: #64748b;">
+                            </div>
+                            <div class="form-group">
+                                <label>Username</label>
+                                <input type="text" class="form-control" id="profileUsername" readonly style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; color: #64748b;">
+                            </div>
+                            <div class="form-group">
+                                <label>Phone Number</label>
+                                <input type="tel" class="form-control" id="profilePhone" required style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px;">
+                            </div>
+                            <div class="form-group">
+                                <label>District</label>
+                                <input type="text" class="form-control" id="profileDistrict" readonly style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; color: #64748b;">
+                            </div>
+                            <div class="form-group">
+                                <label>University / College</label>
+                                <input type="text" class="form-control" id="profileCollege" readonly style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; color: #64748b;">
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                            <button type="button" class="btn btn-secondary" id="cancelProfileBtn">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Profile</button>
+                        </div>
+                    </form>
+
+                    <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--glass-border);">
+                        <h3 style="font-family: 'Outfit'; margin-bottom: 1.5rem; color: var(--text-main);">Change Password</h3>
+                        
+                        <div id="passwordAlert" style="margin-bottom: 1rem; padding: 1rem; border-radius: 8px; font-weight: 500; display: none;"></div>
+
+                        <form id="passwordForm">
+                            <div class="profile-form-grid" style="margin-top: 0;">
+                                <div class="form-group">
+                                    <label>New Password</label>
+                                    <input type="password" class="form-control" id="newPassword" required style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px;" minlength="6">
+                                </div>
+                                <div class="form-group">
+                                    <label>Confirm New Password</label>
+                                    <input type="password" class="form-control" id="confirmPassword" required style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px;" minlength="6">
+                                </div>
+                            </div>
+                            <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
+                                <button type="submit" class="btn btn-primary" style="background: #ef4444; border-color: #ef4444;">Update Password</button>
+                            </div>
+                        </form>
+                    </div>                 </div>             </div>         </main>     </div>      <script src="/js/student.js"></script>     <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            // Setup Header
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const initial = (user.fullName || 'S').charAt(0);
+            document.getElementById('headerAvatar').textContent = initial;
+            document.getElementById('mainAvatar').textContent = initial;
+
+            const logoutBtn = document.getElementById('headerLogoutBtn');
+            if (logoutBtn) {
+                logoutBtn.onclick = (e) => {
+                    e.preventDefault();
+                    localStorage.clear();
+                    window.location.href = '/login.html';
+                };
+            }
+
+            // Load original profile data
+            let originalData = null;
+
+            async function loadProfile() {
+                try {
+                    const res = await fetch('/api/student/profile', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        originalData = data;
+                        document.getElementById('profileFullName').value = data.fullName || '';
+                        document.getElementById('profileEmail').value = data.email || '';
+                        document.getElementById('profileUsername').value = data.username || '';
+                        document.getElementById('profilePhone').value = data.phone || '';
+                        document.getElementById('profileDistrict').value = data.district || '';
+                        document.getElementById('profileCollege').value = data.college || '';
+                        
+                        // Update avatars if name changed
+                        const newInitial = (data.fullName || 'S').charAt(0);
+                        document.getElementById('headerAvatar').textContent = newInitial;
+                        document.getElementById('mainAvatar').textContent = newInitial;
+
+                        // Update localstorage to sync across app
+                        const updatedUser = { ...user, fullName: data.fullName, college: data.college };
+                        localStorage.setItem('user', JSON.stringify(updatedUser));
+                    } else {
+                        showAlert('profileAlert', 'Failed to load profile details.', 'error');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    showAlert('profileAlert', 'Error connecting to server.', 'error');
+                }
+            }
+
+            await loadProfile();
+
+            // Handle Profile Update
+            document.getElementById('profileForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const payload = {
+                    fullName: document.getElementById('profileFullName').value,
+                    phone: document.getElementById('profilePhone').value,
+                    district: document.getElementById('profileDistrict').value,
+                    college: document.getElementById('profileCollege').value
+                };
+
+                try {
+                    const res = await fetch('/api/student/profile', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (res.ok) {
+                        showAlert('profileAlert', 'Profile updated successfully!', 'success');
+                        await loadProfile(); // Reload to get fresh data
+                    } else {
+                        const text = await res.text();
+                        showAlert('profileAlert', text || 'Failed to update profile.', 'error');
+                    }
+                } catch (err) {
+                    showAlert('profileAlert', 'Network error.', 'error');
+                }
+            });
+
+            // Handle Cancel button
+            document.getElementById('cancelProfileBtn').addEventListener('click', () => {
+                if (originalData) {
+                    document.getElementById('profileFullName').value = originalData.fullName || '';
+                    document.getElementById('profilePhone').value = originalData.phone || '';
+                    document.getElementById('profileDistrict').value = originalData.district || '';
+                    document.getElementById('profileCollege').value = originalData.college || '';
+                    showAlert('profileAlert', 'Changes cancelled. Restored original values.', 'info');
+                }
+            });
+
+            // Handle Password Update
+            document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const newPwd = document.getElementById('newPassword').value;
+                const confirmPwd = document.getElementById('confirmPassword').value;
+
+                if (newPwd !== confirmPwd) {
+                    showAlert('passwordAlert', 'Passwords do not match.', 'error');
+                    return;
+                }
+
+                try {
+                    const res = await fetch('/api/student/password', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ newPassword: newPwd })
+                    });
+
+                    if (res.ok) {
+                        showAlert('passwordAlert', 'Password updated successfully!', 'success');
+                        document.getElementById('passwordForm').reset();
+                    } else {
+                        const text = await res.text();
+                        showAlert('passwordAlert', text || 'Failed to update password.', 'error');
+                    }
+                } catch (err) {
+                    showAlert('passwordAlert', 'Network error.', 'error');
+                }
+            });
+
+            function showAlert(elementId, message, type) {
+                const el = document.getElementById(elementId);
+                el.textContent = message;
+                el.style.display = 'block';
+                if (type === 'success') {
+                    el.style.backgroundColor = '#dcfce7';
+                    el.style.color = '#16a34a';
+                    el.style.borderLeft = '4px solid #16a34a';
+                } else if (type === 'error') {
+                    el.style.backgroundColor = '#fee2e2';
+                    el.style.color = '#dc2626';
+                    el.style.borderLeft = '4px solid #dc2626';
+                } else {
+                    el.style.backgroundColor = '#f1f5f9';
+                    el.style.color = '#475569';
+                    el.style.borderLeft = '4px solid #475569';
+                }
+                
+                setTimeout(() => {
+                    el.style.display = 'none';
+                }, 5000);
+            }
+        });
+    </script> </body> </html>

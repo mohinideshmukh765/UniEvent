@@ -1,25 +1,25 @@
 document.getElementById('role')?.addEventListener('change', (e) => {
+    const studentSection = document.getElementById('studentCollegeSection');
     const collegeSection = document.getElementById('collegeSection');
     if (e.target.value === 'COORDINATOR') {
         collegeSection.style.display = 'block';
+        studentSection.style.display = 'none';
         loadColleges();
     } else {
         collegeSection.style.display = 'none';
+        studentSection.style.display = 'block';
     }
 });
 
 async function loadColleges() {
     try {
-        const response = await fetch('/api/public/colleges'); // Need to create this endpoint
-        const colleges = [
-            { id: 1, name: "KIT College, Kolhapur" },
-            { id: 2, name: "DYP College, Kolhapur" }
-        ]; // Mocked for now
-        
+        const response = await fetch('/api/public/colleges');
+        if (!response.ok) throw new Error('Failed to load');
+        const colleges = await response.json();
         const collegeSelect = document.getElementById('collegeId');
-        collegeSelect.innerHTML = colleges.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        collegeSelect.innerHTML = colleges.map(c => `<option value="${c.collegeCode}">${c.collegeName}</option>`).join('');
     } catch (error) {
-        console.error('Error loading colleges');
+        console.error('Error loading colleges', error);
     }
 }
 
@@ -34,7 +34,8 @@ document.getElementById('signupForm')?.addEventListener('submit', async (e) => {
         password: document.getElementById('password').value,
         role: document.getElementById('role').value,
         district: document.getElementById('district').value,
-        collegeId: document.getElementById('role').value === 'COORDINATOR' ? document.getElementById('collegeId').value : null
+        collegeId: document.getElementById('role').value === 'COORDINATOR' ? document.getElementById('collegeId').value : null,
+        college: document.getElementById('role').value === 'STUDENT' ? document.getElementById('college').value : null
     };
 
     const messageDiv = document.getElementById('signupMessage');
