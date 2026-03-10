@@ -1144,16 +1144,35 @@ const AdminPanel = {
         }
 
         grid.innerHTML = this.allPosts.map(post => {
-            const photos = post.photo ? post.photo.split(',') : [];
-            const mainPhoto = photos.length > 0 ? photos[0] : 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&q=80';
+            const photos = post.photo ? post.photo.split(',').map(p => p.trim()).filter(p => p) : [];
+            const hasMultiple = photos.length > 1;
             const eventTitle = post.event?.title || 'Unknown Event';
             const collegeName = (post.event?.college?.name || post.event?.college?.collegeName) || 'Unknown College';
             
             return `
                 <div class="card post-card animate-slide" style="display: flex; flex-direction: column; overflow: hidden; padding: 0;">
-                    <div style="height: 220px; overflow: hidden; position: relative; background: #000;">
-                        <img src="${mainPhoto}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                        ${photos.length > 1 ? `<span style="position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.6); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem;"><i class="fas fa-images"></i> ${photos.length} Photos</span>` : ''}
+                    <div id="slider-${post.id}" style="height: 220px; overflow: hidden; position: relative; background: #000;">
+                        <div class="slider-container">
+                            ${photos.length > 0 ? photos.map((src, idx) => `
+                                <img src="${src}" class="slider-image ${idx === 0 ? 'active' : ''}" data-index="${idx}">
+                            `).join('') : `
+                                <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&q=80" class="slider-image active" data-index="0">
+                            `}
+                        </div>
+                        
+                        ${hasMultiple ? `
+                            <button class="slider-control slider-prev" onclick="AdminPanel.changeSliderPhoto(${post.id}, -1)">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="slider-control slider-next" onclick="AdminPanel.changeSliderPhoto(${post.id}, 1)">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <div class="slider-dots">
+                                ${photos.map((_, idx) => `
+                                    <div class="slider-dot ${idx === 0 ? 'active' : ''}" data-index="${idx}"></div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
                     </div>
                     <div style="padding: 1.25rem; flex: 1; display: flex; flex-direction: column;">
                         <div style="margin-bottom: 1rem;">
@@ -1180,6 +1199,28 @@ const AdminPanel = {
                 </div>
             `;
         }).join('');
+    },
+
+    changeSliderPhoto(postId, direction) {
+        const container = document.getElementById(`slider-${postId}`);
+        if (!container) return;
+
+        const images = container.querySelectorAll('.slider-image');
+        const dots = container.querySelectorAll('.slider-dot');
+        let currentIndex = Array.from(images).findIndex(img => img.classList.contains('active'));
+        
+        // Remove active from current
+        images[currentIndex].classList.remove('active');
+        if (dots[currentIndex]) dots[currentIndex].classList.remove('active');
+
+        // Calculate new index
+        currentIndex += direction;
+        if (currentIndex < 0) currentIndex = images.length - 1;
+        if (currentIndex >= images.length) currentIndex = 0;
+
+        // Add active to new
+        images[currentIndex].classList.add('active');
+        if (dots[currentIndex]) dots[currentIndex].classList.add('active');
     },
 
     async deletePost(eventId) {
