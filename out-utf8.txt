@@ -1,0 +1,29 @@
+﻿=== TABLES ===
+Table: colleges
+  Columns: college_code, city, name, coordinator_name, created_at, district, email, enabled, password, phone, username, 
+Table: users
+  Columns: id, created_at, district, email, enabled, full_name, password, phone, role, username, college, college_code, 
+Table: registration
+  Columns: event_id, username, transactionid, group_id, qrcode, status, reason, registration_date, 
+Table: afterpost
+  Columns: photo, event_description, event_id, feedback_form_link, created_at, 
+Table: event
+  Columns: event_id, title, category, min_participant, max_participant, event_fee_per_person, description, registration_deadline, event_date, location, organized_by, event_coordinator_name, event_coordinator_phone, requires_name, requires_email, requires_college, requires_payment, qrcode_path, photos_folder_path, requires_phone, college_code, 
+Table: categories
+  Columns: id, description, name, 
+Table: districts
+  Columns: id, description, name, 
+Table: registrations
+  Columns: id, registration_date, registration_id, status, team_members_json, upi_id, event_id, student_id, 
+Table: activity_logs
+  Columns: id, action, details, timestamp, user_role, user_id, 
+Table: notifications
+  Columns: id, message, read_status, sent_at, target_audience, title, user_id, 
+Table: posts
+  Columns: id, caption, created_at, images, college_id, event_id, 
+Table: events
+  Columns: id, category, coordinator_mobile, coordinator_name, created_at, description, event_date, fee_per_person, max_participants, min_participants, organized_by, poster_path, qr_code_path, registration_deadline, status, title, venue, college_id, google_form_url, 
+
+=== REGISTRATIONS ===
+Event ID: 1, User: suyog12, Group: 1, Status: PENDING
+Event ID: 1, User: srushti123, Group: 1, Status: PENDING

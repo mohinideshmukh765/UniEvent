@@ -76,23 +76,23 @@ public class Event {
 
     @Builder.Default
     @Column(name = "requires_name")
-    private boolean requiresName = true;
+    private Boolean requiresName = true;
 
     @Builder.Default
     @Column(name = "requires_email")
-    private boolean requiresEmail = true;
+    private Boolean requiresEmail = true;
 
     @Builder.Default
     @Column(name = "requires_college")
-    private boolean requiresCollege = true;
+    private Boolean requiresCollege = true;
 
     @Builder.Default
     @Column(name = "requires_phone")
-    private boolean requiresPhone = true;
+    private Boolean requiresPhone = true;
 
     @Builder.Default
     @Column(name = "requires_payment")
-    private boolean requiresPayment = false;
+    private Boolean requiresPayment = false;
 
 
 

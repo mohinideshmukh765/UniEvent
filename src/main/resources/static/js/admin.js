@@ -12,29 +12,33 @@ const AdminPanel = {
             <div class="animate-slide">
                 <div class="flex-between" style="margin-bottom: 2rem;">
                     <h1>Admin Dashboard</h1>
-                    <button class="btn-primary" style="background: var(--navy-sidebar);"><i class="fas fa-download"></i> Download Report</button>
                 </div>
                 
                 <div class="stats-grid">
-                    <div class="stat-card">
+                    <div class="stat-card" style="cursor: pointer; transition: box-shadow 0.2s;" onclick="AdminPanel.navigate('onboarding')" onmouseover="this.style.boxShadow='0 4px 20px rgba(59,130,246,0.15)'" onmouseout="this.style.boxShadow=''">
                         <div class="stat-icon" style="background: #eff6ff; color: #3b82f6;"><i class="fas fa-university"></i></div>
                         <div class="stat-info"><h3>Total Colleges</h3><p id="stat-colleges">--</p></div>
+                        <small style="color: #3b82f6; font-size: 0.75rem;">Click to view →</small>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" style="cursor: pointer; transition: box-shadow 0.2s;" onclick="AdminPanel.navigate('students-note')" onmouseover="this.style.boxShadow='0 4px 20px rgba(139,92,246,0.15)'" onmouseout="this.style.boxShadow=''">
                         <div class="stat-icon" style="background: #f5f3ff; color: #8b5cf6;"><i class="fas fa-users"></i></div>
                         <div class="stat-info"><h3>Total Students</h3><p id="stat-students">--</p></div>
+                        <small style="color: #8b5cf6; font-size: 0.75rem;">Click to view →</small>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" style="cursor: pointer; transition: box-shadow 0.2s;" onclick="AdminPanel.navigateToEvents('upcoming')" onmouseover="this.style.boxShadow='0 4px 20px rgba(16,185,129,0.15)'" onmouseout="this.style.boxShadow=''">
                         <div class="stat-icon" style="background: #ecfdf5; color: #10b981;"><i class="fas fa-calendar-check"></i></div>
                         <div class="stat-info"><h3>Upcoming Events</h3><p id="stat-upcoming">--</p></div>
+                        <small style="color: #10b981; font-size: 0.75rem;">Click to view →</small>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" style="cursor: pointer; transition: box-shadow 0.2s;" onclick="AdminPanel.navigateToEvents('past')" onmouseover="this.style.boxShadow='0 4px 20px rgba(244,63,94,0.15)'" onmouseout="this.style.boxShadow=''">
                         <div class="stat-icon" style="background: #fff1f2; color: #f43f5e;"><i class="fas fa-history"></i></div>
                         <div class="stat-info"><h3>Past Events</h3><p id="stat-past">--</p></div>
+                        <small style="color: #f43f5e; font-size: 0.75rem;">Click to view →</small>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" style="cursor: pointer; transition: box-shadow 0.2s;" onclick="AdminPanel.navigate('registrations')" onmouseover="this.style.boxShadow='0 4px 20px rgba(219,39,119,0.15)'" onmouseout="this.style.boxShadow=''">
                         <div class="stat-icon" style="background: #fdf2f8; color: #db2777;"><i class="fas fa-ticket-alt"></i></div>
                         <div class="stat-info"><h3>Total Registrations</h3><p id="stat-registrations">--</p></div>
+                        <small style="color: #db2777; font-size: 0.75rem;">Click to view →</small>
                     </div>
                 </div>
 
@@ -66,6 +70,12 @@ const AdminPanel = {
                             <h3>Recent Activities</h3>
                             <div id="activity-list" style="margin-top: 1rem;">
                                 <p style="color: var(--text-muted);">Loading activities...</p>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 2.5rem;">
+                            <div id="today-registrations-list" style="margin-top: 0.5rem;">
+                                <p style="color: var(--text-muted);">Loading today's registrations...</p>
                             </div>
                         </div>
                     </div>
@@ -113,7 +123,7 @@ const AdminPanel = {
                         <h2>Confirm Upload</h2>
                         <p id="onboardingFileInfo">Are you sure you want to onboard colleges from this file?</p>
                         <div class="modal-actions">
-                            <button class="btn-primary" style="background: var(--text-muted);" onclick="document.getElementById('onboardingModal').style.display='none'">Cancel</button>
+                            <button class="btn-primary" style="background: var(--text-muted);" onclick="AdminPanel.closeModal('onboardingModal')">Cancel</button>
                             <button class="btn-primary" id="confirmOnboardingBtn">Submit & Send Emails</button>
                         </div>
                     </div>
@@ -132,7 +142,7 @@ const AdminPanel = {
                         </div>
 
                         <div class="modal-actions" style="justify-content: space-between;">
-                            <button class="btn-primary" style="background: #e2e8f0; color: var(--text-main); border: none;" onclick="document.getElementById('deactivateModal').style.display='none'">Cancel</button>
+                            <button class="btn-primary" style="background: #e2e8f0; color: var(--text-main); border: none;" onclick="AdminPanel.closeModal('deactivateModal')">Cancel</button>
                             <button class="btn-primary" id="finalDeactivateBtn" style="background: var(--danger); opacity: 0.5; cursor: not-allowed;" disabled>Deactivate Now</button>
                         </div>
                     </div>
@@ -193,18 +203,18 @@ const AdminPanel = {
                     <div class="flex-between" style="margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
                         <h3 id="table-title">Upcoming Events</h3>
                         <div style="display: flex; gap: 1rem; align-items: center;">
-                            <div class="search-box">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <select id="filter-district" style="border: none; outline: none; background: transparent; padding-left: 0.5rem;" onchange="AdminPanel.renderModerationEvents()">
+                            <div class="search-box" style="position: relative; width: 180px;">
+                                <i class="fas fa-map-marker-alt" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;"></i>
+                                <select id="filter-district" style="width: 100%; border: 1px solid var(--border-color); outline: none; background: #f8fafc; padding: 0.6rem 1rem 0.6rem 2.8rem; border-radius: 100px; appearance: none; cursor: pointer; font-size: 0.85rem;" onchange="AdminPanel.renderModerationEvents()">
                                     <option value="ALL">All Districts</option>
                                     <option value="Kolhapur">Kolhapur</option>
                                     <option value="Sangli">Sangli</option>
                                     <option value="Satara">Satara</option>
                                 </select>
                             </div>
-                            <div class="search-box">
-                                <i class="fas fa-tags"></i>
-                                <select id="filter-category" style="border: none; outline: none; background: transparent; padding-left: 0.5rem;" onchange="AdminPanel.renderModerationEvents()">
+                            <div class="search-box" style="position: relative; width: 200px;">
+                                <i class="fas fa-tags" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;"></i>
+                                <select id="filter-category" style="width: 100%; border: 1px solid var(--border-color); outline: none; background: #f8fafc; padding: 0.6rem 1rem 0.6rem 2.8rem; border-radius: 100px; appearance: none; cursor: pointer; font-size: 0.85rem;" onchange="AdminPanel.renderModerationEvents()">
                                     <option value="ALL">All Categories</option>
                                     <option>Technical</option>
                                     <option>Cultural</option>
@@ -245,13 +255,13 @@ const AdminPanel = {
                     </div>
                 </div>
 
-                <!-- View Post Modal -->
-                <div id="viewPostModal" class="modal-overlay" style="display: none; align-items: center; justify-content: center; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000;">
-                    <div class="modal-content" style="background: white; padding: 2rem; border-radius: 12px; max-width: 500px; width: 100%; text-align: left; position: relative;">
-                        <button onclick="document.getElementById('viewPostModal').style.display='none'" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
-                        <h2 style="margin-bottom: 1rem; color: var(--text-main);"><i class="fas fa-image" style="color: var(--primary);"></i> Event Post</h2>
-                        <div id="postContentArea" style="min-height: 100px; display: flex; flex-direction: column; gap: 1rem;">
-                            <p style="color: var(--text-muted); text-align: center;">Loading post data...</p>
+                <!-- View Event Modal -->
+                <div id="viewEventModal" class="modal-overlay">
+                    <div class="modal-content" style="max-width: 650px; text-align: left;">
+                        <button onclick="AdminPanel.closeModal('viewEventModal')" style="position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+                        <h2 style="margin-bottom: 1.5rem; font-family: 'Outfit', sans-serif; display: flex; align-items: center; gap: 0.75rem;"><i class="fas fa-calendar-check" style="color: var(--primary);"></i> Event Details</h2>
+                        <div id="eventContentArea" style="min-height: 100px; display: flex; flex-direction: column; gap: 1rem;">
+                            <p style="color: var(--text-muted); text-align: center;">Loading event data...</p>
                         </div>
                     </div>
                 </div>
@@ -262,29 +272,31 @@ const AdminPanel = {
                 <div class="flex-between" style="margin-bottom: 2rem;">
                     <h1>Registration Monitoring</h1>
                 </div>
-                
+
                 <div class="card">
-                    <div class="flex-between" style="margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-                        <h3>All Registrations</h3>
-                        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-                            <div class="search-box">
-                                <i class="fas fa-university"></i>
-                                <select id="reg-filter-college" style="border: none; outline: none; background: transparent; padding-left: 0.5rem;" onchange="AdminPanel.renderRegistrations()">
+                    <!-- Header row: title + filter bar on same line -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+                        <h3 style="margin: 0;">All Registrations</h3>
+                        <!-- Horizontal filter bar -->
+                        <div style="display: flex; gap: 0.75rem; align-items: center; flex-direction: row; flex-wrap: wrap;">
+                            <div style="display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.8rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; min-width: 140px;">
+                                <i class="fas fa-university" style="color: var(--text-muted); font-size: 0.85rem;"></i>
+                                <select id="reg-filter-college" style="border: none; outline: none; background: transparent; font-size: 0.85rem; color: var(--text-main); cursor: pointer; width: 100%;" onchange="AdminPanel.renderRegistrations()">
                                     <option value="ALL">All Colleges</option>
                                 </select>
                             </div>
-                            <div class="search-box">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <select id="reg-filter-district" style="border: none; outline: none; background: transparent; padding-left: 0.5rem;" onchange="AdminPanel.renderRegistrations()">
+                            <div style="display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.8rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; min-width: 130px;">
+                                <i class="fas fa-map-marker-alt" style="color: var(--text-muted); font-size: 0.85rem;"></i>
+                                <select id="reg-filter-district" style="border: none; outline: none; background: transparent; font-size: 0.85rem; color: var(--text-main); cursor: pointer; width: 100%;" onchange="AdminPanel.renderRegistrations()">
                                     <option value="ALL">All Districts</option>
                                     <option value="Kolhapur">Kolhapur</option>
                                     <option value="Sangli">Sangli</option>
                                     <option value="Satara">Satara</option>
                                 </select>
                             </div>
-                            <div class="search-box">
-                                <i class="fas fa-tags"></i>
-                                <select id="reg-filter-category" style="border: none; outline: none; background: transparent; padding-left: 0.5rem;" onchange="AdminPanel.renderRegistrations()">
+                            <div style="display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.8rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; min-width: 140px;">
+                                <i class="fas fa-tags" style="color: var(--text-muted); font-size: 0.85rem;"></i>
+                                <select id="reg-filter-category" style="border: none; outline: none; background: transparent; font-size: 0.85rem; color: var(--text-main); cursor: pointer; width: 100%;" onchange="AdminPanel.renderRegistrations()">
                                     <option value="ALL">All Categories</option>
                                     <option>Technical</option>
                                     <option>Cultural</option>
@@ -303,29 +315,40 @@ const AdminPanel = {
                                     <option>Others</option>
                                 </select>
                             </div>
+                            <div style="display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.8rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; min-width: 120px;">
+                                <i class="fas fa-filter" style="color: var(--text-muted); font-size: 0.85rem;"></i>
+                                <select id="reg-filter-status" style="border: none; outline: none; background: transparent; font-size: 0.85rem; color: var(--text-main); cursor: pointer; width: 100%;" onchange="AdminPanel.renderRegistrations()">
+                                    <option value="ALL">All Status</option>
+                                    <option value="PENDING">Pending</option>
+                                    <option value="APPROVED">Approved</option>
+                                    <option value="DENIED">Denied</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                    
+
                     <div class="data-table-wrapper">
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Student Name</th>
-                                    <th>Student College</th>
+                                    <th>Student Username</th>
                                     <th>Event Name</th>
                                     <th>Hosting College</th>
                                     <th>District</th>
                                     <th>Category</th>
+                                    <th>Reg. Date</th>
+                                    <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody id="registrations-body">
-                                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Loading registrations...</td></tr>
+                                <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading registrations...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         `,
+
         posts: `
             <div class="animate-slide">
                 <h1>Post Moderation</h1>
@@ -342,21 +365,204 @@ const AdminPanel = {
         `,
         analytics: `
             <div class="animate-slide">
-                <h1>District Analytics</h1>
-                <div class="stats-grid" style="margin: 2rem 0;">
-                    <div class="card"><h3>Kolhapur</h3><p>Active</p></div>
-                    <div class="card"><h3>Sangli</h3><p>Steady</p></div>
-                    <div class="card"><h3>Satara</h3><p>Growing</p></div>
+                <div class="flex-between" style="margin-bottom: 2rem;">
+                    <h1>Analytics</h1>
+                    <button class="btn-primary" onclick="AdminPanel.loadAnalyticsData()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                </div>
+                
+                <div class="stats-grid" style="margin-bottom: 2rem; grid-template-columns: repeat(2, 1fr);">
+                    <div class="stat-card" id="analytics-tab-events" style="display: flex; align-items: center; gap: 1.5rem; cursor: pointer; border: 2px solid var(--primary);" onclick="AdminPanel.setAnalyticsTab('events')">
+                        <div class="stat-icon" style="background: #eff6ff; color: #3b82f6;"><i class="fas fa-calendar-check"></i></div>
+                        <div>
+                            <p class="stat-title">Total Events</p>
+                            <h2 class="stat-value" id="analytics-events-count">--</h2>
+                        </div>
+                    </div>
+                    <div class="stat-card" id="analytics-tab-regs" style="display: flex; align-items: center; gap: 1.5rem; cursor: pointer; border: 2px solid transparent;" onclick="AdminPanel.setAnalyticsTab('regs')">
+                        <div class="stat-icon" style="background: #fdf2f8; color: #ec4899;"><i class="fas fa-users"></i></div>
+                        <div>
+                            <p class="stat-title">Total Registrations</p>
+                            <h2 class="stat-value" id="analytics-regs-count">--</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 2rem;">
+                    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.8rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <i class="fas fa-map-marker-alt" style="color: var(--text-muted); font-size: 0.85rem;"></i>
+                            <select id="analytics-filter-district" style="border: none; outline: none; background: transparent; font-size: 0.85rem; color: var(--text-main); cursor: pointer;" onchange="AdminPanel.applyAnalyticsFilters()">
+                                <option value="ALL">All Districts</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.8rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <i class="fas fa-university" style="color: var(--text-muted); font-size: 0.85rem;"></i>
+                            <select id="analytics-filter-college" style="border: none; outline: none; background: transparent; font-size: 0.85rem; color: var(--text-main); cursor: pointer;" onchange="AdminPanel.applyAnalyticsFilters()">
+                                <option value="ALL">All Colleges</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.8rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <i class="fas fa-calendar-alt" style="color: var(--text-muted); font-size: 0.85rem;"></i>
+                            <select id="analytics-filter-event" style="border: none; outline: none; background: transparent; font-size: 0.85rem; color: var(--text-main); cursor: pointer;" onchange="AdminPanel.applyAnalyticsFilters()">
+                                <option value="ALL">All Events</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.8rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <i class="fas fa-tags" style="color: var(--text-muted); font-size: 0.85rem;"></i>
+                            <select id="analytics-filter-category" style="border: none; outline: none; background: transparent; font-size: 0.85rem; color: var(--text-main); cursor: pointer;" onchange="AdminPanel.applyAnalyticsFilters()">
+                                <option value="ALL">All Categories</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.8rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <i class="fas fa-clock" style="color: var(--text-muted); font-size: 0.85rem;"></i>
+                            <input type="date" id="analytics-filter-date-from" placeholder="From" style="border: none; outline: none; background: transparent; font-size: 0.85rem; color: var(--text-main); cursor: pointer;" onchange="AdminPanel.applyAnalyticsFilters()">
+                            <span style="color: var(--text-muted); font-size: 0.85rem;">to</span>
+                            <input type="date" id="analytics-filter-date-to" placeholder="To" style="border: none; outline: none; background: transparent; font-size: 0.85rem; color: var(--text-main); cursor: pointer;" onchange="AdminPanel.applyAnalyticsFilters()">
+                        </div>
+                        <button class="btn-primary" style="background: var(--navy-sidebar);" onclick="AdminPanel.clearAnalyticsFilters()">Clear Filters</button>
+                    </div>
+                </div>
+
+                <div id="analytics-events-view" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div class="card" style="height: 400px; display: flex; flex-direction: column;">
+                        <h3 style="margin-bottom: 1rem;">Events by Category (Pie)</h3>
+                        <div style="flex: 1; position: relative;">
+                            <canvas id="analyticsEventPie"></canvas>
+                        </div>
+                    </div>
+                    <div class="card" style="height: 400px; display: flex; flex-direction: column;">
+                        <h3 style="margin-bottom: 1rem;">Events by College (Bar)</h3>
+                        <div style="flex: 1; position: relative;">
+                            <canvas id="analyticsEventBar"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="analytics-regs-view" style="display: none; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div class="card" style="height: 400px; display: flex; flex-direction: column;">
+                        <h3 style="margin-bottom: 1rem;">Registrations by Category (Pie)</h3>
+                        <div style="flex: 1; position: relative;">
+                            <canvas id="analyticsRegPie"></canvas>
+                        </div>
+                    </div>
+                    <div class="card" style="height: 400px; display: flex; flex-direction: column;">
+                        <h3 style="margin-bottom: 1rem;">Registrations by College (Bar)</h3>
+                        <div style="flex: 1; position: relative;">
+                            <canvas id="analyticsRegBar"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
         `,
         reports: `
             <div class="animate-slide">
-                <h1>System Reports</h1>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
-                    <div class="card"><h4>Event Reports</h4><button class="btn-primary">PDF</button></div>
-                    <div class="card"><h4>Student Stats</h4><button class="btn-primary">CSV</button></div>
-                    <div class="card"><h4>College Activity</h4><button class="btn-primary">Export</button></div>
+                <div class="flex-between" style="margin-bottom: 2rem;">
+                    <h1>System Reports</h1>
+                    <div>
+                        <button class="btn-primary" onclick="AdminPanel.exportReportsToExcel()" style="background: #10b981; margin-right: 0.5rem;"><i class="fas fa-file-excel"></i> Export Excel</button>
+                    </div>
+                </div>
+                
+                <div class="stats-grid" style="margin-bottom: 2rem; grid-template-columns: repeat(2, 1fr);">
+                    <div class="stat-card" id="reports-tab-events" style="display: flex; align-items: center; gap: 1.5rem; cursor: pointer; border: 2px solid var(--primary);" onclick="AdminPanel.setReportsTab('events')">
+                        <div class="stat-icon" style="background: #eff6ff; color: #3b82f6;"><i class="fas fa-calendar-check"></i></div>
+                        <div>
+                            <p class="stat-title">Total Events</p>
+                            <h2 class="stat-value" id="reports-events-count">--</h2>
+                        </div>
+                    </div>
+                    <div class="stat-card" id="reports-tab-regs" style="display: flex; align-items: center; gap: 1.5rem; cursor: pointer; border: 2px solid transparent;" onclick="AdminPanel.setReportsTab('regs')">
+                        <div class="stat-icon" style="background: #fdf2f8; color: #ec4899;"><i class="fas fa-users"></i></div>
+                        <div>
+                            <p class="stat-title">Total Registrations</p>
+                            <h2 class="stat-value" id="reports-regs-count">--</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 2rem;">
+                    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.8rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <i class="fas fa-map-marker-alt" style="color: var(--text-muted); font-size: 0.85rem;"></i>
+                            <select id="reports-filter-district" style="border: none; outline: none; background: transparent; font-size: 0.85rem; color: var(--text-main); cursor: pointer;" onchange="AdminPanel.applyReportsFilters()">
+                                <option value="ALL">All Districts</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.8rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <i class="fas fa-university" style="color: var(--text-muted); font-size: 0.85rem;"></i>
+                            <select id="reports-filter-college" style="border: none; outline: none; background: transparent; font-size: 0.85rem; color: var(--text-main); cursor: pointer;" onchange="AdminPanel.applyReportsFilters()">
+                                <option value="ALL">All Colleges</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.8rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <i class="fas fa-calendar-alt" style="color: var(--text-muted); font-size: 0.85rem;"></i>
+                            <select id="reports-filter-event" style="border: none; outline: none; background: transparent; font-size: 0.85rem; color: var(--text-main); cursor: pointer;" onchange="AdminPanel.applyReportsFilters()">
+                                <option value="ALL">All Events</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.8rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <i class="fas fa-tags" style="color: var(--text-muted); font-size: 0.85rem;"></i>
+                            <select id="reports-filter-category" style="border: none; outline: none; background: transparent; font-size: 0.85rem; color: var(--text-main); cursor: pointer;" onchange="AdminPanel.applyReportsFilters()">
+                                <option value="ALL">All Categories</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.8rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <i class="fas fa-clock" style="color: var(--text-muted); font-size: 0.85rem;"></i>
+                            <input type="date" id="reports-filter-date-from" placeholder="From" style="border: none; outline: none; background: transparent; font-size: 0.85rem; color: var(--text-main); cursor: pointer;" onchange="AdminPanel.applyReportsFilters()">
+                            <span style="color: var(--text-muted); font-size: 0.85rem;">to</span>
+                            <input type="date" id="reports-filter-date-to" placeholder="To" style="border: none; outline: none; background: transparent; font-size: 0.85rem; color: var(--text-main); cursor: pointer;" onchange="AdminPanel.applyReportsFilters()">
+                        </div>
+                        <button class="btn-primary" style="background: var(--navy-sidebar);" onclick="AdminPanel.clearReportsFilters()">Clear</button>
+                    </div>
+                </div>
+
+                <div id="reports-events-view" style="display: block;">
+                    <div class="card">
+                        <div class="data-table-wrapper" style="max-height: 400px; overflow-y: auto;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Title</th>
+                                        <th>Category</th>
+                                        <th>College</th>
+                                        <th>District</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reports-events-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="reports-regs-view" style="display: none;">
+                    <div class="card">
+                        <div class="data-table-wrapper" style="max-height: 400px; overflow-y: auto;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Event</th>
+                                        <th>Category</th>
+                                        <th>College</th>
+                                        <th>Reg. Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reports-regs-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `,
+        "students-note": `
+            <div class="animate-slide">
+                <div style="text-align: center; padding: 5rem 2rem;">
+                    <div style="font-size: 4rem; color: #e2e8f0; margin-bottom: 1.5rem;"><i class="fas fa-user-graduate"></i></div>
+                    <h1 style="color: var(--text-main); margin-bottom: 0.75rem;">Students Directory</h1>
+                    <p style="color: var(--text-muted); font-size: 1rem; max-width: 400px; margin: 0 auto 2rem;">The dedicated Students page is coming soon. You can view student registrations under the <strong>Registrations</strong> section.</p>
+                    <button class="btn-primary" onclick="AdminPanel.navigate('registrations')">View Registrations</button>
                 </div>
             </div>
         `,
@@ -409,6 +615,10 @@ const AdminPanel = {
             this.loadModerationEventsData();
         } else if (pageId === 'registrations') {
             this.loadRegistrationsData();
+        } else if (pageId === 'analytics') {
+            this.loadAnalyticsData();
+        } else if (pageId === 'reports') {
+            this.loadReportsData();
         }
     },
 
@@ -586,7 +796,7 @@ const AdminPanel = {
             confirmBtn.style.cursor = 'pointer';
         }
 
-        modal.style.display = 'flex';
+        modal.classList.add('active');
 
         confirmBtn.onclick = async () => {
             try {
@@ -648,6 +858,7 @@ const AdminPanel = {
                                     <p style="font-size: 0.9rem; font-weight: 700;">${event.title}</p>
                                     <p style="font-size: 0.8rem; color: var(--text-muted);">${event.college ? event.college.name : 'University'}</p>
                                 </div>
+                                <button class="btn-primary" style="padding: 0.3rem 0.6rem; font-size: 0.7rem; background: var(--navy-sidebar);" onclick="AdminPanel.viewEventDetails(${event.id})">View</button>
                             </div>
                         `).join('');
                     }
@@ -674,9 +885,107 @@ const AdminPanel = {
                 }
             }
 
+            // Today's Registrations
+            try {
+                const todayRes = await fetch('/api/admin/registrations/today', {
+                    headers: this.getAuthHeaders()
+                });
+                const todayList = document.getElementById('today-registrations-list');
+                if (todayRes.ok && todayList) {
+                    const todayRegs = await todayRes.json();
+                    if (todayRegs.length === 0) {
+                        todayList.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No registrations recorded today yet.</p>`;
+                    } else {
+                        todayList.innerHTML = `
+                            <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+                                <thead>
+                                    <tr style="border-bottom: 2px solid var(--border-color);">
+                                        <th style="text-align: left; padding: 0.6rem 0.8rem; color: var(--text-muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">Time</th>
+                                        <th style="text-align: left; padding: 0.6rem 0.8rem; color: var(--text-muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">Student</th>
+                                        <th style="text-align: left; padding: 0.6rem 0.8rem; color: var(--text-muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">Event</th>
+                                        <th style="text-align: left; padding: 0.6rem 0.8rem; color: var(--text-muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">College</th>
+                                        <th style="text-align: left; padding: 0.6rem 0.8rem; color: var(--text-muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${todayRegs.map(r => {
+                                        const studentName = r.username || 'Unknown';
+                                        const eventTitle = r.event ? r.event.title : 'Unknown Event';
+                                        const college = r.event && r.event.college ? r.event.college.name : '—';
+                                        const timeStr = r.registrationDate ? new Date(r.registrationDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--';
+                                        return `
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 0.7rem 0.8rem;">
+                                                    <span style="background: #ecfdf5; color: #10b981; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.78rem; font-weight: 700;">${timeStr}</span>
+                                                </td>
+                                                <td style="padding: 0.7rem 0.8rem; font-weight: 600; color: var(--text-main);">${studentName}</td>
+                                                <td style="padding: 0.7rem 0.8rem; color: var(--primary); font-weight: 600;">${eventTitle}</td>
+                                                <td style="padding: 0.7rem 0.8rem; color: var(--text-muted);">${college}</td>
+                                                <td style="padding: 0.7rem 0.8rem;">
+                                                    <span style="background: #d1fae5; color: #065f46; padding: 2px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: 600;">New</span>
+                                                </td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        `;
+                    }
+                }
+            } catch(e) {
+                console.warn('Could not load today\'s registrations:', e);
+                const todayList = document.getElementById('today-registrations-list');
+                if (todayList) todayList.innerHTML = `<p style="color: var(--text-muted);">Unable to load today's data.</p>`;
+            }
+
+            // District Event Distribution Chart
+            try {
+                const distEventsRes = await fetch('/api/admin/events', {
+                    headers: this.getAuthHeaders()
+                });
+                if (distEventsRes.ok) {
+                    const allEvents = await distEventsRes.json();
+                    const distrCounts = { Kolhapur: 0, Sangli: 0, Satara: 0 };
+                    
+                    allEvents.forEach(e => {
+                        const d = e.college && e.college.district;
+                        if (distrCounts[d] !== undefined) distrCounts[d]++;
+                    });
+                    
+                    let maxCount = Math.max(...Object.values(distrCounts));
+                    if (maxCount === 0) maxCount = 1;
+                    
+                    const chartHtml = `
+                        <div style="width: 60px; height: 90%; background: #e2e8f0; border-radius: 8px 8px 0 0; position: relative;">
+                            <div class="chart-bar" style="position: absolute; bottom: 0; width: 100%; height: ${(distrCounts.Kolhapur / maxCount) * 100}%; background: #3b82f6; border-radius: 8px 8px 0 0;"></div>
+                            <span style="position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); font-size: 0.8rem; font-weight: 600;">Kolhapur: ${distrCounts.Kolhapur}</span>
+                        </div>
+                        <div style="width: 60px; height: 90%; background: #e2e8f0; border-radius: 8px 8px 0 0; position: relative;">
+                            <div class="chart-bar" style="position: absolute; bottom: 0; width: 100%; height: ${(distrCounts.Sangli / maxCount) * 100}%; background: #3b82f6; border-radius: 8px 8px 0 0;"></div>
+                            <span style="position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); font-size: 0.8rem; font-weight: 600;">Sangli: ${distrCounts.Sangli}</span>
+                        </div>
+                        <div style="width: 60px; height: 90%; background: #e2e8f0; border-radius: 8px 8px 0 0; position: relative;">
+                            <div class="chart-bar" style="position: absolute; bottom: 0; width: 100%; height: ${(distrCounts.Satara / maxCount) * 100}%; background: #3b82f6; border-radius: 8px 8px 0 0;"></div>
+                            <span style="position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); font-size: 0.8rem; font-weight: 600;">Satara: ${distrCounts.Satara}</span>
+                        </div>
+                    `;
+                    
+                    const dbChart = document.getElementById('district-chart');
+                    if (dbChart) dbChart.innerHTML = chartHtml;
+                }
+            } catch (e) {
+                console.warn('Could not load district chart data:', e);
+            }
+
         } catch (error) {
             console.error("Error loading dashboard data:", error);
         }
+    },
+
+    navigateToEvents(tab) {
+        this.navigate('events');
+        // Wait for template to render, then set the tab
+        setTimeout(() => this.setEventTab(tab), 50);
     },
 
     filterColleges() {
@@ -795,7 +1104,7 @@ const AdminPanel = {
                     </td>
                     <td><strong style="color: var(--text-main);">${e.title}</strong></td>
                     <td><span style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">${e.category || 'N/A'}</span></td>
-                    <td>${e.college ? e.college.name : 'Unknown'}</td>
+                    <td>${(e.college && (e.college.name || e.college.collegeName)) || 'Unknown'}</td>
                     <td>${e.college ? e.college.district : 'N/A'}</td>
                     <td>
                         <span style="background: ${statusColor}; color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">
@@ -803,8 +1112,8 @@ const AdminPanel = {
                         </span>
                     </td>
                     <td>
-                        <button class="btn-primary" style="background: var(--navy-sidebar); font-size: 0.75rem; padding: 0.4rem 0.8rem;" onclick="AdminPanel.viewEventPost(${e.id})">
-                            <i class="fas fa-eye"></i> View Post
+                        <button class="btn-primary" style="background: var(--navy-sidebar); font-size: 0.75rem; padding: 0.4rem 0.8rem;" onclick="AdminPanel.viewEventDetails(${e.id})">
+                            <i class="fas fa-eye"></i> View Event
                         </button>
                     </td>
                 </tr>
@@ -812,46 +1121,38 @@ const AdminPanel = {
         }).join('');
     },
 
-    async viewEventPost(eventId) {
-        const modal = document.getElementById('viewPostModal');
-        const contentArea = document.getElementById('postContentArea');
+    viewEventDetails(eventId) {
+        const modal = document.getElementById('viewEventModal');
+        const contentArea = document.getElementById('eventContentArea');
         if (!modal || !contentArea) return;
 
-        modal.style.display = 'flex';
-        contentArea.innerHTML = `<p style="color: var(--text-muted); text-align: center;"><i class="fas fa-spinner fa-spin"></i> Fetching post...</p>`;
+        modal.classList.add('active');
+        // Search across all possible event sources
+        const event = (this.allModerationEvents || []).find(e => e.id == eventId) || 
+                      (this.reportsEvents || []).find(e => e.id == eventId);
 
-        try {
-            const res = await fetch(`/api/admin/events/${eventId}/post`, { headers: this.getAuthHeaders() });
-            if (res.ok) {
-                const post = await res.json();
-                let imageHtml = '';
-                if (post.images) {
-                    imageHtml = `<img src="${post.images}" style="width: 100%; border-radius: 8px; margin-bottom: 1rem; border: 1px solid var(--border-color); object-fit: cover; max-height: 300px;" alt="Post Image">`;
-                }
-
-                contentArea.innerHTML = `
-                    ${imageHtml}
-                    <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
-                        <p style="font-size: 0.95rem; color: var(--text-main); white-space: pre-wrap; line-height: 1.5;">${post.caption || '<em>No caption provided.</em>'}</p>
+        if (event) {
+            const dateStr = new Date(event.eventDate).toLocaleString();
+            contentArea.innerHTML = `
+                <div style="background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--primary); margin-bottom: 0.5rem; font-size: 1.4rem;">${event.title || 'N/A'}</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;"><i class="fas fa-layer-group"></i> ${event.category || 'N/A'} &nbsp;|&nbsp; <i class="far fa-calendar-alt"></i> ${dateStr}</p>
+                    
+                    <div style="font-size: 0.95rem; color: var(--text-main); margin-bottom: 1.5rem; border-left: 4px solid var(--primary); padding-left: 1rem; white-space: pre-wrap; line-height: 1.5;">${event.description || 'No description provided.'}</div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.85rem; background: white; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                        <div><strong style="color: var(--text-muted);"><i class="fas fa-university" style="width: 16px;"></i> College:</strong><br/>${(event.college && (event.college.name || event.college.collegeName)) || 'Unknown'}</div>
+                        <div><strong style="color: var(--text-muted);"><i class="fas fa-map-marker-alt" style="width: 16px;"></i> Venue:</strong><br/>${event.venue || 'N/A'}</div>
+                        <div><strong style="color: var(--text-muted);"><i class="fas fa-user-tie" style="width: 16px;"></i> Organizer:</strong><br/>${event.organizedBy || 'N/A'}</div>
+                        <div><strong style="color: var(--text-muted);"><i class="fas fa-phone" style="width: 16px;"></i> Contact:</strong><br/>${event.coordinatorName || ''} ${event.coordinatorMobile ? '<br/>('+event.coordinatorMobile+')' : ''}</div>
+                        <div><strong style="color: var(--text-muted);"><i class="fas fa-users" style="width: 16px;"></i> Participants:</strong><br/>${event.minParticipants || 0} - ${event.maxParticipants || 'Unlimited'}</div>
+                        <div><strong style="color: var(--text-muted);"><i class="fas fa-rupee-sign" style="width: 16px;"></i> Fee:</strong><br/>${event.feePerPerson ? '₹' + event.feePerPerson : 'Free'}</div>
+                        <div style="grid-column: span 2;"><strong style="color: var(--text-muted);"><i class="fas fa-clock" style="width: 16px;"></i> Reg. Deadline:</strong> ${event.registrationDeadline ? new Date(event.registrationDeadline).toLocaleString() : 'N/A'}</div>
                     </div>
-                    <p style="font-size: 0.75rem; color: var(--text-muted); text-align: right; margin-top: 0.5rem;">
-                        Posted: ${new Date(post.createdAt || Date.now()).toLocaleDateString()}
-                    </p>
-                `;
-            } else if (res.status === 404) {
-                contentArea.innerHTML = `
-                    <div style="text-align: center; padding: 2rem 0;">
-                        <i class="fas fa-folder-open" style="font-size: 3rem; color: #e2e8f0; margin-bottom: 1rem;"></i>
-                        <h3 style="color: var(--text-muted);">No Post Available</h3>
-                        <p style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.5rem;">The coordinator has not created a post for this event yet.</p>
-                    </div>
-                `;
-            } else {
-                contentArea.innerHTML = `<p style="color: var(--danger); text-align: center;">Error loading post: Server returned ${res.status}</p>`;
-            }
-        } catch (error) {
-            console.error("Error viewing post:", error);
-            contentArea.innerHTML = `<p style="color: var(--danger); text-align: center;">An unexpected error occurred.</p>`;
+                </div>
+            `;
+        } else {
+            contentArea.innerHTML = `<p style="color: var(--danger); text-align: center;">Error loading event details.</p>`;
         }
     },
 
@@ -902,6 +1203,12 @@ const AdminPanel = {
 
         let filtered = this.allRegistrations;
 
+        // Apply Status Filter
+        const statusFilter = document.getElementById('reg-filter-status')?.value || 'ALL';
+        if (statusFilter !== 'ALL') {
+            filtered = filtered.filter(r => (r.status || '').toUpperCase() === statusFilter);
+        }
+
         // Apply Category Filter
         if (catFilter !== 'ALL') {
             filtered = filtered.filter(r => r.event && r.event.category === catFilter);
@@ -918,29 +1225,445 @@ const AdminPanel = {
         }
 
         if (filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">No registrations found matching these filters.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No registrations found matching these filters.</td></tr>`;
             return;
         }
 
         tbody.innerHTML = filtered.map(r => {
-            const studentName = r.student ? (r.student.fullName || r.student.username) : 'N/A';
-            const studentCollegeInfo = r.student && r.student.college ? r.student.college.name : 'Unknown';
+            const studentName = r.username || r.student?.username || 'N/A';
             const eventName = r.event ? r.event.title : 'N/A';
-            const hostingCollege = r.event && r.event.college ? r.event.college.name : 'Unknown';
+            const hostingCollege = r.event && r.event.college ? (r.event.college.name || r.event.college.collegeName) : 'Unknown';
             const district = r.event && r.event.college ? r.event.college.district : 'N/A';
             const category = r.event ? r.event.category : 'N/A';
+            const regDate = r.registrationDate ? new Date(r.registrationDate).toLocaleDateString() : '—';
+            const status = r.status || 'PENDING';
+            const statusColor = status === 'APPROVED' ? '#10b981' : status === 'DENIED' ? '#ef4444' : '#f59e0b';
+            const statusBg = status === 'APPROVED' ? '#ecfdf5' : status === 'DENIED' ? '#fef2f2' : '#fffbeb';
 
             return `
                 <tr>
-                    <td><strong>${studentName}</strong></td>
-                    <td><span style="font-size: 0.85rem; color: var(--text-muted);">${studentCollegeInfo}</span></td>
+                    <td><strong style="color: var(--text-main);">${studentName}</strong></td>
                     <td><strong style="color: var(--primary);">${eventName}</strong></td>
                     <td>${hostingCollege}</td>
-                    <td>${district}</td>
-                    <td><span style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">${category}</span></td>
+                    <td><span style="background: #f1f5f9; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;">${district}</span></td>
+                    <td><span style="background: #f1f5f9; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;">${category}</span></td>
+                    <td style="font-size: 0.85rem; color: var(--text-muted);">${regDate}</td>
+                    <td><span style="background: ${statusBg}; color: ${statusColor}; padding: 3px 10px; border-radius: 10px; font-size: 0.78rem; font-weight: 700;">${status}</span></td>
                 </tr>
             `;
         }).join('');
+    },
+
+    setAnalyticsTab(tab) {
+        const eventsTab = document.getElementById('analytics-tab-events');
+        const regsTab = document.getElementById('analytics-tab-regs');
+        const eventsView = document.getElementById('analytics-events-view');
+        const regsView = document.getElementById('analytics-regs-view');
+        
+        if (eventsTab) eventsTab.style.borderColor = tab === 'events' ? 'var(--primary)' : 'transparent';
+        if (regsTab) regsTab.style.borderColor = tab === 'regs' ? 'var(--primary)' : 'transparent';
+        
+        if (eventsView) eventsView.style.display = tab === 'events' ? 'grid' : 'none';
+        if (regsView) regsView.style.display = tab === 'regs' ? 'grid' : 'none';
+        
+        // Re-render charts to fit the visible containers properly
+        this.applyAnalyticsFilters(); 
+    },
+
+    async loadAnalyticsData() {
+        try {
+            const [eventsRes, regsRes] = await Promise.all([
+                fetch('/api/admin/events', { headers: this.getAuthHeaders() }),
+                fetch('/api/admin/registrations', { headers: this.getAuthHeaders() })
+            ]);
+
+            if (eventsRes.ok && regsRes.ok) {
+                this.analyticsEvents = await eventsRes.json();
+                this.analyticsRegs = await regsRes.json();
+
+                const districts = new Set();
+                const colleges = new Set();
+                const events = new Set();
+                const categories = new Set();
+
+                this.analyticsEvents.forEach(e => {
+                    events.add(e.title);
+                    if (e.category) categories.add(e.category);
+                    if (e.college) {
+                        colleges.add(e.college.name || e.college.collegeName);
+                        districts.add(e.college.district);
+                    }
+                });
+
+                const populateSelect = (id, set, defaultText) => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.innerHTML = `<option value="ALL">${defaultText}</option>` +
+                            Array.from(set).filter(Boolean).sort().map(item => `<option value="${item}">${item}</option>`).join('');
+                    }
+                };
+
+                populateSelect('analytics-filter-district', districts, 'All Districts');
+                populateSelect('analytics-filter-college', colleges, 'All Colleges');
+                populateSelect('analytics-filter-event', events, 'All Events');
+                populateSelect('analytics-filter-category', categories, 'All Categories');
+
+                // Apply filters and route to default "events" tab
+                this.setAnalyticsTab('events');
+            } else {
+                console.error("Failed to load analytics data");
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    },
+
+    applyAnalyticsFilters() {
+        const district = document.getElementById('analytics-filter-district')?.value || 'ALL';
+        const college = document.getElementById('analytics-filter-college')?.value || 'ALL';
+        const eventOpt = document.getElementById('analytics-filter-event')?.value || 'ALL';
+        const categoryOpt = document.getElementById('analytics-filter-category')?.value || 'ALL';
+        const dateFrom = document.getElementById('analytics-filter-date-from')?.value;
+        const dateTo = document.getElementById('analytics-filter-date-to')?.value;
+
+        // Filter events
+        let fEvents = this.analyticsEvents || [];
+        if (district !== 'ALL') fEvents = fEvents.filter(e => e.college && e.college.district === district);
+        if (college !== 'ALL') fEvents = fEvents.filter(e => e.college && (e.college.name === college || e.college.collegeName === college));
+        if (eventOpt !== 'ALL') fEvents = fEvents.filter(e => e.title === eventOpt);
+        if (categoryOpt !== 'ALL') fEvents = fEvents.filter(e => e.category === categoryOpt);
+
+        if (dateFrom) {
+            const dFrom = new Date(dateFrom);
+            fEvents = fEvents.filter(e => e.eventDate && new Date(e.eventDate) >= dFrom);
+        }
+        if (dateTo) {
+            const dTo = new Date(dateTo);
+            dTo.setHours(23, 59, 59, 999);
+            fEvents = fEvents.filter(e => e.eventDate && new Date(e.eventDate) <= dTo);
+        }
+
+        // Filter registrations
+        let fRegs = this.analyticsRegs || [];
+        if (district !== 'ALL') fRegs = fRegs.filter(r => r.event && r.event.college && r.event.college.district === district);
+        if (college !== 'ALL') fRegs = fRegs.filter(r => r.event && r.event.college && (r.event.college.name === college || r.event.college.collegeName === college));
+        if (eventOpt !== 'ALL') fRegs = fRegs.filter(r => r.event && r.event.title === eventOpt);
+        if (categoryOpt !== 'ALL') fRegs = fRegs.filter(r => r.event && r.event.category === categoryOpt);
+
+        if (dateFrom) {
+            const dFrom = new Date(dateFrom);
+            fRegs = fRegs.filter(r => r.registrationDate && new Date(r.registrationDate) >= dFrom);
+        }
+        if (dateTo) {
+            const dTo = new Date(dateTo);
+            dTo.setHours(23, 59, 59, 999);
+            fRegs = fRegs.filter(r => r.registrationDate && new Date(r.registrationDate) <= dTo);
+        }
+
+        // Update cards
+        const evCountEl = document.getElementById('analytics-events-count');
+        const regCountEl = document.getElementById('analytics-regs-count');
+        if (evCountEl) evCountEl.textContent = fEvents.length;
+        if (regCountEl) regCountEl.textContent = fRegs.length;
+
+        this.renderAnalyticsCharts(fEvents, fRegs);
+    },
+
+    clearAnalyticsFilters() {
+        if(document.getElementById('analytics-filter-district')) document.getElementById('analytics-filter-district').value = 'ALL';
+        if(document.getElementById('analytics-filter-college')) document.getElementById('analytics-filter-college').value = 'ALL';
+        if(document.getElementById('analytics-filter-event')) document.getElementById('analytics-filter-event').value = 'ALL';
+        if(document.getElementById('analytics-filter-category')) document.getElementById('analytics-filter-category').value = 'ALL';
+        if(document.getElementById('analytics-filter-date-from')) document.getElementById('analytics-filter-date-from').value = '';
+        if(document.getElementById('analytics-filter-date-to')) document.getElementById('analytics-filter-date-to').value = '';
+        this.applyAnalyticsFilters();
+    },
+
+    renderAnalyticsCharts(events, regs) {
+        if (!window.Chart) return;
+        
+        // Destroy existing
+        if (this.analyticsEventPie) this.analyticsEventPie.destroy();
+        if (this.analyticsEventBar) this.analyticsEventBar.destroy();
+        if (this.analyticsRegPie) this.analyticsRegPie.destroy();
+        if (this.analyticsRegBar) this.analyticsRegBar.destroy();
+
+        const pieColors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
+        
+        // ---------------- EVENTS CHARTS ----------------
+        // Event Pie: Events by Category
+        const eventCats = {};
+        events.forEach(e => {
+            const c = e.category || 'Other';
+            eventCats[c] = (eventCats[c] || 0) + 1;
+        });
+        const ePieCtx = document.getElementById('analyticsEventPie');
+        if (ePieCtx && Object.keys(eventCats).length > 0) {
+            this.analyticsEventPie = new Chart(ePieCtx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(eventCats),
+                    datasets: [{ data: Object.values(eventCats), backgroundColor: pieColors, borderWidth: 1 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+        
+        // Event Bar: Events by College
+        const eventColleges = {};
+        events.forEach(e => {
+            const cName = e.college ? (e.college.name || e.college.collegeName) : 'Unknown';
+            eventColleges[cName] = (eventColleges[cName] || 0) + 1;
+        });
+        const sortedEventColleges = Object.entries(eventColleges).sort((a,b)=>b[1]-a[1]).slice(0, 5);
+        const eBarCtx = document.getElementById('analyticsEventBar');
+        if (eBarCtx && sortedEventColleges.length > 0) {
+            this.analyticsEventBar = new Chart(eBarCtx, {
+                type: 'bar',
+                data: {
+                    labels: sortedEventColleges.map(x=>x[0].substring(0,15) + (x[0].length>15?'...':'')),
+                    datasets: [{ label: 'Number of Events', data: sortedEventColleges.map(x=>x[1]), backgroundColor: '#3b82f6', borderRadius: 4 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+            });
+        }
+
+        // ---------------- REGISTRATIONS CHARTS ----------------
+        // Reg Pie: Regs by Category
+        const regCats = {};
+        regs.forEach(r => {
+            const c = (r.event && r.event.category) || 'Other';
+            regCats[c] = (regCats[c] || 0) + 1;
+        });
+        const rPieCtx = document.getElementById('analyticsRegPie');
+        if (rPieCtx && Object.keys(regCats).length > 0) {
+            this.analyticsRegPie = new Chart(rPieCtx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(regCats),
+                    datasets: [{ data: Object.values(regCats), backgroundColor: pieColors, borderWidth: 1 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        // Reg Bar: Regs by College
+        const regColleges = {};
+        regs.forEach(r => {
+            const cName = (r.event && r.event.college) ? (r.event.college.name || r.event.college.collegeName) : 'Unknown';
+            regColleges[cName] = (regColleges[cName] || 0) + 1;
+        });
+        const sortedRegColleges = Object.entries(regColleges).sort((a,b)=>b[1]-a[1]).slice(0, 5);
+        const rBarCtx = document.getElementById('analyticsRegBar');
+        if (rBarCtx && sortedRegColleges.length > 0) {
+            this.analyticsRegBar = new Chart(rBarCtx, {
+                type: 'bar',
+                data: {
+                    labels: sortedRegColleges.map(x=>x[0].substring(0,15) + (x[0].length>15?'...':'')),
+                    datasets: [{ label: 'Number of Registrations', data: sortedRegColleges.map(x=>x[1]), backgroundColor: '#ec4899', borderRadius: 4 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+            });
+        }
+    },
+
+    setReportsTab(tab) {
+        document.getElementById('reports-tab-events').style.border = tab === 'events' ? '2px solid var(--primary)' : '2px solid transparent';
+        document.getElementById('reports-tab-regs').style.border = tab === 'regs' ? '2px solid var(--primary)' : '2px solid transparent';
+
+        document.getElementById('reports-events-view').style.display = tab === 'events' ? 'block' : 'none';
+        document.getElementById('reports-regs-view').style.display = tab === 'regs' ? 'none' : 'block';
+        if (tab === 'regs') {
+            document.getElementById('reports-events-view').style.display = 'none';
+            document.getElementById('reports-regs-view').style.display = 'block';
+        }
+        this.currentReportsTab = tab;
+    },
+
+    async loadReportsData() {
+        try {
+            const getEvents = fetch('/api/admin/events', { headers: this.getAuthHeaders() });
+            const getRegs = fetch('/api/admin/registrations', { headers: this.getAuthHeaders() });
+            
+            const [eventsRes, regsRes] = await Promise.all([getEvents, getRegs]);
+            
+            if (eventsRes.ok && regsRes.ok) {
+                this.reportsEvents = await eventsRes.json();
+                this.reportsRegs = await regsRes.json();
+
+                const districts = new Set();
+                const colleges = new Set();
+                const events = new Set();
+                const categories = new Set();
+
+                this.reportsEvents.forEach(e => {
+                    events.add(e.title);
+                    if (e.category) categories.add(e.category);
+                    if (e.college) {
+                        colleges.add(e.college.name || e.college.collegeName);
+                        districts.add(e.college.district);
+                    }
+                });
+
+                const populateSelect = (id, set, defaultText) => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.innerHTML = `<option value="ALL">${defaultText}</option>` +
+                            Array.from(set).filter(Boolean).sort().map(item => `<option value="${item}">${item}</option>`).join('');
+                    }
+                };
+
+                populateSelect('reports-filter-district', districts, 'All Districts');
+                populateSelect('reports-filter-college', colleges, 'All Colleges');
+                populateSelect('reports-filter-event', events, 'All Events');
+                populateSelect('reports-filter-category', categories, 'All Categories');
+
+                this.setReportsTab('events');
+                this.applyReportsFilters();
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    },
+
+    applyReportsFilters() {
+        const district = document.getElementById('reports-filter-district')?.value || 'ALL';
+        const college = document.getElementById('reports-filter-college')?.value || 'ALL';
+        const eventOpt = document.getElementById('reports-filter-event')?.value || 'ALL';
+        const categoryOpt = document.getElementById('reports-filter-category')?.value || 'ALL';
+        const dateFrom = document.getElementById('reports-filter-date-from')?.value;
+        const dateTo = document.getElementById('reports-filter-date-to')?.value;
+
+        // Filter events
+        let fEvents = this.reportsEvents || [];
+        if (district !== 'ALL') fEvents = fEvents.filter(e => e.college && e.college.district === district);
+        if (college !== 'ALL') fEvents = fEvents.filter(e => e.college && (e.college.name === college || e.college.collegeName === college));
+        if (eventOpt !== 'ALL') fEvents = fEvents.filter(e => e.title === eventOpt);
+        if (categoryOpt !== 'ALL') fEvents = fEvents.filter(e => e.category === categoryOpt);
+
+        if (dateFrom) {
+            const dFrom = new Date(dateFrom);
+            fEvents = fEvents.filter(e => e.eventDate && new Date(e.eventDate) >= dFrom);
+        }
+        if (dateTo) {
+            const dTo = new Date(dateTo);
+            dTo.setHours(23, 59, 59, 999);
+            fEvents = fEvents.filter(e => e.eventDate && new Date(e.eventDate) <= dTo);
+        }
+
+        // Filter registrations
+        let fRegs = this.reportsRegs || [];
+        if (district !== 'ALL') fRegs = fRegs.filter(r => r.event && r.event.college && r.event.college.district === district);
+        if (college !== 'ALL') fRegs = fRegs.filter(r => r.event && r.event.college && (r.event.college.name === college || r.event.college.collegeName === college));
+        if (eventOpt !== 'ALL') fRegs = fRegs.filter(r => r.event && r.event.title === eventOpt);
+        if (categoryOpt !== 'ALL') fRegs = fRegs.filter(r => r.event && r.event.category === categoryOpt);
+
+        if (dateFrom) {
+            const dFrom = new Date(dateFrom);
+            fRegs = fRegs.filter(r => r.registrationDate && new Date(r.registrationDate) >= dFrom);
+        }
+        if (dateTo) {
+            const dTo = new Date(dateTo);
+            dTo.setHours(23, 59, 59, 999);
+            fRegs = fRegs.filter(r => r.registrationDate && new Date(r.registrationDate) <= dTo);
+        }
+
+        const evCountEl = document.getElementById('reports-events-count');
+        const regCountEl = document.getElementById('reports-regs-count');
+        if (evCountEl) evCountEl.textContent = fEvents.length;
+        if (regCountEl) regCountEl.textContent = fRegs.length;
+
+        this.currentReportsEvents = fEvents;
+        this.currentReportsRegs = fRegs;
+        
+        // Render Tables
+        const evBody = document.getElementById('reports-events-body');
+        if (evBody) {
+            if (fEvents.length === 0) {
+                evBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No events found.</td></tr>';
+            } else {
+                evBody.innerHTML = fEvents.map(e => `
+                    <tr>
+                        <td>${e.eventDate ? new Date(e.eventDate).toLocaleDateString() : 'N/A'}</td>
+                        <td style="font-weight: 600;">${e.title || 'N/A'}</td>
+                        <td>${e.category || 'N/A'}</td>
+                        <td>${(e.college && (e.college.name || e.college.collegeName)) || 'N/A'}</td>
+                        <td>${(e.college && e.college.district) || 'N/A'}</td>
+                        <td>
+                            <button class="btn-primary" style="padding: 0.35rem 0.7rem; font-size: 0.75rem; background: var(--navy-sidebar);" onclick="AdminPanel.viewEventDetails(${e.id})">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        const regBody = document.getElementById('reports-regs-body');
+        if (regBody) {
+            if (fRegs.length === 0) {
+                regBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No registrations found.</td></tr>';
+            } else {
+                regBody.innerHTML = fRegs.map(r => `
+                    <tr>
+                        <td style="font-weight: 600;">${r.username || (r.student && r.student.username) || 'N/A'}</td>
+                        <td>${r.event ? r.event.title : 'N/A'}</td>
+                        <td>${(r.event && r.event.category) || 'N/A'}</td>
+                        <td>${(r.event && r.event.college && (r.event.college.name || r.event.college.collegeName)) || 'N/A'}</td>
+                        <td>${r.registrationDate ? new Date(r.registrationDate).toLocaleDateString() : 'N/A'}</td>
+                    </tr>
+                `).join('');
+            }
+        }
+    },
+
+    clearReportsFilters() {
+        if(document.getElementById('reports-filter-district')) document.getElementById('reports-filter-district').value = 'ALL';
+        if(document.getElementById('reports-filter-college')) document.getElementById('reports-filter-college').value = 'ALL';
+        if(document.getElementById('reports-filter-event')) document.getElementById('reports-filter-event').value = 'ALL';
+        if(document.getElementById('reports-filter-category')) document.getElementById('reports-filter-category').value = 'ALL';
+        if(document.getElementById('reports-filter-date-from')) document.getElementById('reports-filter-date-from').value = '';
+        if(document.getElementById('reports-filter-date-to')) document.getElementById('reports-filter-date-to').value = '';
+        this.applyReportsFilters();
+    },
+
+    exportReportsToExcel() {
+        if (!this.currentReportsEvents || !this.currentReportsRegs) return;
+        const isEvents = this.currentReportsTab === 'events';
+        let csvContent = "";
+        
+        if (isEvents) {
+            csvContent = "Date,Title,Category,College,District\n";
+            this.currentReportsEvents.forEach(e => {
+                const date = e.eventDate ? new Date(e.eventDate).toLocaleDateString() : '';
+                const title = `"${(e.title || '').replace(/"/g, '""')}"`;
+                const cat = `"${(e.category || '').replace(/"/g, '""')}"`;
+                const col = `"${((e.college && (e.college.name || e.college.collegeName)) || '').replace(/"/g, '""')}"`;
+                const dist = `"${((e.college && e.college.district) || '').replace(/"/g, '""')}"`;
+                csvContent += `${date},${title},${cat},${col},${dist}\n`;
+            });
+        } else {
+            csvContent = "Username,Event,Category,College,Reg. Date\n";
+            this.currentReportsRegs.forEach(r => {
+                const studentName = r.username || (r.student && r.student.username) || '';
+                const uname = `"${studentName.replace(/"/g, '""')}"`;
+                const event = `"${(r.event ? r.event.title : '').replace(/"/g, '""')}"`;
+                const cat = `"${((r.event && r.event.category) || '').replace(/"/g, '""')}"`;
+                const col = `"${((r.event && r.event.college && (r.event.college.name || r.event.college.collegeName)) || '').replace(/"/g, '""')}"`;
+                const date = r.registrationDate ? new Date(r.registrationDate).toLocaleDateString() : '';
+                csvContent += `${uname},${event},${cat},${col},${date}\n`;
+            });
+        }
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', isEvents ? 'events_report.csv' : 'registrations_report.csv');
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     },
 
     render() {
@@ -963,6 +1686,15 @@ const AdminPanel = {
             localStorage.clear();
             window.location.href = '/login.html';
         });
+    },
+
+    closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.remove('active');
+            // Compatibility for inline styles if present
+            modal.style.display = 'none';
+        }
     }
 };
 

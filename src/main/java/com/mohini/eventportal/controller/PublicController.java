@@ -94,11 +94,11 @@ public class PublicController {
         dto.put("minParticipants", e.getMinParticipants());
         dto.put("maxParticipants", e.getMaxParticipants());
         dto.put("feePerPerson", e.getFeePerPerson());
-        dto.put("requiresName", e.isRequiresName());
-        dto.put("requiresEmail", e.isRequiresEmail());
-        dto.put("requiresCollege", e.isRequiresCollege());
-        dto.put("requiresPayment", e.isRequiresPayment());
-        dto.put("requiresPhone", e.isRequiresPhone());
+        dto.put("requiresName", e.getRequiresName());
+        dto.put("requiresEmail", e.getRequiresEmail());
+        dto.put("requiresCollege", e.getRequiresCollege());
+        dto.put("requiresPayment", e.getRequiresPayment());
+        dto.put("requiresPhone", e.getRequiresPhone());
         dto.put("qrCodePath", e.getQrCodePath());
         dto.put("photosFolderPath", e.getPhotosFolderPath());
         
@@ -224,5 +224,17 @@ public class PublicController {
             result.add(dto);
         }
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/debug/db")
+    public ResponseEntity<?> debugDb() {
+        java.util.List<Map<String, String>> regs = new java.util.ArrayList<>();
+        registrationRepository.findAll().forEach(r -> {
+            regs.add(Map.of("user", r.getUsername(), 
+                           "group", r.getGroupId() != null ? r.getGroupId() : "null", 
+                           "status", r.getStatus() != null ? r.getStatus() : "null", 
+                           "eventId", r.getEvent() != null ? String.valueOf(r.getEvent().getId()) : "null"));
+        });
+        return ResponseEntity.ok(Map.of("registrations", regs));
     }
 }
