@@ -256,6 +256,67 @@ public class AdminController {
 
     @GetMapping("/registrations")
     public ResponseEntity<?> getAllRegistrations() {
-        return ResponseEntity.ok(registrationRepository.findAll());
+        java.util.List<Map<String, Object>> result = registrationRepository.findAll().stream()
+                .map(r -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("username", r.getUsername());
+                    map.put("status", r.getStatus());
+                    map.put("registrationDate", r.getRegistrationDate() != null ? r.getRegistrationDate().toString() : null);
+                    map.put("groupId", r.getGroupId());
+                    try {
+                        com.mohini.eventportal.model.Event ev = r.getEvent();
+                        if (ev != null) {
+                            Map<String, Object> evMap = new HashMap<>();
+                            evMap.put("id", ev.getId());
+                            evMap.put("title", ev.getTitle());
+                            evMap.put("category", ev.getCategory());
+                            if (ev.getCollege() != null) {
+                                Map<String, Object> colMap = new HashMap<>();
+                                colMap.put("name", ev.getCollege().getCollegeName());
+                                colMap.put("district", ev.getCollege().getDistrict());
+                                colMap.put("city", ev.getCollege().getCity());
+                                evMap.put("college", colMap);
+                            }
+                            map.put("event", evMap);
+                        }
+                    } catch (Exception ignored) { }
+                    return map;
+                })
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/registrations/today")
+    public ResponseEntity<?> getTodayRegistrations() {
+        java.time.LocalDate today = java.time.LocalDate.now();
+        java.util.List<Map<String, Object>> result = registrationRepository.findAll().stream()
+                .filter(r -> r.getRegistrationDate() != null &&
+                             r.getRegistrationDate().toLocalDate().equals(today))
+                .map(r -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("username", r.getUsername());
+                    map.put("status", r.getStatus());
+                    map.put("registrationDate", r.getRegistrationDate() != null ? r.getRegistrationDate().toString() : null);
+                    // Safely access lazy-loaded event
+                    try {
+                        com.mohini.eventportal.model.Event ev = r.getEvent();
+                        if (ev != null) {
+                            Map<String, Object> evMap = new HashMap<>();
+                            evMap.put("id", ev.getId());
+                            evMap.put("title", ev.getTitle());
+                            if (ev.getCollege() != null) {
+                                Map<String, Object> colMap = new HashMap<>();
+                                colMap.put("name", ev.getCollege().getCollegeName());
+                                colMap.put("district", ev.getCollege().getDistrict());
+                                evMap.put("college", colMap);
+                            }
+                            map.put("event", evMap);
+                        }
+                    } catch (Exception ignored) { }
+                    return map;
+                })
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(result);
     }
 }
+

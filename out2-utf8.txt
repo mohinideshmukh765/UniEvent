@@ -1,0 +1,6 @@
+﻿=== EVENT 1 ===
+Event ID: 1, Title: pioneer, CollegeCode: null
+
+=== REGISTRATION ===
+Event: 1, Username: suyog12, Status: PENDING
+Event: 1, Username: srushti123, Status: PENDING
