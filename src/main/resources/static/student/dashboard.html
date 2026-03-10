@@ -180,6 +180,92 @@
             justify-content: center;
             font-weight: 700;
         }
+
+        .card-img-container {
+            position: relative;
+            height: 160px;
+            overflow: hidden;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--primary);
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: var(--transition);
+            z-index: 10;
+        }
+
+        .event-card-compact:hover .carousel-btn {
+            opacity: 1;
+        }
+
+        .carousel-btn:hover {
+            background: white;
+            color: var(--primary-dark);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .carousel-btn.prev { left: 8px; }
+        .carousel-btn.next { right: 8px; }
+
+        /* Zoom Modal */
+        .zoom-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: zoom-out;
+            padding: 2rem;
+        }
+
+        .zoom-modal.active {
+            display: flex;
+        }
+
+        .zoom-content {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            object-fit: contain;
+        }
+
+        .zoom-close {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .zoom-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body class="light-theme">
@@ -284,6 +370,12 @@
         </main>
     </div>
 
+    <!-- Zoom Modal -->
+    <div id="zoomModal" class="zoom-modal" onclick="this.classList.remove('active')">
+        <div class="zoom-close"><i class="fas fa-times"></i></div>
+        <img id="zoomImage" class="zoom-content" src="" alt="Zoomed Photo">
+    </div>
+
     <script src="/js/student.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
@@ -310,14 +402,29 @@
                 const eventsRes = await fetch('/api/public/events');
                 const events = await eventsRes.json();
                 const recommendedContainer = document.getElementById('recommendedEvents');
-                recommendedContainer.innerHTML = events.slice(0, 4).map(event => `
+                recommendedContainer.innerHTML = events.slice(0, 4).map(event => {
+                    const images = event.imageUrls && event.imageUrls.length > 0 ? event.imageUrls : ['https://images.unsplash.com/photo-1540575861501-7ad058c64030?w=800&q=80'];
+                    const hasGallery = images.length > 1;
+                    
+                    return `
                     <div class="event-card-compact">
-                        <div class="card-img" style="background-image: url('${event.imageUrl || 'https://images.unsplash.com/photo-1540575861501-7ad058c64030?w=800&q=80'}')"></div>
+                        <div class="card-img-container">
+                            <div class="card-img" id="img-rec-${event.id}" data-images='${JSON.stringify(images)}' data-current="0" 
+                                 style="background-image: url('${images[0]}'); cursor: zoom-in;" 
+                                 onclick="zoomImage(this)"></div>
+                            ${hasGallery ? `
+                                <button class="carousel-btn prev" onclick="changeImage('img-rec-${event.id}', -1, event)"><i class="fas fa-chevron-left"></i></button>
+                                <button class="carousel-btn next" onclick="changeImage('img-rec-${event.id}', 1, event)"><i class="fas fa-chevron-right"></i></button>
+                            ` : ''}
+                        </div>
                         <div class="card-body">
                             <div class="badge" style="background: rgba(79, 70, 229, 0.1); color: var(--primary); margin-bottom: 0.5rem;">${event.category}</div>
                             <h4 style="margin-bottom: 0.25rem;">${event.title}</h4>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem;">
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem;">
                                 <i class="fas fa-map-marker-alt"></i> ${event.venue || 'Remote'}
+                            </div>
+                            <div style="font-size: 0.75rem; color: var(--primary); font-weight: 600; margin-bottom: 1rem;">
+                                <i class="fas fa-users"></i> ${event.registrationCount || 0} Registrations
                             </div>
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <span style="font-weight: 700; color: var(--primary);">${event.feePerPerson > 0 ? '₹' + event.feePerPerson : 'FREE'}</span>
@@ -325,7 +432,7 @@
                             </div>
                         </div>
                     </div>
-                `).join('');
+                `}).join('');
 
                 // Fetch stats (mock for now or add endpoint)
                 document.getElementById('statsEventsAvailable').textContent = events.length;
@@ -361,6 +468,26 @@
                 console.error("Error loading dashboard:", err);
             }
         });
+
+        function changeImage(elId, direction, event) {
+            if (event) event.stopPropagation();
+            const imgEl = document.getElementById(elId);
+            if (!imgEl) return;
+            const images = JSON.parse(imgEl.getAttribute('data-images'));
+            let current = parseInt(imgEl.getAttribute('data-current'));
+            current = (current + direction + images.length) % images.length;
+            imgEl.style.backgroundImage = `url('${images[current]}')`;
+            imgEl.setAttribute('data-current', current);
+        }
+
+        function zoomImage(imgEl) {
+            const bg = imgEl.style.backgroundImage;
+            const url = bg.replace(/^url\(['"](.+)['"]\)/, '$1');
+            const modal = document.getElementById('zoomModal');
+            const zoomImg = document.getElementById('zoomImage');
+            zoomImg.src = url;
+            modal.classList.add('active');
+        }
     </script>
 </body>
 </html>

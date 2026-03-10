@@ -139,7 +139,55 @@
         .coord-details { display: flex; justify-content: space-between; align-items: center; }
         .coord-name { font-size: 0.85rem; font-weight: 600; color: #1e293b; }
         .coord-contact { font-size: 0.85rem; color: #4f46e5; text-decoration: none; font-weight: 600; transition: color 0.15s; }
-        .coord-contact:hover { color: #4338ca; }
+        .carousel-btn.prev { left: 8px; }
+        .carousel-btn.next { right: 8px; }
+
+        /* Zoom Modal */
+        .zoom-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: zoom-out;
+            padding: 2rem;
+        }
+
+        .zoom-modal.active {
+            display: flex;
+        }
+
+        .zoom-content {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            object-fit: contain;
+        }
+
+        .zoom-close {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .zoom-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
@@ -239,6 +287,12 @@
             </div>
         </div>
     </main>
+</div>
+
+<!-- Zoom Modal -->
+<div id="zoomModal" class="zoom-modal" onclick="this.classList.remove('active')">
+    <div class="zoom-close"><i class="fas fa-times"></i></div>
+    <img id="zoomImage" class="zoom-content" src="" alt="Zoomed Photo">
 </div>
 
 <!-- ===== REGISTRATION MODAL ===== -->
@@ -398,11 +452,8 @@
             const college = e.college ? e.college.collegeName : 'Unknown College';
             const district = e.college ? e.college.district : '';
 
-            const imgHtml = e.thumbnailUrl
-                ? `<img src="${e.thumbnailUrl}" alt="${e.title}" onerror="this.src='${e.qrCodePath || ''}'; this.onerror=function(){this.parentNode.innerHTML='<div class=no-photo><i class=fas fa-image></i><span>${e.category}</span></div>'}">`
-                : (e.qrCodePath 
-                    ? `<img src="${e.qrCodePath}" alt="${e.title}" onerror="this.parentNode.innerHTML='<div class=no-photo><i class=fas fa-image></i><span>${e.category}</span></div>'">`
-                    : `<div class="no-photo"><i class="fas fa-image"></i><span>${e.category || 'Event'}</span></div>`);
+            const images = e.imageUrls && e.imageUrls.length > 0 ? e.imageUrls : ['https://images.unsplash.com/photo-1540575861501-7ad058c64030?w=800&q=80'];
+            const hasGallery = images.length > 1;
 
             const formattedDate = eventDate ? eventDate.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'}) : 'TBA';
             const formattedDeadline = deadline ? deadline.toLocaleDateString('en-IN', {day:'2-digit', month:'short'}) : 'Open';
@@ -414,7 +465,14 @@
             return `
             <div class="event-card" data-category="${e.category || ''}" data-id="${e.id}">
                 <div class="event-img">
-                    ${imgHtml}
+                    <div id="img-grid-${e.id}" data-images='${JSON.stringify(images)}' data-current="0" 
+                         style="width:100%; height:100%; background-image: url('${images[0]}'); background-size: cover; background-position: center; cursor: zoom-in;"
+                         onclick="zoomImage(this)">
+                    </div>
+                    ${hasGallery ? `
+                        <button class="carousel-btn prev" onclick="changeImage('img-grid-${e.id}', -1, event)"><i class="fas fa-chevron-left"></i></button>
+                        <button class="carousel-btn next" onclick="changeImage('img-grid-${e.id}', 1, event)"><i class="fas fa-chevron-right"></i></button>
+                    ` : ''}
                     <span class="category-badge">${e.category || 'General'}</span>
                     <span class="fee-badge ${isFree ? 'free' : 'paid'}">${isFree ? 'Free' : '₹' + e.feePerPerson}</span>
                 </div>
@@ -426,6 +484,10 @@
                         ${college}${district ? ', ' + district : ''}
                     </div>
                     
+                    <div style="font-size: 0.8rem; color: #4f46e5; font-weight: 700; margin-bottom: 0.75rem;">
+                        <i class="fas fa-users"></i> ${e.registrationCount || 0} Registrations
+                    </div>
+
                     <p class="event-desc-snippet">${e.description ? (e.description.length > 100 ? e.description.substring(0, 100) + '...' : e.description) : 'No description available.'}</p>
 
                     <div class="event-meta">
@@ -911,7 +973,27 @@
         el.textContent = '❌ ' + msg;
         el.className = 'modal-result error';
         el.style.display = 'block';
-    }
-</script>
+        }
+
+        function changeImage(elId, direction, event) {
+            if (event) event.stopPropagation();
+            const imgEl = document.getElementById(elId);
+            if (!imgEl) return;
+            const images = JSON.parse(imgEl.getAttribute('data-images'));
+            let current = parseInt(imgEl.getAttribute('data-current'));
+            current = (current + direction + images.length) % images.length;
+            imgEl.style.backgroundImage = `url('${images[current]}')`;
+            imgEl.setAttribute('data-current', current);
+        }
+
+        function zoomImage(imgEl) {
+            const bg = imgEl.style.backgroundImage;
+            const url = bg.replace(/^url\(['"](.+)['"]\)/, '$1');
+            const modal = document.getElementById('zoomModal');
+            const zoomImg = document.getElementById('zoomImage');
+            zoomImg.src = url;
+            modal.classList.add('active');
+        }
+    </script>
 </body>
 </html>

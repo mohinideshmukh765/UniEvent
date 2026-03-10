@@ -165,19 +165,14 @@
 
             // Fetch Event Details
             try {
-                const res = await fetch(`/api/coordinator/events`); // Fetching all events and filtering for now as we don't have public getEventById
-                const events = await res.json();
-                currentEvent = events.find(e => e.id == eventId);
-
-                if (!currentEvent) {
-                    alert('Event not found');
-                    window.location.href = '/student/events.html';
-                    return;
-                }
+                const res = await fetch(`/api/public/events/${eventId}`);
+                if (!res.ok) throw new Error('Event not found');
+                currentEvent = await res.json();
 
                 renderFormConfig(currentEvent);
             } catch (err) {
                 console.error('Error fetching event:', err);
+                alert('Could not load event details.');
             }
 
             function renderFormConfig(event) {

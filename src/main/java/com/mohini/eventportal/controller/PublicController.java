@@ -5,10 +5,14 @@ import com.mohini.eventportal.model.Event;
 import com.mohini.eventportal.repository.CollegeRepository;
 import com.mohini.eventportal.repository.EventRepository;
 import com.mohini.eventportal.repository.UserRepository;
+import com.mohini.eventportal.repository.PostRepository;
+import com.mohini.eventportal.repository.RegistrationRepository;
+import com.mohini.eventportal.model.Post;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.File;
 import java.util.*;
 
@@ -26,19 +30,44 @@ public class PublicController {
     @Autowired
     EventRepository eventRepository;
 
+    @Autowired
+    PostRepository postRepository;
+
+    @Autowired
+    RegistrationRepository registrationRepository;
+
+    @Autowired
+    ObjectMapper objectMapper;
+
     @GetMapping("/colleges")
     public List<College> getAllApprovedColleges() {
         return collegeRepository.findByEnabled(true);
     }
 
-    /** Returns all events with college info — no auth needed */
+    /** Returns all events with college info — no auth needed, sorted by popularity */
     @GetMapping("/events")
     public ResponseEntity<?> getAllEvents() {
         List<Event> events = eventRepository.findAll();
+        List<Object[]> counts = registrationRepository.countAllRegistrationsPerEvent();
+        Map<Integer, Long> countMap = new HashMap<>();
+        for (Object[] row : counts) {
+            countMap.put((Integer) row[0], (Long) row[1]);
+        }
+
         List<Map<String, Object>> result = new ArrayList<>();
         for (Event e : events) {
-            result.add(toDto(e));
+            Map<String, Object> dto = toDto(e);
+            dto.put("registrationCount", countMap.getOrDefault(e.getId(), 0L));
+            result.add(dto);
         }
+
+        // Sort by registration count descending
+        result.sort((a, b) -> {
+            Long c1 = (Long) a.get("registrationCount");
+            Long c2 = (Long) b.get("registrationCount");
+            return c2.compareTo(c1);
+        });
+
         return ResponseEntity.ok(result);
     }
 
@@ -73,25 +102,25 @@ public class PublicController {
         dto.put("qrCodePath", e.getQrCodePath());
         dto.put("photosFolderPath", e.getPhotosFolderPath());
         
-        // Add a thumbnail URL (the first image in the photos folder)
-        String thumbnail = null;
+        // Add all photos URLs
+        List<String> imageUrls = new ArrayList<>();
         if (e.getPhotosFolderPath() != null) {
-            File dir = new File(e.getPhotosFolderPath().substring(1)); // Remove leading / for file access
+            File dir = new File(getUploadBase() + "/photos/" + e.getId());
             if (dir.exists() && dir.isDirectory()) {
                 File[] files = dir.listFiles();
                 if (files != null) {
                     for (File f : files) {
                         String name = f.getName().toLowerCase();
                         if (name.endsWith(".jpg") || name.endsWith(".jpeg") ||
-                            name.endsWith(".png") || name.endsWith(".webp")) {
-                            thumbnail = "/uploads/photos/" + e.getId() + "/" + f.getName();
-                            break;
+                            name.endsWith(".png") || name.endsWith(".webp") || name.endsWith(".gif")) {
+                            imageUrls.add("/uploads/photos/" + e.getId() + "/" + f.getName());
                         }
                     }
                 }
             }
         }
-        dto.put("thumbnailUrl", thumbnail);
+        dto.put("imageUrls", imageUrls);
+        dto.put("thumbnailUrl", imageUrls.isEmpty() ? null : imageUrls.get(0));
 
         if (e.getCollege() != null) {
             Map<String, Object> college = new LinkedHashMap<>();
@@ -108,7 +137,8 @@ public class PublicController {
     /** Lists all photo URLs for a given event from its uploads/photos/{id}/ folder */
     @GetMapping("/events/{id}/photos")
     public ResponseEntity<?> getEventPhotos(@PathVariable Integer id) {
-        File dir = new File("uploads/photos/" + id);
+        // Use absolute path to correctly resolve the directory on Windows
+        File dir = new File(getUploadBase() + "/photos/" + id);
         List<String> urls = new ArrayList<>();
         if (dir.exists() && dir.isDirectory()) {
             File[] files = dir.listFiles();
@@ -123,6 +153,16 @@ public class PublicController {
             }
         }
         return ResponseEntity.ok(urls);
+    }
+
+    /** Returns the absolute base path for uploads, ensuring it's relative to the project root */
+    private String getUploadBase() {
+        String userDir = System.getProperty("user.dir");
+        java.io.File uploads = new java.io.File(userDir, "uploads");
+        if (!uploads.exists()) {
+            uploads.mkdirs();
+        }
+        return uploads.getAbsolutePath();
     }
 
     /** Fetches student details for auto-filling registration forms */
@@ -158,5 +198,31 @@ public class PublicController {
         } else {
             return ResponseEntity.ok(Map.of("valid", false, "invalid", invalid));
         }
+    }
+
+    @GetMapping("/posts")
+    public ResponseEntity<?> getLatestPosts() {
+        List<Post> posts = postRepository.findAllByOrderByCreatedAtDesc();
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Post p : posts) {
+            Map<String, Object> dto = new HashMap<>();
+            dto.put("id", p.getId());
+            dto.put("eventTitle", p.getEvent() != null ? p.getEvent().getTitle() : "Event");
+            dto.put("description", p.getCaption());
+            dto.put("createdAt", p.getCreatedAt());
+            try {
+                if (p.getImages() != null && !p.getImages().isEmpty()) {
+                    dto.put("imageUrls", objectMapper.readValue(p.getImages(), new TypeReference<List<String>>() {}));
+                } else if (p.getPhoto() != null) {
+                    dto.put("imageUrls", Arrays.asList(p.getPhoto().split(",")));
+                } else {
+                    dto.put("imageUrls", Collections.emptyList());
+                }
+            } catch (Exception e) {
+                dto.put("imageUrls", Collections.emptyList());
+            }
+            result.add(dto);
+        }
+        return ResponseEntity.ok(result);
     }
 }

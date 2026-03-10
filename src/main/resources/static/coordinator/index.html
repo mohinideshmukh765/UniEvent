@@ -43,12 +43,6 @@
                 <a href="#" class="nav-link" data-page="posts">
                     <i class="fas fa-paper-plane"></i> <span>Posts</span>
                 </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" data-page="notifications">
-                    <i class="fas fa-bell"></i> <span>Notifications</span>
-                </a>
-            </li>
             <li class="nav-item">
                 <a href="#" class="nav-link" data-page="statistics">
                     <i class="fas fa-chart-line"></i> <span>Statistics</span>
@@ -60,13 +54,6 @@
                 </a>
             </li>
         </ul>
-
-        <div class="sidebar-footer" style="padding-top: 2rem; border-top: 1px solid var(--border-color);">
-            <button id="logoutBtn" class="nav-link"
-                style="width: 100%; border: none; background: none; cursor: pointer; color: #ef4444;">
-                <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
-            </button>
-        </div>
     </aside>
 
     <!-- Main Content -->
@@ -77,16 +64,16 @@
                 <input type="text" placeholder="Search events, students...">
             </div>
 
-            <div class="user-profile">
-                <div class="user-info">
-                    <span class="user-name"><span id="userName"></span></span>
-                    <span class="user-role"><span id="userRole"></span></span>
-                </div>
-                <!-- Placeholder for profile image -->
-                <div class="avatar"
-                    style="background: var(--primary-light); display: flex; align-items: center; justify-content: center; color: var(--primary-dark); font-weight: bold;">
-                    RP
-                </div>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <a href="#" class="nav-link" data-page="notifications" style="border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center; background: #f1f5f9; color: #475569; text-decoration: none;">
+                    <i class="fas fa-bell"></i>
+                </a>
+                <a href="#" class="nav-link" data-page="profile" id="headerAvatar" style="width: 44px; height: 44px; text-decoration: none; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                    C
+                </a>
+                <a href="#" id="headerLogoutBtn" style="border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center; background: #f1f5f9; color: #ef4444; text-decoration: none;" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
             </div>
         </header>
 

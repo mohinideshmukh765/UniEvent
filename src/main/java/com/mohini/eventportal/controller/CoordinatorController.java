@@ -76,7 +76,31 @@ public class CoordinatorController {
         College college = getCurrentCollege();
         if (college == null)
             return ResponseEntity.ok(java.util.Collections.emptyList());
-        return ResponseEntity.ok(eventRepository.findByCollege_CollegeCode(college.getCollegeCode()));
+        
+        java.util.List<Event> events = eventRepository.findByCollege_CollegeCode(college.getCollegeCode());
+        for (Event e : events) {
+            java.util.List<String> urls = new java.util.ArrayList<>();
+            if (e.getPhotosFolderPath() != null) {
+                java.io.File dir = new java.io.File(getUploadBase() + "/photos/" + e.getId());
+                if (dir.exists() && dir.isDirectory()) {
+                    java.io.File[] files = dir.listFiles();
+                    if (files != null) {
+                        for (java.io.File f : files) {
+                            String name = f.getName().toLowerCase();
+                            if (name.endsWith(".jpg") || name.endsWith(".jpeg") ||
+                                name.endsWith(".png") || name.endsWith(".webp") || name.endsWith(".gif")) {
+                                urls.add("/uploads/photos/" + e.getId() + "/" + f.getName());
+                            }
+                        }
+                    }
+                }
+            }
+            e.setImageUrls(urls);
+            if (!urls.isEmpty()) {
+                e.setThumbnailUrl(urls.get(0));
+            }
+        }
+        return ResponseEntity.ok(events);
     }
 
     @GetMapping("/registrations")
@@ -87,7 +111,7 @@ public class CoordinatorController {
             return ResponseEntity.ok(java.util.Collections.emptyList());
 
         java.util.List<Registration> rawRegs = registrationRepository
-                .findByStatusAndEvent_College_CollegeCode("APPROVED", college.getCollegeCode());
+                .findByEvent_College_CollegeCode(college.getCollegeCode());
         
         // Sort registrations by date desc if available
         rawRegs.sort((a, b) -> {
@@ -120,6 +144,7 @@ public class CoordinatorController {
                 eventDto.put("title", "Unknown");
             }
             dto.put("event", eventDto);
+            dto.put("status", r.getStatus());
             dto.put("registrationDate", r.getRegistrationDate());
             dtos.add(dto);
         }
@@ -197,10 +222,9 @@ public class CoordinatorController {
         response.put("eventTitle", first.getEvent().getTitle());
         response.put("feePerPerson", first.getEvent().getFeePerPerson());
 
-        // Process screenshot if exists
-        if (first.getQrcode() != null) {
-            String base64 = java.util.Base64.getEncoder().encodeToString(first.getQrcode());
-            response.put("paymentScreenshot", "data:image/png;base64," + base64);
+        // Only using file-based path since qrcode column was removed
+        if (first.getPaymentScreenshotPath() != null) {
+            response.put("paymentScreenshot", first.getPaymentScreenshotPath());
         }
 
         // Fetch user profiles for all members
@@ -313,12 +337,14 @@ public class CoordinatorController {
         College college = getCurrentCollege();
         if (college == null) return ResponseEntity.status(403).body("Unauthorized");
         
-        java.util.List<Event> pastEvents = eventRepository.findByCollege_CollegeCode(college.getCollegeCode()).stream()
-                .filter(e -> e.getEventDate().isBefore(java.time.LocalDateTime.now()))
+        // Use a 1-day buffer to show events that were today or yesterday
+        java.time.LocalDateTime cutoff = java.time.LocalDateTime.now().plusDays(1);
+        java.util.List<Event> eligible = eventRepository.findByCollege_CollegeCode(college.getCollegeCode()).stream()
+                .filter(e -> e.getEventDate().isBefore(cutoff))
                 .filter(e -> !postRepository.findByEvent(e).isPresent())
                 .collect(java.util.stream.Collectors.toList());
         
-        return ResponseEntity.ok(pastEvents);
+        return ResponseEntity.ok(eligible);
     }
 
     @PostMapping("/events")
@@ -379,12 +405,12 @@ public class CoordinatorController {
 
     @PostMapping("/events/{eventId}/qr")
     @PreAuthorize("hasRole('COORDINATOR')")
-    public ResponseEntity<?> uploadQrCode(@PathVariable Long eventId, @RequestParam("qr") MultipartFile qrFile) {
+    public ResponseEntity<?> uploadQrCode(@PathVariable Integer eventId, @RequestParam("qr") MultipartFile qrFile) {
         College college = getCurrentCollege();
         if (college == null)
             return ResponseEntity.badRequest().body("Coordinator not found");
 
-        Optional<Event> optEvent = eventRepository.findById(eventId.intValue());
+        Optional<Event> optEvent = eventRepository.findById(eventId);
         if (!optEvent.isPresent())
             return ResponseEntity.badRequest().body("Event not found");
 
@@ -394,17 +420,19 @@ public class CoordinatorController {
         }
 
         try {
-            // Store in uploads/qr/{eventId}/ folder
-            File uploadDir = new File("uploads/qr/" + eventId);
-            uploadDir.mkdirs();
+            // Store in uploads/qr/{eventId}/ folder using absolute path
+            java.nio.file.Path uploadPath = java.nio.file.Paths.get(getUploadBase(), "qr", String.valueOf(eventId));
+            java.nio.file.Files.createDirectories(uploadPath);
+            
             String filename = "qr_" + System.currentTimeMillis() + "." + getExtension(qrFile.getOriginalFilename());
-            File dest = new File(uploadDir, filename);
-            qrFile.transferTo(dest);
-            // Store folder path in qrcode_path
-            String folderPath = "/uploads/qr/" + eventId + "/" + filename;
-            event.setQrCodePath(folderPath);
-            eventRepository.save(event);
-            return ResponseEntity.ok(Map.of("qrCodePath", folderPath));
+            java.nio.file.Path dest = uploadPath.resolve(filename);
+            
+            java.nio.file.Files.copy(qrFile.getInputStream(), dest, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            
+            // Store URL path in qrcode_path using atomic update to avoid race conditions
+            String urlPath = "/uploads/qr/" + eventId + "/" + filename;
+            eventRepository.updateQrCodePath(eventId, urlPath);
+            return ResponseEntity.ok(Map.of("qrCodePath", urlPath));
         } catch (Exception ex) {
             return ResponseEntity.status(500).body("Failed to upload QR: " + ex.getMessage());
         }
@@ -434,27 +462,30 @@ public class CoordinatorController {
         if (photos.size() > 10)
             return ResponseEntity.badRequest().body("Maximum 10 photos allowed");
 
-        File uploadDir = new File("uploads/photos/" + eventId);
-        uploadDir.mkdirs();
+        // Use absolute path to avoid Windows working-directory issues
+        java.nio.file.Path uploadPath = java.nio.file.Paths.get(getUploadBase(), "photos", String.valueOf(eventId));
+        try {
+            java.nio.file.Files.createDirectories(uploadPath);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to create upload directory: " + e.getMessage());
+        }
 
         java.util.List<String> savedPaths = new java.util.ArrayList<>();
         for (MultipartFile photo : photos) {
             if (photo.isEmpty()) continue;
             try {
                 String filename = System.currentTimeMillis() + "_" + photo.getOriginalFilename();
-                File dest = new File(uploadDir, filename);
-                photo.transferTo(dest);
+                java.nio.file.Path dest = uploadPath.resolve(filename);
+                java.nio.file.Files.copy(photo.getInputStream(), dest, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
                 savedPaths.add("/uploads/photos/" + eventId + "/" + filename);
             } catch (Exception ex) {
                 return ResponseEntity.status(500).body("Failed to upload photo: " + ex.getMessage());
             }
         }
 
-        // Store folder path in photos_folder_path
+        // Store URL path in photos_folder_path using atomic update to avoid race conditions
         String folderPath = "/uploads/photos/" + eventId;
-        event.setPhotosFolderPath(folderPath);
-        eventRepository.save(event);
-
+        eventRepository.updatePhotosFolderPath(eventId, folderPath);
         return ResponseEntity.ok(Map.of(
             "photosFolderPath", folderPath,
             "uploadedFiles", savedPaths
@@ -482,9 +513,19 @@ public class CoordinatorController {
         if (!event.getCollege().getCollegeCode().equals(college.getCollegeCode()))
             return ResponseEntity.status(403).body("Unauthorized");
 
-        File file = new File("uploads/photos/" + eventId + "/" + filename);
+        File file = new File(getUploadBase() + "/photos/" + eventId + "/" + filename);
         if (file.exists()) file.delete();
         return ResponseEntity.ok(Map.of("deleted", filename));
+    }
+
+    /** Returns the absolute base path for uploads, ensuring it's relative to the project root */
+    private String getUploadBase() {
+        String userDir = System.getProperty("user.dir");
+        java.io.File uploads = new java.io.File(userDir, "uploads");
+        if (!uploads.exists()) {
+            uploads.mkdirs();
+        }
+        return uploads.getAbsolutePath();
     }
 
     private String getExtension(String filename) {
@@ -526,16 +567,21 @@ public class CoordinatorController {
         if (photos.size() > 10)
             return ResponseEntity.badRequest().body("Maximum 10 photos allowed");
 
-        File uploadDir = new File("uploads/afterposts/" + eventId);
-        uploadDir.mkdirs();
+        // Use absolute path: uploads/afterposts/{event_id}/
+        java.nio.file.Path uploadPath = java.nio.file.Paths.get(getUploadBase(), "afterposts", String.valueOf(eventId));
+        try {
+            java.nio.file.Files.createDirectories(uploadPath);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to create upload directory: " + e.getMessage());
+        }
 
         java.util.List<String> photoPaths = new java.util.ArrayList<>();
         for (org.springframework.web.multipart.MultipartFile photo : photos) {
             if (photo.isEmpty()) continue;
             try {
                 String filename = System.currentTimeMillis() + "_" + photo.getOriginalFilename();
-                File dest = new File(uploadDir, filename);
-                photo.transferTo(dest);
+                java.nio.file.Path dest = uploadPath.resolve(filename);
+                java.nio.file.Files.copy(photo.getInputStream(), dest, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
                 photoPaths.add("/uploads/afterposts/" + eventId + "/" + filename);
             } catch (Exception ex) {
                 return ResponseEntity.status(500).body("Failed to upload photos: " + ex.getMessage());

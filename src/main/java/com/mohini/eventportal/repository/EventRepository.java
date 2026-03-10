@@ -24,4 +24,14 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
 
     @Query("SELECT e FROM Event e WHERE e.eventDate > :date")
     List<Event> findUpcomingEvents(@Param("date") java.time.LocalDateTime date);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.transaction.annotation.Transactional
+    @Query("UPDATE Event e SET e.qrCodePath = :path WHERE e.id = :id")
+    void updateQrCodePath(@Param("id") Integer id, @Param("path") String path);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.transaction.annotation.Transactional
+    @Query("UPDATE Event e SET e.photosFolderPath = :path WHERE e.id = :id")
+    void updatePhotosFolderPath(@Param("id") Integer id, @Param("path") String path);
 }

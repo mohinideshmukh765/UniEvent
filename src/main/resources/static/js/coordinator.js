@@ -401,14 +401,70 @@ const CoordinatorPanel = {
             </div>
         `,
         'statistics': `
-            <div class="animate-slide">
-                <h1>Event Statistics</h1>
-                <div class="stats-grid">
-                    <div class="card" style="grid-column: span 2;">
-                        <h3>Registration Trend</h3>
-                        <div style="height: 200px; background: #f9fafb; display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
-                             [ Chart Placeholder ]
+            <div class="animate-slide" style="max-width: 1000px; margin: 0 auto;">
+                <div class="flex-between" style="margin-bottom: 2rem;">
+                    <div>
+                        <h1>Event Statistics</h1>
+                        <p style="color: var(--text-muted);">Analyze your registration numbers across different events and categories.</p>
+                    </div>
+                </div>
+
+                <!-- Filters Section -->
+                <div class="card" style="margin-bottom: 2rem; padding: 1.25rem; background: #f8fafc; border: 1px solid #e2e8f0;">
+                    <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 1rem; align-items: flex-end;">
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 700; color: #475569;">Filter by Event</label>
+                            <select id="statFilterEvent" onchange="CoordinatorPanel.renderStatistics()" style="width: 100%; padding: 0.6rem; border-radius: 10px; border: 1px solid #cbd5e1;">
+                                <option value="all">All Events</option>
+                            </select>
                         </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 700; color: #475569;">Event Category</label>
+                            <select id="statFilterCategory" onchange="CoordinatorPanel.renderStatistics()" style="width: 100%; padding: 0.6rem; border-radius: 10px; border: 1px solid #cbd5e1;">
+                                <option value="all">All Categories</option>
+                                <option>Technical</option>
+                                <option>Cultural</option>
+                                <option>Sports</option>
+                                <option>Workshop</option>
+                                <option>Hackathon</option>
+                                <option>Project Competition</option>
+                                <option>Coding Competition</option>
+                                <option>Electrical related</option>
+                                <option>Civil related</option>
+                                <option>Idea Pitching</option>
+                                <option>Business Competition</option>
+                                <option>Debate Competition</option>
+                                <option>Group Discussion</option>
+                                <option>Seminar/Webinar</option>
+                                <option>Others</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 700; color: #475569;">Reg Date From</label>
+                            <input type="date" id="statFilterDateStart" onchange="CoordinatorPanel.renderStatistics()" style="width: 100%; padding: 0.6rem; border-radius: 10px; border: 1px solid #cbd5e1;">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 700; color: #475569;">To</label>
+                            <input type="date" id="statFilterDateEnd" onchange="CoordinatorPanel.renderStatistics()" style="width: 100%; padding: 0.6rem; border-radius: 10px; border: 1px solid #cbd5e1;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-grid" style="margin-bottom: 2rem;">
+                    <div class="stat-card" style="background: white; border: 1px solid var(--border-color);">
+                        <div class="stat-icon" style="background: #eef2ff; color: #6366f1;"><i class="fas fa-users"></i></div>
+                        <div class="stat-info"><h3>Filtered Registrations</h3><p id="statFilteredTotal">0</p></div>
+                    </div>
+                    <div class="stat-card" style="background: white; border: 1px solid var(--border-color);">
+                        <div class="stat-icon" style="background: #fff7ed; color: #f59e0b;"><i class="fas fa-calendar-check"></i></div>
+                        <div class="stat-info"><h3>Events Covered</h3><p id="statFilteredEventsCount">0</p></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-bottom: 1.5rem; color: #334155;">Registrations by Event</h3>
+                    <div id="registrationBarsContainer" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <!-- Bars injected here -->
                     </div>
                 </div>
             </div>
@@ -551,6 +607,15 @@ const CoordinatorPanel = {
                 coordinatorName: e.coordinatorName,
                 coordinatorMobile: e.coordinatorMobile,
                 organizedBy: e.organizedBy,
+                minParticipants: e.minParticipants,
+                maxParticipants: e.maxParticipants,
+                feePerPerson: e.feePerPerson,
+                requiresName: e.requiresName,
+                requiresEmail: e.requiresEmail,
+                requiresCollege: e.requiresCollege,
+                requiresPhone: e.requiresPhone,
+                requiresPayment: e.requiresPayment,
+                qrCodePath: e.qrCodePath,
                 imageUrls: e.imageUrls
             }));
 
@@ -758,6 +823,15 @@ const CoordinatorPanel = {
                 window.location.href = '/login.html';
             });
         }
+        
+        const headerLogoutBtn = document.getElementById('headerLogoutBtn');
+        if (headerLogoutBtn) {
+            headerLogoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.clear();
+                window.location.href = '/login.html';
+            });
+        }
     },
 
     render() {
@@ -773,6 +847,8 @@ const CoordinatorPanel = {
                 this.filterEventsTable();
             } else if (this.currentPage === 'form-builder') {
                 this.initFormBuilder();
+            } else if (this.currentPage === 'statistics') {
+                this.renderStatistics();
             } else if (this.currentPage === 'profile') {
                 this.populateProfileData();
             } else if (this.currentPage === 'posts') {
@@ -781,6 +857,89 @@ const CoordinatorPanel = {
                 this.loadPendingRegistrations();
             }
         }
+    },
+
+    renderStatistics() {
+        const container = document.getElementById('registrationBarsContainer');
+        if (!container) return;
+
+        // Populate Event Filter Dropdown
+        const eventSelect = document.getElementById('statFilterEvent');
+        if (eventSelect && eventSelect.options.length === 1) { // Only "All Events" option
+            this.data.events.forEach(ev => {
+                const opt = document.createElement('option');
+                opt.value = ev.name;
+                opt.textContent = ev.name;
+                eventSelect.appendChild(opt);
+            });
+        }
+
+        const filterEventName = eventSelect?.value;
+        const filterCategory = document.getElementById('statFilterCategory')?.value;
+        const filterDateStart = document.getElementById('statFilterDateStart')?.value;
+        const filterDateEnd = document.getElementById('statFilterDateEnd')?.value;
+
+        let filtered = this.data.registrations;
+
+        if (filterEventName && filterEventName !== 'all') {
+            filtered = filtered.filter(r => r.event === filterEventName);
+        }
+        if (filterCategory && filterCategory !== 'all') {
+            filtered = filtered.filter(r => r.category === filterCategory);
+        }
+        if (filterDateStart) {
+            filtered = filtered.filter(r => r.time && new Date(r.time) >= new Date(filterDateStart));
+        }
+        if (filterDateEnd) {
+            const endDate = new Date(filterDateEnd);
+            endDate.setHours(23, 59, 59);
+            filtered = filtered.filter(r => r.time && new Date(r.time) <= endDate);
+        }
+
+        // Initialize all events with 0 counts to ensure they show up even with no registrations
+        const eventCounts = {};
+        this.data.events.forEach(ev => {
+            eventCounts[ev.name] = 0;
+        });
+
+        // Tally registrations per event among the filtered data
+        filtered.forEach(r => {
+            const evName = r.event || 'Unknown';
+            if (eventCounts.hasOwnProperty(evName)) {
+                eventCounts[evName]++;
+            } else {
+                eventCounts[evName] = 1;
+            }
+        });
+
+        // Update Summary Cards
+        document.getElementById('statFilteredTotal').textContent = filtered.length;
+        document.getElementById('statFilteredEventsCount').textContent = Object.keys(eventCounts).length;
+
+        // Render Bars
+        const entries = Object.entries(eventCounts).sort((a, b) => b[1] - a[1]); // sort descending
+        const maxVal = entries.length > 0 ? entries[0][1] : 0;
+
+        if (entries.length === 0) {
+            container.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 2rem;">No registrations match your filters.</p>`;
+            return;
+        }
+
+        container.innerHTML = entries.map(([evName, count]) => {
+            // max width 100% relative to the maxVal
+            const widthPct = Math.max(5, (count / maxVal) * 100); 
+            return `
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem; font-size: 0.9rem; font-weight: 600;">
+                        <span style="color: #334155;">${evName}</span>
+                        <span style="color: var(--primary);">${count}</span>
+                    </div>
+                    <div style="width: 100%; background: #f1f5f9; height: 16px; border-radius: 8px; overflow: hidden;">
+                        <div style="width: ${widthPct}%; height: 100%; background: var(--primary); border-radius: 8px; transition: width 0.5s ease;"></div>
+                    </div>
+                </div>
+            `;
+        }).join('');
     },
 
     async loadPendingRegistrations() {
@@ -1334,8 +1493,8 @@ const CoordinatorPanel = {
             maxParticipants: parseInt(document.getElementById('evMaxParticipants').value) || 1,
             feePerPerson: parseFloat(document.getElementById('evFee').value) || 0,
             description: document.getElementById('evDescription').value,
-            registrationDeadline: document.getElementById('evRegDeadline').value + 'T23:59:59',
-            eventDate: document.getElementById('evDate').value + ':00',
+            registrationDeadline: document.getElementById('evRegDeadline').value ? document.getElementById('evRegDeadline').value + 'T23:59:59' : null,
+            eventDate: document.getElementById('evDate').value ? document.getElementById('evDate').value + ':00' : null,
             venue: document.getElementById('evVenue').value,
             coordinatorName: document.getElementById('evCoordinatorName').value,
             coordinatorMobile: document.getElementById('evCoordinatorMobile').value,
@@ -1466,7 +1625,7 @@ const CoordinatorPanel = {
         if (activeCard) activeCard.style.borderColor = 'var(--primary)';
 
         let html = '';
-        const today = new Date('2024-03-08'); // Mock today matching user metadata
+        const today = new Date(); // Use actual current date
 
         if (this.selectedDashboardTab === 'registrations') {
             const districts = [...new Set(this.data.registrations.map(r => r.district).filter(Boolean))];
@@ -1476,6 +1635,14 @@ const CoordinatorPanel = {
                 <div class="card-header" style="flex-direction: column; align-items: flex-start; gap: 1rem;">
                     <div class="flex-between" style="width: 100%;">
                         <h2>Recent Registrations</h2>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn-primary" onclick="CoordinatorPanel.exportRegistrations('excel')" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; background: #10b981;">
+                                <i class="fas fa-file-excel"></i> Export Excel
+                            </button>
+                            <button class="btn-primary" onclick="CoordinatorPanel.exportRegistrations('pdf')" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; background: #ef4444;">
+                                <i class="fas fa-file-pdf"></i> Export PDF
+                            </button>
+                        </div>
                     </div>
                     
                     <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; width: 100%; padding: 1rem; background: #f8fafc; border-radius: 12px; border: 1px solid var(--border-color); align-items: center;">
@@ -1653,7 +1820,7 @@ const CoordinatorPanel = {
     },
 
     getFilteredPastEventsRows(query = '', category = 'all', dateStart = '', dateEnd = '') {
-        const today = new Date('2024-03-08'); // Mock today
+        const today = new Date(); // Use actual current date
         let rows = this.data.events.filter(e => new Date(e.date) < today);
 
         if (category !== 'all') {
@@ -1709,7 +1876,7 @@ const CoordinatorPanel = {
     },
 
     getFilteredDashEventsRows(query = '', category = 'all', dateStart = '', dateEnd = '') {
-        const today = new Date('2024-03-08'); // Mock today
+        const today = new Date(); // Use actual current date
         let rows = this.data.events;
 
         if (this.selectedDashboardTab === 'present') {
@@ -1783,7 +1950,6 @@ const CoordinatorPanel = {
             });
         }
         
-        // Filter by search query
         if (query) {
             rows = rows.filter(r => 
                 (r.student || '').toLowerCase().includes(query) || 
@@ -1810,6 +1976,197 @@ const CoordinatorPanel = {
                 </td>
             </tr>
         `).join('');
+    },
+
+    async exportRegistrations(format) {
+        const tbody = document.getElementById('registrationsTableBody');
+        const rows = tbody ? tbody.querySelectorAll('tr') : [];
+        if (rows.length === 0 || (rows.length === 1 && rows[0].innerText.includes('No matching registrations'))) {
+            alert('No registrations to export based on current filters.');
+            return;
+        }
+
+        const query = document.getElementById('regSearchInput')?.value.toLowerCase() || '';
+        const category = document.getElementById('regCategoryFilter')?.value || 'all';
+        const district = document.getElementById('regDistrictFilter')?.value || 'all';
+        const dateStart = document.getElementById('regDateStart')?.value || '';
+        const dateEnd = document.getElementById('regDateEnd')?.value || '';
+
+        let filteredRegs = this.data.registrations;
+        if (category !== 'all') filteredRegs = filteredRegs.filter(r => r.category === category);
+        if (district !== 'all') filteredRegs = filteredRegs.filter(r => r.district === district);
+        if (dateStart || dateEnd) {
+            filteredRegs = filteredRegs.filter(r => {
+                if (!r.time) return false;
+                const regDate = new Date(r.time).setHours(0,0,0,0);
+                const start = dateStart ? new Date(dateStart).setHours(0,0,0,0) : null;
+                const end = dateEnd ? new Date(dateEnd).setHours(23,59,59,999) : null;
+                if (start && regDate < start) return false;
+                if (end && regDate > end) return false;
+                return true;
+            });
+        }
+        if (query) {
+            filteredRegs = filteredRegs.filter(r => 
+                (r.student || '').toLowerCase().includes(query) || 
+                (r.email || '').toLowerCase().includes(query) ||
+                (r.phone || '').toLowerCase().includes(query)
+            );
+        }
+
+        if (filteredRegs.length === 0) {
+            alert('No registrations to export.');
+            return;
+        }
+
+        const token = localStorage.getItem('token');
+        let fullGroupData = [];
+        
+        try {
+            const groupPromises = filteredRegs.map(r => 
+                fetch(`/api/coordinator/registrations/group/${r.id}`, { headers: { 'Authorization': `Bearer ${token}` } })
+                .then(res => res.ok ? res.json() : null)
+            );
+            
+            const results = await Promise.all(groupPromises);
+            fullGroupData = results.filter(g => g !== null);
+            
+            fullGroupData.sort((a, b) => {
+                if(a.groupId < b.groupId) return -1;
+                if(a.groupId > b.groupId) return 1;
+                return 0;
+            });
+
+        } catch(err) {
+            console.error("Export fetch error:", err);
+            alert("Error preparing export data.");
+            return;
+        }
+
+        if (format === 'excel') {
+            this.downloadExcel(fullGroupData);
+        } else if (format === 'pdf') {
+            this.downloadPDF(fullGroupData);
+        }
+    },
+
+    downloadExcel(groups) {
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Group ID,Event,Registration Status,Total Amount,Leader Name,Leader College,Leader Email,Leader Phone,Member 2 Name,Member 2 College,Member 2 Email,Member 2 Phone,Member 3 Name,Member 3 College,Member 3 Email,Member 3 Phone,Member 4 Name,Member 4 College,Member 4 Email,Member 4 Phone,Member 5 Name,Member 5 College,Member 5 Email,Member 5 Phone\n";
+        
+        groups.forEach(g => {
+            const members = g.members || [];
+            const totalMoney = (g.feePerPerson || 0) * members.length;
+
+            let row = [
+                g.groupId,
+                `"${g.eventTitle}"`,
+                g.status,
+                totalMoney
+            ];
+            
+            // Allow up to 5 members (or pad empty if fewer)
+            for(let i = 0; i < 5; i++) {
+                if (members[i]) {
+                    row.push(`"${members[i].fullName || members[i].username || ''}"`);
+                    row.push(`"${members[i].college || ''}"`);
+                    row.push(`"${members[i].email || ''}"`);
+                    row.push(`"${members[i].phone || ''}"`);
+                } else {
+                    row.push('""', '""', '""', '""');
+                }
+            }
+
+            csvContent += row.join(",") + "\n";
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "Registrations_Export.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    },
+
+    downloadPDF(groups) {
+        const popWindow = window.open('', '_blank', 'width=1000,height=700');
+        if (!popWindow) {
+            alert("Please allow pop-ups to print PDF.");
+            return;
+        }
+
+        let html = `
+            <html>
+            <head>
+                <title>Registrations Export</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; font-size: 11px; }
+                    h1 { color: #333; text-align: center; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #ddd; padding: 6px; text-align: left; vertical-align: top; }
+                    th { background-color: #f2f2f2; color: #333; font-weight: bold; }
+                    tr:nth-child(even) { background-color: #fafafa; }
+                    .member-block { margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px dashed #ccc; }
+                    .member-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+                </style>
+            </head>
+            <body>
+                <h1>Event Registrations</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="80">Group ID</th>
+                            <th width="120">Event</th>
+                            <th width="70">Status</th>
+                            <th width="70">Amount</th>
+                            <th>Team Members (Details)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        groups.forEach(g => {
+            const members = g.members || [];
+            const totalMoney = (g.feePerPerson || 0) * members.length;
+            
+            let membersHtml = members.map((m, idx) => {
+                const name = m.fullName || m.username || 'N/A';
+                const role = idx === 0 ? '(Leader)' : '';
+                return `
+                    <div class="member-block">
+                        <strong>${name} ${role}</strong><br>
+                        College: ${m.college || 'N/A'}<br>
+                        Email: ${m.email || 'N/A'} | Phone: ${m.phone || 'N/A'}
+                    </div>
+                `;
+            }).join('');
+
+            html += `
+                <tr>
+                    <td>${g.groupId}</td>
+                    <td>${g.eventTitle}</td>
+                    <td>${g.status}</td>
+                    <td>Rs ${totalMoney}</td>
+                    <td>${membersHtml || '-'}</td>
+                </tr>
+            `;
+        });
+
+        html += `
+                    </tbody>
+                </table>
+                <script>
+                    window.onload = function() {
+                        window.print();
+                    }
+                </script>
+            </body>
+            </html>
+        `;
+
+        popWindow.document.write(html);
+        popWindow.document.close();
     },
 
     formatDateShort(dateStr) {
@@ -1893,11 +2250,36 @@ const CoordinatorPanel = {
                             <p><strong>Description:</strong></p>
                             <p style="color: var(--text-muted); padding: 1rem; background: #f8fafc; border-radius: 8px;">${event.description || 'No description provided.'}</p>
                         </div>
+                        <div style="grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                            <div>
+                                <p style="margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase;">Team Size</p>
+                                <p><strong>Min:</strong> ${event.minParticipants} <strong>Max:</strong> ${event.maxParticipants}</p>
+                            </div>
+                            <div>
+                                <p style="margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase;">Registration Fee</p>
+                                <p><strong>${event.feePerPerson > 0 ? 'Rs ' + event.feePerPerson + ' / Person' : 'Free'}</strong></p>
+                            </div>
+                            <div style="grid-column: span 2;">
+                                <p style="margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase;">Requirements</p>
+                                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                                    ${event.requiresName ? `<span style="background: var(--primary-light); color: var(--primary-dark); padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem;"><i class="fas fa-check"></i> Name</span>` : ''}
+                                    ${event.requiresEmail ? `<span style="background: var(--primary-light); color: var(--primary-dark); padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem;"><i class="fas fa-check"></i> Email</span>` : ''}
+                                    ${event.requiresPhone ? `<span style="background: var(--primary-light); color: var(--primary-dark); padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem;"><i class="fas fa-check"></i> Phone</span>` : ''}
+                                    ${event.requiresCollege ? `<span style="background: var(--primary-light); color: var(--primary-dark); padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem;"><i class="fas fa-check"></i> College</span>` : ''}
+                                    ${event.requiresPayment ? `<span style="background: var(--primary-light); color: var(--primary-dark); padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem;"><i class="fas fa-check"></i> Payment</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        ${event.qrCodePath ? `
+                        <div style="grid-column: span 2;">
+                            <p style="margin-bottom: 0.5rem;"><strong>Payment QR Code:</strong></p>
+                            <img src="${event.qrCodePath}" style="max-height: 200px; border-radius: 8px; border: 1px solid var(--border-color);">
+                        </div>` : ''}
                         ${event.imageUrls && event.imageUrls.length > 0 ? `
                         <div style="grid-column: span 2;">
                             <p style="margin-bottom: 0.5rem;"><strong>Event Photos:</strong></p>
-                            <div style="display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 0.5rem;">
-                                ${event.imageUrls.map(url => `<img src="${url}" style="height: 120px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-color);">`).join('')}
+                            <div style="display: flex; flex-wrap: wrap; gap: 1rem; padding-bottom: 0.5rem;">
+                                ${event.imageUrls.map(url => `<a href="${url}" target="_blank"><img src="${url}" style="height: 120px; width: auto; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-color); cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"></a>`).join('')}
                             </div>
                         </div>` : ''}
                         <div style="grid-column: span 2; display: flex; justify-content: flex-end; margin-top: 1rem;">

@@ -24,6 +24,9 @@ public interface RegistrationRepository extends JpaRepository<Registration, Regi
 
     @Query("SELECT r FROM Registration r WHERE r.status = :status AND r.event.college.collegeCode = :collegeCode")
     List<Registration> findByStatusAndEvent_College_CollegeCode(@Param("status") String status, @Param("collegeCode") String collegeCode);
+
+    @Query("SELECT COUNT(r) FROM Registration r WHERE r.status = :status AND r.event.college.collegeCode = :collegeCode")
+    long countByStatusAndEvent_College_CollegeCode(@Param("status") String status, @Param("collegeCode") String collegeCode);
     
     List<Registration> findByGroupId(String groupId);
     
@@ -33,4 +36,7 @@ public interface RegistrationRepository extends JpaRepository<Registration, Regi
 
     @Query("SELECT COALESCE(MAX(CAST(r.groupId AS integer)), 0) FROM Registration r")
     Integer findMaxGroupId();
+
+    @Query("SELECT r.event.id, COUNT(r) FROM Registration r GROUP BY r.event.id")
+    List<Object[]> countAllRegistrationsPerEvent();
 }

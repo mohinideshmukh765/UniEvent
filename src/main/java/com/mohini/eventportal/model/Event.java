@@ -109,6 +109,12 @@ public class Event {
     @Transient
     private LocalDateTime createdAt;
 
+    @Transient
+    private java.util.List<String> imageUrls;
+    
+    @Transient
+    private String thumbnailUrl;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

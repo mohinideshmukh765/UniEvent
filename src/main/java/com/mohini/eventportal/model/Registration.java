@@ -19,6 +19,7 @@ public class Registration {
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Event event;
 
     @Id
@@ -31,8 +32,11 @@ public class Registration {
     @Column(name = "group_id", length = 50)
     private String groupId;
 
-    @Column(name = "qrcode", columnDefinition = "bytea")
-    private byte[] qrcode;
+// qrcode field removed because it does not exist in the registration table
+
+    /** URL path to the payment screenshot file, e.g. /uploads/payment_success/{groupId}/payment_xxx.png */
+    @Column(name = "payment_screenshot_path", length = 500)
+    private String paymentScreenshotPath;
 
     @Column(name = "status", length = 20)
     private String status;

@@ -124,7 +124,7 @@ public class StudentController {
         }
 
         // Validate payment for paid events
-        byte[] qrCodeBytes = null;
+        String screenshotUrl = null;
         if (event.getFeePerPerson() > 0) {
             if (transactionId == null || transactionId.isBlank()) {
                 return ResponseEntity.badRequest().body(Map.of("message", "Transaction ID is required for paid events"));
@@ -132,16 +132,29 @@ public class StudentController {
             if (qrcodeFile == null || qrcodeFile.isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of("message", "Payment screenshot (QR Code) is required for paid events"));
             }
-            try {
-                qrCodeBytes = qrcodeFile.getBytes();
-            } catch (IOException e) {
-                return ResponseEntity.status(500).body(Map.of("message", "Error processing payment screenshot"));
-            }
         }
 
-        // Numeric increment logic for Group ID
+        // Numeric increment logic for Group ID — compute before saving screenshot
         Integer maxGroupId = registrationRepository.findMaxGroupId();
         String nextGroupId = String.valueOf(maxGroupId + 1);
+
+        // Save payment screenshot to disk: uploads/payment_success/{groupId}/
+        if (qrcodeFile != null && !qrcodeFile.isEmpty()) {
+            try {
+                java.nio.file.Path uploadPath = java.nio.file.Paths.get(getUploadBase(), "payment_success", nextGroupId);
+                java.nio.file.Files.createDirectories(uploadPath);
+                
+                String ext = getExtension(qrcodeFile.getOriginalFilename());
+                String filename = "payment_" + System.currentTimeMillis() + "." + ext;
+                java.nio.file.Path dest = uploadPath.resolve(filename);
+                
+                java.nio.file.Files.copy(qrcodeFile.getInputStream(), dest, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                
+                screenshotUrl = "/uploads/payment_success/" + nextGroupId + "/" + filename;
+            } catch (IOException e) {
+                return ResponseEntity.status(500).body(Map.of("message", "Error saving payment screenshot: " + e.getMessage()));
+            }
+        }
 
         List<Registration> registrationsToSave = new ArrayList<>();
         for (String uname : teamUsernames) {
@@ -150,7 +163,7 @@ public class StudentController {
                     .username(uname.trim())
                     .transactionId(transactionId)
                     .groupId(nextGroupId)
-                    .qrcode(qrCodeBytes)
+                    .paymentScreenshotPath(screenshotUrl) // file URL on disk
                     .status("PENDING")
                     .registrationDate(java.time.LocalDateTime.now())
                     .build();
@@ -231,9 +244,8 @@ public class StudentController {
                 }
             }
             dto.put("transactionId", r.getTransactionId());
-            if (r.getQrcode() != null) {
-                String base64Qr = java.util.Base64.getEncoder().encodeToString(r.getQrcode());
-                dto.put("qrcodeBase64", base64Qr);
+            if (r.getPaymentScreenshotPath() != null) {
+                dto.put("paymentScreenshot", r.getPaymentScreenshotPath());
             }
             
             // Fetch all members of this group
@@ -334,5 +346,20 @@ public class StudentController {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof UserDetails) return ((UserDetails) principal).getUsername();
         return principal.toString();
+    }
+
+    /** Returns the absolute base path for uploads, ensuring it's relative to the project root */
+    private String getUploadBase() {
+        String userDir = System.getProperty("user.dir");
+        java.io.File uploads = new java.io.File(userDir, "uploads");
+        if (!uploads.exists()) {
+            uploads.mkdirs();
+        }
+        return uploads.getAbsolutePath();
+    }
+
+    private String getExtension(String filename) {
+        if (filename == null || !filename.contains(".")) return "jpg";
+        return filename.substring(filename.lastIndexOf('.') + 1);
     }
 }
