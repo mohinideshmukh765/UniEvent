@@ -100,6 +100,24 @@
                 <p>Loading Admin Portal...</p>
             </div>
         </section>
+
+        <!-- View Event Modal (Global) -->
+        <div id="viewEventModal" class="modal-overlay">
+            <div class="modal-content" style="max-width: 650px; text-align: left;">
+                <div class="flex-between" style="margin-bottom: 1.5rem;">
+                    <h2 style="margin: 0;">Event Details</h2>
+                    <button class="btn-primary" style="background: #f1f5f9; color: var(--text-main); padding: 0.5rem;" onclick="AdminPanel.closeModal('viewEventModal')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="eventContentArea">
+                    <!-- Dynamic details injected here -->
+                </div>
+                <div class="modal-actions" style="margin-top: 2rem; justify-content: flex-end;">
+                    <button class="btn-primary" onclick="AdminPanel.closeModal('viewEventModal')">Close</button>
+                </div>
+            </div>
+        </div>
     </main>
 
     <!-- Core Script -->

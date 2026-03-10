@@ -254,6 +254,41 @@ public class AdminController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/posts")
+    public ResponseEntity<?> getAllPosts() {
+        return ResponseEntity.ok(postRepository.findAllByOrderByCreatedAtDesc().stream().map(post -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", post.getId());
+            map.put("caption", post.getCaption());
+            map.put("photo", post.getPhoto());
+            map.put("createdAt", post.getCreatedAt());
+            map.put("feedbackFormLink", post.getFeedbackFormLink());
+            
+            if (post.getEvent() != null) {
+                Map<String, Object> eventMap = new HashMap<>();
+                eventMap.put("id", post.getEvent().getId());
+                eventMap.put("title", post.getEvent().getTitle());
+                if (post.getEvent().getCollege() != null) {
+                    Map<String, Object> collegeMap = new HashMap<>();
+                    collegeMap.put("collegeName", post.getEvent().getCollege().getCollegeName());
+                    collegeMap.put("collegeCode", post.getEvent().getCollege().getCollegeCode());
+                    eventMap.put("college", collegeMap);
+                }
+                map.put("event", eventMap);
+            }
+            return map;
+        }).collect(Collectors.toList()));
+    }
+
+    @DeleteMapping("/posts/{eventId}")
+    public ResponseEntity<?> deletePost(@PathVariable("eventId") Integer eventId) {
+        if (postRepository.existsById(eventId)) {
+            postRepository.deleteById(eventId);
+            return ResponseEntity.ok("Post deleted successfully");
+        }
+        return ResponseEntity.notFound().build();
+    }
+
     @GetMapping("/registrations")
     public ResponseEntity<?> getAllRegistrations() {
         java.util.List<Map<String, Object>> result = registrationRepository.findAll().stream()

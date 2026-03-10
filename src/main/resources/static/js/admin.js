@@ -89,13 +89,6 @@ const AdminPanel = {
                             <div id="upcoming-events-list" style="display: flex; flex-direction: column; gap: 1rem;">
                                 <p style="color: var(--text-muted);">Loading events...</p>
                             </div>
-                            <button class="btn-primary" style="width: 100%; margin-top: 2rem; background: white; color: var(--text-main); border: 1px solid var(--border-color);">View Calendar</button>
-                        </div>
-                        
-                        <div class="card" style="background: var(--navy-sidebar); color: white;">
-                            <h3 style="color: white; margin-bottom: 0.5rem;">Need assistance?</h3>
-                            <p style="font-size: 0.85rem; opacity: 0.8; margin-bottom: 1.5rem;">The event management support team is available 24/7 for technical issues.</p>
-                            <button class="btn-primary" style="width: 100%; background: var(--primary);">Contact Support</button>
                         </div>
                     </div>
                 </div>
@@ -254,17 +247,6 @@ const AdminPanel = {
                         </table>
                     </div>
                 </div>
-
-                <!-- View Event Modal -->
-                <div id="viewEventModal" class="modal-overlay">
-                    <div class="modal-content" style="max-width: 650px; text-align: left;">
-                        <button onclick="AdminPanel.closeModal('viewEventModal')" style="position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
-                        <h2 style="margin-bottom: 1.5rem; font-family: 'Outfit', sans-serif; display: flex; align-items: center; gap: 0.75rem;"><i class="fas fa-calendar-check" style="color: var(--primary);"></i> Event Details</h2>
-                        <div id="eventContentArea" style="min-height: 100px; display: flex; flex-direction: column; gap: 1rem;">
-                            <p style="color: var(--text-muted); text-align: center;">Loading event data...</p>
-                        </div>
-                    </div>
-                </div>
             </div>
         `,
         registrations: `
@@ -351,14 +333,14 @@ const AdminPanel = {
 
         posts: `
             <div class="animate-slide">
-                <h1>Post Moderation</h1>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-top: 2rem;">
-                    <div class="card">
-                        <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&q=80" style="width: 100%; border-radius: 12px;">
-                        <div class="flex-between" style="margin-top: 1rem;">
-                            <h4>Winners of Tech-Fest</h4>
-                            <div class="action-btns"><button class="btn-primary">Approve</button><button class="btn-primary" style="background: var(--danger);">Delete</button></div>
-                        </div>
+                <div class="flex-between" style="margin-bottom: 2rem;">
+                    <h1>Post Moderation</h1>
+                    <button class="btn-primary" onclick="AdminPanel.loadPostsData()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                </div>
+                <div id="posts-moderation-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;">
+                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted);">
+                        <i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 1rem;"></i>
+                        <p>Loading after-event posts...</p>
                     </div>
                 </div>
             </div>
@@ -619,6 +601,8 @@ const AdminPanel = {
             this.loadAnalyticsData();
         } else if (pageId === 'reports') {
             this.loadReportsData();
+        } else if (pageId === 'posts') {
+            this.loadPostsData();
         }
     },
 
@@ -843,24 +827,28 @@ const AdminPanel = {
             });
             if (eventsRes.ok) {
                 const events = await eventsRes.json();
+                this.dashboardEvents = events; // Store for the modal viewer
                 const eventsList = document.getElementById('upcoming-events-list');
                 if (eventsList) {
                     if (events.length === 0) {
                         eventsList.innerHTML = `<p style="font-size: 0.9rem; color: var(--text-muted);">No active upcoming events.</p>`;
                     } else {
-                        eventsList.innerHTML = events.slice(0, 5).map(event => `
-                            <div style="display: flex; gap: 1rem; align-items: flex-start;">
-                                <div style="background: #eff6ff; padding: 0.5rem; border-radius: 8px; text-align: center; min-width: 60px;">
-                                    <div style="text-transform: uppercase; font-size: 0.75rem; font-weight: 700; color: var(--primary);">${new Date(event.eventDate).toLocaleString('default', { month: 'short' })}</div>
-                                    <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">${new Date(event.eventDate).getDate()}</div>
+                        eventsList.innerHTML = events.slice(0, 5).map(event => {
+                            const collegeName = event.college ? (event.college.name || event.college.collegeName) : 'University';
+                            return `
+                                <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                                    <div style="background: #eff6ff; padding: 0.5rem; border-radius: 8px; text-align: center; min-width: 60px;">
+                                        <div style="text-transform: uppercase; font-size: 0.75rem; font-weight: 700; color: var(--primary);">${new Date(event.eventDate).toLocaleString('default', { month: 'short' })}</div>
+                                        <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">${new Date(event.eventDate).getDate()}</div>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <p style="font-size: 0.9rem; font-weight: 700;">${event.title}</p>
+                                        <p style="font-size: 0.8rem; color: var(--text-muted);">${collegeName}</p>
+                                    </div>
+                                    <button class="btn-primary" style="padding: 0.3rem 0.6rem; font-size: 0.7rem; background: var(--navy-sidebar);" onclick="AdminPanel.viewEventDetails(${event.id})">View</button>
                                 </div>
-                                <div style="flex: 1;">
-                                    <p style="font-size: 0.9rem; font-weight: 700;">${event.title}</p>
-                                    <p style="font-size: 0.8rem; color: var(--text-muted);">${event.college ? event.college.name : 'University'}</p>
-                                </div>
-                                <button class="btn-primary" style="padding: 0.3rem 0.6rem; font-size: 0.7rem; background: var(--navy-sidebar);" onclick="AdminPanel.viewEventDetails(${event.id})">View</button>
-                            </div>
-                        `).join('');
+                            `;
+                        }).join('');
                     }
                 }
             }
@@ -873,15 +861,21 @@ const AdminPanel = {
                 const activities = await activitiesRes.json();
                 const activityList = document.getElementById('activity-list');
                 if (activityList) {
-                    activityList.innerHTML = activities.slice(0, 6).map(activity => `
-                        <div class="recent-activity-item">
-                            <span style="font-size: 0.8rem; color: var(--text-muted); width: 80px;">${new Date(activity.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                            <div style="flex: 1;">
-                                <p style="font-size: 0.9rem; font-weight: 600;">${activity.action}</p>
-                                <small style="color: var(--text-muted);">${activity.details}</small>
+                    const now = new Date();
+                    activityList.innerHTML = activities.slice(0, 6).map(activity => {
+                        const activityDate = new Date(activity.timestamp);
+                        const isRecent = (now - activityDate) < (24 * 60 * 60 * 1000); // 24 hours
+                        
+                        return `
+                            <div class="recent-activity-item">
+                                <span style="font-size: 0.8rem; color: var(--text-muted); width: 80px;">${activityDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                <div style="flex: 1;">
+                                    <p style="font-size: 0.9rem; font-weight: 600;">${activity.action}</p>
+                                    ${isRecent ? `<small style="color: var(--text-muted);">${activity.details}</small>` : ''}
+                                </div>
                             </div>
-                        </div>
-                    `).join('');
+                        `;
+                    }).join('');
                 }
             }
 
@@ -1121,14 +1115,146 @@ const AdminPanel = {
         }).join('');
     },
 
+    async loadPostsData() {
+        const grid = document.getElementById('posts-moderation-grid');
+        try {
+            const res = await fetch('/api/admin/posts', { headers: this.getAuthHeaders() });
+            if (res.ok) {
+                this.allPosts = await res.json();
+                this.renderPosts();
+            } else {
+                if (grid) grid.innerHTML = `<div style="grid-column: 1/-1; color: red; text-align:center;">Failed to load posts.</div>`;
+            }
+        } catch (e) {
+            console.error(e);
+            if (grid) grid.innerHTML = `<div style="grid-column: 1/-1; color: red; text-align:center;">Error: ${e.message}</div>`;
+        }
+    },
+
+    renderPosts() {
+        const grid = document.getElementById('posts-moderation-grid');
+        if (!grid) return;
+
+        if (!this.allPosts || this.allPosts.length === 0) {
+            grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 4rem; color: var(--text-muted); background: #f8fafc; border-radius: 12px; border: 2px dashed #e2e8f0;">
+                <i class="fas fa-images fa-3x" style="margin-bottom: 1rem; opacity: 0.3;"></i>
+                <p>No after-event posts found to moderate.</p>
+            </div>`;
+            return;
+        }
+
+        grid.innerHTML = this.allPosts.map(post => {
+            const photos = post.photo ? post.photo.split(',').map(p => p.trim()).filter(p => p) : [];
+            const hasMultiple = photos.length > 1;
+            const eventTitle = post.event?.title || 'Unknown Event';
+            const collegeName = (post.event?.college?.name || post.event?.college?.collegeName) || 'Unknown College';
+            
+            return `
+                <div class="card post-card animate-slide" style="display: flex; flex-direction: column; overflow: hidden; padding: 0;">
+                    <div id="slider-${post.id}" style="height: 220px; overflow: hidden; position: relative; background: #000;">
+                        <div class="slider-container">
+                            ${photos.length > 0 ? photos.map((src, idx) => `
+                                <img src="${src}" class="slider-image ${idx === 0 ? 'active' : ''}" data-index="${idx}">
+                            `).join('') : `
+                                <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&q=80" class="slider-image active" data-index="0">
+                            `}
+                        </div>
+                        
+                        ${hasMultiple ? `
+                            <button class="slider-control slider-prev" onclick="AdminPanel.changeSliderPhoto(${post.id}, -1)">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="slider-control slider-next" onclick="AdminPanel.changeSliderPhoto(${post.id}, 1)">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <div class="slider-dots">
+                                ${photos.map((_, idx) => `
+                                    <div class="slider-dot ${idx === 0 ? 'active' : ''}" data-index="${idx}"></div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div style="padding: 1.25rem; flex: 1; display: flex; flex-direction: column;">
+                        <div style="margin-bottom: 1rem;">
+                            <div style="font-size: 0.75rem; color: var(--primary); font-weight: 700; text-transform: uppercase; margin-bottom: 0.25rem;">${collegeName}</div>
+                            <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-main);">${eventTitle}</h3>
+                        </div>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.5rem; flex: 1;">
+                            ${post.caption || 'No caption provided.'}
+                        </p>
+                        <div class="flex-between" style="padding-top: 1rem; border-top: 1px solid #f1f5f9;">
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn-primary" style="background: #10b981; font-size: 0.8rem; padding: 0.5rem 1rem;" onclick="alert('Post Approved (Visual Only)')">
+                                    <i class="fas fa-check"></i> Approve
+                                </button>
+                                <button class="btn-primary" style="background: #ef4444; font-size: 0.8rem; padding: 0.5rem 1rem;" onclick="AdminPanel.deletePost(${post.id})">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                            <small style="color: var(--text-muted); font-size: 0.75rem;">
+                                ${new Date(post.createdAt || Date.now()).toLocaleDateString()}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    },
+
+    changeSliderPhoto(postId, direction) {
+        const container = document.getElementById(`slider-${postId}`);
+        if (!container) return;
+
+        const images = container.querySelectorAll('.slider-image');
+        const dots = container.querySelectorAll('.slider-dot');
+        let currentIndex = Array.from(images).findIndex(img => img.classList.contains('active'));
+        
+        // Remove active from current
+        images[currentIndex].classList.remove('active');
+        if (dots[currentIndex]) dots[currentIndex].classList.remove('active');
+
+        // Calculate new index
+        currentIndex += direction;
+        if (currentIndex < 0) currentIndex = images.length - 1;
+        if (currentIndex >= images.length) currentIndex = 0;
+
+        // Add active to new
+        images[currentIndex].classList.add('active');
+        if (dots[currentIndex]) dots[currentIndex].classList.add('active');
+    },
+
+    async deletePost(eventId) {
+        if (!confirm("Are you sure you want to delete this after-event post? This action cannot be undone.")) return;
+        
+        try {
+            const res = await fetch(`/api/admin/posts/${eventId}`, {
+                method: 'DELETE',
+                headers: this.getAuthHeaders()
+            });
+            if (res.ok) {
+                alert("Post deleted successfully.");
+                this.loadPostsData();
+            } else {
+                alert("Failed to delete post: " + await res.text());
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Error deleting post: " + e.message);
+        }
+    },
+
     viewEventDetails(eventId) {
         const modal = document.getElementById('viewEventModal');
         const contentArea = document.getElementById('eventContentArea');
         if (!modal || !contentArea) return;
 
+        // Reset visibility state from previous closes
+        modal.style.display = ''; 
         modal.classList.add('active');
+
         // Search across all possible event sources
         const event = (this.allModerationEvents || []).find(e => e.id == eventId) || 
+                      (this.dashboardEvents || []).find(e => e.id == eventId) ||
                       (this.reportsEvents || []).find(e => e.id == eventId);
 
         if (event) {
@@ -1692,8 +1818,8 @@ const AdminPanel = {
         const modal = document.getElementById(modalId);
         if (modal) {
             modal.classList.remove('active');
-            // Compatibility for inline styles if present
-            modal.style.display = 'none';
+            // Remove any inline style that might interfere with CSS class display logic
+            modal.style.display = '';
         }
     }
 };
