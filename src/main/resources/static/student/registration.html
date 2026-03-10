@@ -1,37 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event Registration | UniEvent Portal</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap"
+        rel="stylesheet">
     <style>
-        :root { --sidebar-width: 280px; }
-        .student-layout { display: grid; grid-template-columns: var(--sidebar-width) 1fr; min-height: 100vh; background: #f8fafc; }
-        .student-sidebar { background: white; border-right: 1px solid var(--glass-border); padding: 2rem 1.5rem; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }
-        .student-main { padding: 4rem; display: flex; justify-content: center; }
-        .nav-link { display: flex; align-items: center; gap: 1rem; padding: 0.875rem 1.25rem; color: var(--text-muted); text-decoration: none; border-radius: 12px; margin-bottom: 0.5rem; font-weight: 500; transition: var(--transition); }
-        .nav-link:hover, .nav-link.active { background: rgba(79, 70, 229, 0.08); color: var(--primary); }
-        
-        .registration-form-card { background: white; width: 100%; max-width: 800px; padding: 4rem; border-radius: 40px; border: 1px solid var(--glass-border); box-shadow: var(--shadow-xl); }
-        .form-section { margin-bottom: 3rem; }
-        .form-section h3 { font-size: 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-        
-        .team-member-row { display: flex; gap: 1rem; margin-bottom: 1rem; align-items: center; }
-        .btn-remove { background: #fee2e2; color: #ef4444; border: none; padding: 0.5rem; border-radius: 8px; cursor: pointer; }
+        :root {
+            --sidebar-width: 280px;
+        }
 
-        .success-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 1000; display: none; align-items: center; justify-content: center; text-align: center; }
-        .registration-id { font-size: 2.5rem; font-weight: 800; color: var(--primary); font-family: 'Outfit'; margin: 1rem 0; letter-spacing: 2px; }
+        .student-layout {
+            display: grid;
+            grid-template-columns: var(--sidebar-width) 1fr;
+            min-height: 100vh;
+            background: #f8fafc;
+        }
 
-        .profile-footer { margin-top: auto; display: flex; align-items: center; gap: 1rem; padding-top: 2rem; border-top: 1px solid var(--glass-border); }
-        .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; }
-        
-        .payment-qr { max-width: 250px; border-radius: 12px; margin: 1rem 0; border: 1px solid var(--glass-border); }
+        .student-sidebar {
+            background: white;
+            border-right: 1px solid var(--glass-border);
+            padding: 2rem 1.5rem;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .student-main {
+            padding: 4rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.875rem 1.25rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(79, 70, 229, 0.08);
+            color: var(--primary);
+        }
+
+        .registration-form-card {
+            background: white;
+            width: 100%;
+            max-width: 800px;
+            padding: 4rem;
+            border-radius: 40px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .form-section {
+            margin-bottom: 3rem;
+        }
+
+        .form-section h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .team-member-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .btn-remove {
+            background: #fee2e2;
+            color: #ef4444;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .success-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .registration-id {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            font-family: 'Outfit';
+            margin: 1rem 0;
+            letter-spacing: 2px;
+        }
+
+        .profile-footer {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .payment-qr {
+            max-width: 250px;
+            border-radius: 12px;
+            margin: 1rem 0;
+            border: 1px solid var(--glass-border);
+        }
     </style>
 </head>
+
 <body class="light-theme">
     <div class="student-layout">
         <aside class="student-sidebar">
@@ -39,13 +159,15 @@
             <nav class="sidebar-nav" style="margin-top: 2rem; flex: 1;">
                 <a href="/student/dashboard.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
                 <a href="/student/events.html" class="nav-link active"><i class="fas fa-search"></i> Browse Events</a>
-                <a href="/student/my-registrations.html" class="nav-link"><i class="fas fa-ticket-alt"></i> My Registrations</a>
-                <a href="/student/certificates.html" class="nav-link"><i class="fas fa-certificate"></i> Certificates</a>
+                <a href="/student/my-registrations.html" class="nav-link"><i class="fas fa-ticket-alt"></i> My
+                    Registrations</a>
+                <a href="/student/analytics.html" class="nav-link"><i class="fas fa-chart-pie"></i> Analytics</a>
             </nav>
             <div class="profile-footer">
                 <div class="avatar" id="userAvatar">A</div>
                 <div style="flex: 1;">
-                    <div class="student-name" id="userNameHeader" style="font-weight: 600; font-size: 0.9rem;">Loading...</div>
+                    <div class="student-name" id="userNameHeader" style="font-weight: 600; font-size: 0.9rem;">
+                        Loading...</div>
                     <div style="font-size: 0.75rem; color: var(--text-muted);" id="userRoleHeader">Student</div>
                 </div>
             </div>
@@ -90,7 +212,8 @@
                         </p>
                         <div id="teamMembersList">
                             <div class="team-member-row">
-                                <input type="text" class="form-input member-username" placeholder="Username (Member 1)" readonly id="leaderUsername">
+                                <input type="text" class="form-input member-username" placeholder="Username (Member 1)"
+                                    readonly id="leaderUsername">
                                 <span style="color: var(--primary); font-weight: 600;">Leader</span>
                             </div>
                         </div>
@@ -102,10 +225,13 @@
                     <!-- Payment Section -->
                     <div class="form-section" id="paymentSection" style="display: none;">
                         <h3><i class="fas fa-credit-card"></i> Payment Details</h3>
-                        <div style="background: #f1f5f9; padding: 2rem; border-radius: 20px; border: 1px solid var(--glass-border);">
+                        <div
+                            style="background: #f1f5f9; padding: 2rem; border-radius: 20px; border: 1px solid var(--glass-border);">
                             <div id="qrContainer" style="text-align: center; margin-bottom: 1.5rem;">
-                                <p style="font-weight: 600; margin-bottom: 0.5rem;">Scan QR to Pay: <span id="feeDisplay" style="color: var(--primary);">₹0</span></p>
-                                <img src="/images/qr-placeholder.png" id="eventQrCode" class="payment-qr" alt="Payment QR">
+                                <p style="font-weight: 600; margin-bottom: 0.5rem;">Scan QR to Pay: <span
+                                        id="feeDisplay" style="color: var(--primary);">₹0</span></p>
+                                <img src="/images/qr-placeholder.png" id="eventQrCode" class="payment-qr"
+                                    alt="Payment QR">
                             </div>
                             <div class="form-grid">
                                 <div class="form-group">
@@ -121,8 +247,10 @@
                     </div>
 
                     <div style="display: flex; gap: 1.5rem; margin-top: 4rem;">
-                        <button type="button" class="btn btn-secondary" style="flex: 1; justify-content: center;" onclick="location.href='/student/events.html'">Cancel</button>
-                        <button type="submit" class="btn btn-primary" id="btnSubmit" style="flex: 2; justify-content: center; font-size: 1.1rem;">Submit Registration</button>
+                        <button type="button" class="btn btn-secondary" style="flex: 1; justify-content: center;"
+                            onclick="location.href='/student/events.html'">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="btnSubmit"
+                            style="flex: 2; justify-content: center; font-size: 1.1rem;">Submit Registration</button>
                     </div>
                 </form>
             </div>
@@ -132,13 +260,15 @@
     <!-- Success Overlay -->
     <div id="successOverlay" class="success-overlay">
         <div class="glass" style="padding: 4rem; border-radius: 40px; max-width: 500px;">
-            <div class="icon-box" style="background: #10b981; color: white; margin: 0 auto 2rem; width: 80px; height: 80px; border-radius: 50%; font-size: 2.5rem; display: flex; align-items: center; justify-content: center;">
+            <div class="icon-box"
+                style="background: #10b981; color: white; margin: 0 auto 2rem; width: 80px; height: 80px; border-radius: 50%; font-size: 2.5rem; display: flex; align-items: center; justify-content: center;">
                 <i class="fas fa-check"></i>
             </div>
             <h2 style="font-family: 'Outfit'; margin-bottom: 1rem;">Registration Submitted!</h2>
             <p style="color: var(--text-muted);">Your team registration has been sent for approval. Group ID:</p>
             <div class="registration-id" id="displayRegId">...</div>
-            <a href="/student/my-registrations.html" class="btn btn-primary" style="width: 100%; justify-content: center;">View My Registrations</a>
+            <a href="/student/my-registrations.html" class="btn btn-primary"
+                style="width: 100%; justify-content: center;">View My Registrations</a>
         </div>
     </div>
 
@@ -177,7 +307,7 @@
 
             function renderFormConfig(event) {
                 document.getElementById('eventTitleDisplay').textContent = `Participating in: ${event.title}`;
-                
+
                 // Configurable fields
                 if (event.requiresName === false) document.getElementById('group-name').style.display = 'none';
                 if (event.requiresEmail === false) document.getElementById('group-email').style.display = 'none';
@@ -199,7 +329,7 @@
             // Team Member Management
             const btnAddMember = document.getElementById('btnAddMember');
             const teamMembersList = document.getElementById('teamMembersList');
-            
+
             btnAddMember.addEventListener('click', () => {
                 const currentRows = teamMembersList.querySelectorAll('.team-member-row').length;
                 if (currentRows >= currentEvent.maxParticipants) {
@@ -226,7 +356,7 @@
 
                 const formData = new FormData();
                 formData.append('eventId', eventId);
-                
+
                 if (currentEvent.feePerPerson > 0) {
                     formData.append('transactionId', document.getElementById('transactionId').value);
                     const file = document.getElementById('paymentFile').files[0];
@@ -261,4 +391,5 @@
         });
     </script>
 </body>
+
 </html>

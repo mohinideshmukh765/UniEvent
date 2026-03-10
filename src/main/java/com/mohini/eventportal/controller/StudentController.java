@@ -27,8 +27,6 @@ import java.util.*;
 @RequestMapping("/api/student")
 public class StudentController {
 
-
-
     @Autowired
     UserRepository userRepository;
 
@@ -65,41 +63,49 @@ public class StudentController {
 
         // Get current student (team leader)
         String leaderUsername = getCurrentUsername();
-        if (leaderUsername == null) return ResponseEntity.status(401).body("Unauthorized");
+        if (leaderUsername == null)
+            return ResponseEntity.status(401).body("Unauthorized");
 
         Optional<User> leaderOpt = userRepository.findByUsername(leaderUsername);
-        if (!leaderOpt.isPresent()) return ResponseEntity.badRequest().body(Map.of("message", "Student not found"));
+        if (!leaderOpt.isPresent())
+            return ResponseEntity.badRequest().body(Map.of("message", "Student not found"));
         User leader = leaderOpt.get();
 
         // Find event
         Optional<Event> eventOpt = eventRepository.findById(eventId);
-        if (!eventOpt.isPresent()) return ResponseEntity.badRequest().body(Map.of("message", "Event not found"));
+        if (!eventOpt.isPresent())
+            return ResponseEntity.badRequest().body(Map.of("message", "Event not found"));
         Event event = eventOpt.get();
 
         // Check deadline
-        if (event.getRegistrationDeadline() != null && event.getRegistrationDeadline().isBefore(java.time.LocalDateTime.now())) {
+        if (event.getRegistrationDeadline() != null
+                && event.getRegistrationDeadline().isBefore(java.time.LocalDateTime.now())) {
             return ResponseEntity.badRequest().body(Map.of("message", "Registration deadline has passed"));
         }
 
         // Parse team members
         List<String> teamUsernames;
         try {
-            teamUsernames = objectMapper.readValue(teamMembersJson, new TypeReference<List<String>>() {});
+            teamUsernames = objectMapper.readValue(teamMembersJson, new TypeReference<List<String>>() {
+            });
         } catch (IOException e) {
             return ResponseEntity.badRequest().body(Map.of("message", "Invalid teamMembers format"));
         }
 
         if (teamUsernames == null || teamUsernames.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "At least one participant (the leader) is required"));
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "At least one participant (the leader) is required"));
         }
 
         // Validate team size
         int count = teamUsernames.size();
         if (count < event.getMinParticipants()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Minimum " + event.getMinParticipants() + " participants required"));
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "Minimum " + event.getMinParticipants() + " participants required"));
         }
         if (count > event.getMaxParticipants()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Maximum " + event.getMaxParticipants() + " participants allowed"));
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "Maximum " + event.getMaxParticipants() + " participants allowed"));
         }
 
         // Validate all usernames exist and are students
@@ -113,13 +119,15 @@ public class StudentController {
             }
         }
         if (!invalidUsernames.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Registration blocked. Issues with: " + String.join(", ", invalidUsernames)));
+            return ResponseEntity.badRequest().body(
+                    Map.of("message", "Registration blocked. Issues with: " + String.join(", ", invalidUsernames)));
         }
 
         // Check if any member already registered for this event
         for (String uname : teamUsernames) {
             if (registrationRepository.existsByUsernameAndEvent_Id(uname.trim(), eventId)) {
-                return ResponseEntity.badRequest().body(Map.of("message", "User '" + uname + "' is already registered for this event"));
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "User '" + uname + "' is already registered for this event"));
             }
         }
 
@@ -127,10 +135,12 @@ public class StudentController {
         String screenshotUrl = null;
         if (event.getFeePerPerson() > 0) {
             if (transactionId == null || transactionId.isBlank()) {
-                return ResponseEntity.badRequest().body(Map.of("message", "Transaction ID is required for paid events"));
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "Transaction ID is required for paid events"));
             }
             if (qrcodeFile == null || qrcodeFile.isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of("message", "Payment screenshot (QR Code) is required for paid events"));
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "Payment screenshot (QR Code) is required for paid events"));
             }
         }
 
@@ -141,18 +151,21 @@ public class StudentController {
         // Save payment screenshot to disk: uploads/payment_success/{groupId}/
         if (qrcodeFile != null && !qrcodeFile.isEmpty()) {
             try {
-                java.nio.file.Path uploadPath = java.nio.file.Paths.get(getUploadBase(), "payment_success", nextGroupId);
+                java.nio.file.Path uploadPath = java.nio.file.Paths.get(getUploadBase(), "payment_success",
+                        nextGroupId);
                 java.nio.file.Files.createDirectories(uploadPath);
-                
+
                 String ext = getExtension(qrcodeFile.getOriginalFilename());
                 String filename = "payment_" + System.currentTimeMillis() + "." + ext;
                 java.nio.file.Path dest = uploadPath.resolve(filename);
-                
-                java.nio.file.Files.copy(qrcodeFile.getInputStream(), dest, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                
+
+                java.nio.file.Files.copy(qrcodeFile.getInputStream(), dest,
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
                 screenshotUrl = "/uploads/payment_success/" + nextGroupId + "/" + filename;
             } catch (IOException e) {
-                return ResponseEntity.status(500).body(Map.of("message", "Error saving payment screenshot: " + e.getMessage()));
+                return ResponseEntity.status(500)
+                        .body(Map.of("message", "Error saving payment screenshot: " + e.getMessage()));
             }
         }
 
@@ -176,13 +189,12 @@ public class StudentController {
         String collegeCode = event.getCollege() != null ? event.getCollege().getCollegeCode() : "0";
         String notifTitle = "New Registration Pending Approval";
         String notifMsg = String.format(
-            "Student '%s' submitted registration for '%s'. Team size: %d. Group ID: %s. UPI/Ref: %s",
-            leader.getFullName(),
-            event.getTitle(),
-            count,
-            nextGroupId,
-            transactionId != null ? transactionId : "N/A"
-        );
+                "Student '%s' submitted registration for '%s'. Team size: %d. Group ID: %s. UPI/Ref: %s",
+                leader.getFullName(),
+                event.getTitle(),
+                count,
+                nextGroupId,
+                transactionId != null ? transactionId : "N/A");
 
         Notification notification = Notification.builder()
                 .title(notifTitle)
@@ -192,9 +204,10 @@ public class StudentController {
         notificationRepository.save(notification);
 
         // Fire notification to each student in the team
-        String studentMsg = String.format("You have registered for '%s' scheduled on %s. Status is currently PENDING approval.", 
+        String studentMsg = String.format(
+                "You have registered for '%s' scheduled on %s. Status is currently PENDING approval.",
                 event.getTitle(), event.getEventDate() != null ? event.getEventDate().toLocalDate().toString() : "TBD");
-        
+
         for (String uname : teamUsernames) {
             userRepository.findByUsername(uname.trim()).ifPresent(u -> {
                 Notification n = Notification.builder()
@@ -208,21 +221,21 @@ public class StudentController {
         }
 
         return ResponseEntity.ok(Map.of(
-            "groupId", nextGroupId,
-            "status", "PENDING",
-            "message", "Registration successful! Group ID: " + nextGroupId
-        ));
+                "groupId", nextGroupId,
+                "status", "PENDING",
+                "message", "Registration successful! Group ID: " + nextGroupId));
     }
 
     @GetMapping("/registrations")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<?> getMyRegistrations() {
         String username = getCurrentUsername();
-        if (username == null) return ResponseEntity.status(401).body("Unauthorized");
+        if (username == null)
+            return ResponseEntity.status(401).body("Unauthorized");
 
         List<Registration> regs = registrationRepository.findByUsername(username);
         List<Map<String, Object>> result = new ArrayList<>();
-        
+
         for (Registration r : regs) {
             Map<String, Object> dto = new HashMap<>();
             dto.put("id", r.getGroupId());
@@ -239,15 +252,17 @@ public class StudentController {
                 dto.put("coordinatorMobile", r.getEvent().getCoordinatorMobile());
                 dto.put("organizedBy", r.getEvent().getOrganizedBy());
                 dto.put("feePerPerson", r.getEvent().getFeePerPerson());
+                dto.put("category", r.getEvent().getCategory());
                 if (r.getEvent().getCollege() != null) {
                     dto.put("collegeName", r.getEvent().getCollege().getCollegeName());
+                    dto.put("district", r.getEvent().getCollege().getDistrict());
                 }
             }
             dto.put("transactionId", r.getTransactionId());
             if (r.getPaymentScreenshotPath() != null) {
                 dto.put("paymentScreenshot", r.getPaymentScreenshotPath());
             }
-            
+
             // Fetch all members of this group
             List<Registration> groupMembers = registrationRepository.findByGroupId(r.getGroupId());
             List<Map<String, String>> membersList = new ArrayList<>();
@@ -272,10 +287,12 @@ public class StudentController {
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<?> getMyNotifications() {
         String username = getCurrentUsername();
-        if (username == null) return ResponseEntity.status(401).body("Unauthorized");
-        
+        if (username == null)
+            return ResponseEntity.status(401).body("Unauthorized");
+
         // Using the finder from NotificationRepository
-        List<Notification> notifs = notificationRepository.findByTargetAudienceContainingOrderBySentAtDesc("USER:" + username);
+        List<Notification> notifs = notificationRepository
+                .findByTargetAudienceContainingOrderBySentAtDesc("USER:" + username);
         return ResponseEntity.ok(notifs);
     }
 
@@ -283,10 +300,12 @@ public class StudentController {
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<?> getProfile() {
         String username = getCurrentUsername();
-        if (username == null) return ResponseEntity.status(401).body("Unauthorized");
+        if (username == null)
+            return ResponseEntity.status(401).body("Unauthorized");
 
         Optional<User> uOpt = userRepository.findByUsername(username);
-        if (!uOpt.isPresent()) return ResponseEntity.badRequest().body(Map.of("message", "User not found"));
+        if (!uOpt.isPresent())
+            return ResponseEntity.badRequest().body(Map.of("message", "User not found"));
         User user = uOpt.get();
 
         Map<String, Object> profile = new HashMap<>();
@@ -305,16 +324,22 @@ public class StudentController {
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<?> updateProfile(@RequestBody Map<String, String> payload) {
         String username = getCurrentUsername();
-        if (username == null) return ResponseEntity.status(401).body("Unauthorized");
+        if (username == null)
+            return ResponseEntity.status(401).body("Unauthorized");
 
         Optional<User> uOpt = userRepository.findByUsername(username);
-        if (!uOpt.isPresent()) return ResponseEntity.badRequest().body(Map.of("message", "User not found"));
+        if (!uOpt.isPresent())
+            return ResponseEntity.badRequest().body(Map.of("message", "User not found"));
         User user = uOpt.get();
 
-        if (payload.containsKey("fullName")) user.setFullName(payload.get("fullName"));
-        if (payload.containsKey("phone")) user.setPhone(payload.get("phone"));
-        if (payload.containsKey("district")) user.setDistrict(payload.get("district"));
-        if (payload.containsKey("college")) user.setCollege(payload.get("college"));
+        if (payload.containsKey("fullName"))
+            user.setFullName(payload.get("fullName"));
+        if (payload.containsKey("phone"))
+            user.setPhone(payload.get("phone"));
+        if (payload.containsKey("district"))
+            user.setDistrict(payload.get("district"));
+        if (payload.containsKey("college"))
+            user.setCollege(payload.get("college"));
 
         userRepository.save(user);
 
@@ -325,10 +350,12 @@ public class StudentController {
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<?> updatePassword(@RequestBody Map<String, String> payload) {
         String username = getCurrentUsername();
-        if (username == null) return ResponseEntity.status(401).body("Unauthorized");
+        if (username == null)
+            return ResponseEntity.status(401).body("Unauthorized");
 
         Optional<User> uOpt = userRepository.findByUsername(username);
-        if (!uOpt.isPresent()) return ResponseEntity.badRequest().body(Map.of("message", "User not found"));
+        if (!uOpt.isPresent())
+            return ResponseEntity.badRequest().body(Map.of("message", "User not found"));
         User user = uOpt.get();
 
         String newPassword = payload.get("newPassword");
@@ -344,11 +371,15 @@ public class StudentController {
 
     private String getCurrentUsername() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails) return ((UserDetails) principal).getUsername();
+        if (principal instanceof UserDetails)
+            return ((UserDetails) principal).getUsername();
         return principal.toString();
     }
 
-    /** Returns the absolute base path for uploads, ensuring it's relative to the project root */
+    /**
+     * Returns the absolute base path for uploads, ensuring it's relative to the
+     * project root
+     */
     private String getUploadBase() {
         String userDir = System.getProperty("user.dir");
         java.io.File uploads = new java.io.File(userDir, "uploads");
@@ -359,7 +390,8 @@ public class StudentController {
     }
 
     private String getExtension(String filename) {
-        if (filename == null || !filename.contains(".")) return "jpg";
+        if (filename == null || !filename.contains("."))
+            return "jpg";
         return filename.substring(filename.lastIndexOf('.') + 1);
     }
 }

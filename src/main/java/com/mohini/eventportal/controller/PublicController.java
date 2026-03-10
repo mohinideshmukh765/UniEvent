@@ -2,16 +2,16 @@ package com.mohini.eventportal.controller;
 
 import com.mohini.eventportal.model.College;
 import com.mohini.eventportal.model.Event;
-import com.mohini.eventportal.repository.CollegeRepository;
-import com.mohini.eventportal.repository.EventRepository;
-import com.mohini.eventportal.repository.UserRepository;
-import com.mohini.eventportal.repository.PostRepository;
-import com.mohini.eventportal.repository.RegistrationRepository;
 import com.mohini.eventportal.model.Post;
+import com.mohini.eventportal.model.PostLike;
+import com.mohini.eventportal.model.User;
+import com.mohini.eventportal.repository.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import java.io.File;
 import java.util.*;
@@ -37,6 +37,9 @@ public class PublicController {
     RegistrationRepository registrationRepository;
 
     @Autowired
+    PostLikeRepository postLikeRepository;
+
+    @Autowired
     ObjectMapper objectMapper;
 
     @GetMapping("/colleges")
@@ -44,7 +47,9 @@ public class PublicController {
         return collegeRepository.findByEnabled(true);
     }
 
-    /** Returns all events with college info — no auth needed, sorted by popularity */
+    /**
+     * Returns all events with college info — no auth needed, sorted by popularity
+     */
     @GetMapping("/events")
     public ResponseEntity<?> getAllEvents() {
         List<Event> events = eventRepository.findAll();
@@ -75,8 +80,8 @@ public class PublicController {
     @GetMapping("/events/{id}")
     public ResponseEntity<?> getEventById(@PathVariable Integer id) {
         return eventRepository.findById(id)
-            .map(e -> ResponseEntity.ok((Object) toDto(e)))
-            .orElse(ResponseEntity.notFound().build());
+                .map(e -> ResponseEntity.ok((Object) toDto(e)))
+                .orElse(ResponseEntity.notFound().build());
     }
 
     private Map<String, Object> toDto(Event e) {
@@ -101,7 +106,7 @@ public class PublicController {
         dto.put("requiresPhone", e.getRequiresPhone());
         dto.put("qrCodePath", e.getQrCodePath());
         dto.put("photosFolderPath", e.getPhotosFolderPath());
-        
+
         // Add all photos URLs
         List<String> imageUrls = new ArrayList<>();
         if (e.getPhotosFolderPath() != null) {
@@ -112,7 +117,7 @@ public class PublicController {
                     for (File f : files) {
                         String name = f.getName().toLowerCase();
                         if (name.endsWith(".jpg") || name.endsWith(".jpeg") ||
-                            name.endsWith(".png") || name.endsWith(".webp") || name.endsWith(".gif")) {
+                                name.endsWith(".png") || name.endsWith(".webp") || name.endsWith(".gif")) {
                             imageUrls.add("/uploads/photos/" + e.getId() + "/" + f.getName());
                         }
                     }
@@ -134,7 +139,9 @@ public class PublicController {
         return dto;
     }
 
-    /** Lists all photo URLs for a given event from its uploads/photos/{id}/ folder */
+    /**
+     * Lists all photo URLs for a given event from its uploads/photos/{id}/ folder
+     */
     @GetMapping("/events/{id}/photos")
     public ResponseEntity<?> getEventPhotos(@PathVariable Integer id) {
         // Use absolute path to correctly resolve the directory on Windows
@@ -146,7 +153,7 @@ public class PublicController {
                 for (File f : files) {
                     String name = f.getName().toLowerCase();
                     if (name.endsWith(".jpg") || name.endsWith(".jpeg") ||
-                        name.endsWith(".png") || name.endsWith(".webp") || name.endsWith(".gif")) {
+                            name.endsWith(".png") || name.endsWith(".webp") || name.endsWith(".gif")) {
                         urls.add("/uploads/photos/" + id + "/" + f.getName());
                     }
                 }
@@ -155,7 +162,10 @@ public class PublicController {
         return ResponseEntity.ok(urls);
     }
 
-    /** Returns the absolute base path for uploads, ensuring it's relative to the project root */
+    /**
+     * Returns the absolute base path for uploads, ensuring it's relative to the
+     * project root
+     */
     private String getUploadBase() {
         String userDir = System.getProperty("user.dir");
         java.io.File uploads = new java.io.File(userDir, "uploads");
@@ -169,18 +179,18 @@ public class PublicController {
     @GetMapping("/users/{username}")
     public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
         return userRepository.findByUsername(username)
-            .map(u -> {
-                if (u.getRole() != com.mohini.eventportal.model.User.Role.STUDENT) {
-                    return ResponseEntity.badRequest().body("User is not a student");
-                }
-                Map<String, Object> details = new HashMap<>();
-                details.put("fullName", u.getFullName());
-                details.put("email", u.getEmail());
-                details.put("college", u.getCollege());
-                details.put("phone", u.getPhone());
-                return ResponseEntity.ok(details);
-            })
-            .orElse(ResponseEntity.status(404).body("User not registered on portal"));
+                .map(u -> {
+                    if (u.getRole() != com.mohini.eventportal.model.User.Role.STUDENT) {
+                        return ResponseEntity.badRequest().body("User is not a student");
+                    }
+                    Map<String, Object> details = new HashMap<>();
+                    details.put("fullName", u.getFullName());
+                    details.put("email", u.getEmail());
+                    details.put("college", u.getCollege());
+                    details.put("phone", u.getPhone());
+                    return ResponseEntity.ok(details);
+                })
+                .orElse(ResponseEntity.status(404).body("User not registered on portal"));
     }
 
     @GetMapping("/validate-usernames")
@@ -210,9 +220,20 @@ public class PublicController {
             dto.put("eventTitle", p.getEvent() != null ? p.getEvent().getTitle() : "Event");
             dto.put("description", p.getCaption());
             dto.put("createdAt", p.getCreatedAt());
+            dto.put("likes", p.getLikes());
+            dto.put("feedbackFormLink", p.getFeedbackFormLink());
+
+            // Add college name
+            String collegeName = "UniEvent College";
+            if (p.getEvent() != null && p.getEvent().getCollege() != null) {
+                collegeName = p.getEvent().getCollege().getCollegeName();
+            }
+            dto.put("collegeName", collegeName);
+
             try {
                 if (p.getImages() != null && !p.getImages().isEmpty()) {
-                    dto.put("imageUrls", objectMapper.readValue(p.getImages(), new TypeReference<List<String>>() {}));
+                    dto.put("imageUrls", objectMapper.readValue(p.getImages(), new TypeReference<List<String>>() {
+                    }));
                 } else if (p.getPhoto() != null) {
                     dto.put("imageUrls", Arrays.asList(p.getPhoto().split(",")));
                 } else {
@@ -226,15 +247,37 @@ public class PublicController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/debug/db")
-    public ResponseEntity<?> debugDb() {
-        java.util.List<Map<String, String>> regs = new java.util.ArrayList<>();
-        registrationRepository.findAll().forEach(r -> {
-            regs.add(Map.of("user", r.getUsername(), 
-                           "group", r.getGroupId() != null ? r.getGroupId() : "null", 
-                           "status", r.getStatus() != null ? r.getStatus() : "null", 
-                           "eventId", r.getEvent() != null ? String.valueOf(r.getEvent().getId()) : "null"));
-        });
-        return ResponseEntity.ok(Map.of("registrations", regs));
+    @PostMapping("/posts/{id}/like")
+    public ResponseEntity<?> likePost(@PathVariable Integer id) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if ("anonymousUser".equals(principal)) {
+            return ResponseEntity.status(401).body(Map.of("message", "Please log in to like posts"));
+        }
+
+        String username = ((UserDetails) principal).getUsername();
+        Optional<User> userOpt = userRepository.findByUsername(username);
+        if (!userOpt.isPresent())
+            return ResponseEntity.status(404).body(Map.of("message", "User not found"));
+        User user = userOpt.get();
+
+        return postRepository.findById(id).map(p -> {
+            if (postLikeRepository.existsByPostAndUser(p, user)) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "You already liked this post", "likes", p.getLikes()));
+            }
+
+            // Save the like record
+            PostLike like = PostLike.builder()
+                    .post(p)
+                    .user(user)
+                    .build();
+            postLikeRepository.save(like);
+
+            // Increment like count
+            p.setLikes((p.getLikes() == null ? 0 : p.getLikes()) + 1);
+            postRepository.save(p);
+
+            return ResponseEntity.ok(Map.of("likes", p.getLikes(), "message", "Liked successfully"));
+        }).orElse(ResponseEntity.notFound().build());
     }
 }

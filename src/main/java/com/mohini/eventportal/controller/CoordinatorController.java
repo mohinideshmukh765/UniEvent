@@ -21,8 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -76,7 +75,7 @@ public class CoordinatorController {
         College college = getCurrentCollege();
         if (college == null)
             return ResponseEntity.ok(java.util.Collections.emptyList());
-        
+
         java.util.List<Event> events = eventRepository.findByCollege_CollegeCode(college.getCollegeCode());
         for (Event e : events) {
             java.util.List<String> urls = new java.util.ArrayList<>();
@@ -88,7 +87,7 @@ public class CoordinatorController {
                         for (java.io.File f : files) {
                             String name = f.getName().toLowerCase();
                             if (name.endsWith(".jpg") || name.endsWith(".jpeg") ||
-                                name.endsWith(".png") || name.endsWith(".webp") || name.endsWith(".gif")) {
+                                    name.endsWith(".png") || name.endsWith(".webp") || name.endsWith(".gif")) {
                                 urls.add("/uploads/photos/" + e.getId() + "/" + f.getName());
                             }
                         }
@@ -112,10 +111,11 @@ public class CoordinatorController {
 
         java.util.List<Registration> rawRegs = registrationRepository
                 .findByEvent_College_CollegeCode(college.getCollegeCode());
-        
+
         // Sort registrations by date desc if available
         rawRegs.sort((a, b) -> {
-            if (a.getRegistrationDate() == null || b.getRegistrationDate() == null) return 0;
+            if (a.getRegistrationDate() == null || b.getRegistrationDate() == null)
+                return 0;
             return b.getRegistrationDate().compareTo(a.getRegistrationDate());
         });
 
@@ -124,7 +124,7 @@ public class CoordinatorController {
         for (Registration r : rawRegs) {
             if (r.getGroupId() != null && !seenGroups.add(r.getGroupId()))
                 continue;
-            
+
             Map<String, Object> dto = new java.util.HashMap<>();
             dto.put("id", r.getGroupId());
             dto.put("status", r.getStatus());
@@ -160,10 +160,11 @@ public class CoordinatorController {
 
         java.util.List<Registration> rawRegs = registrationRepository
                 .findByEvent_College_CollegeCode(college.getCollegeCode());
-        
+
         // Sort registrations by date desc if available
         rawRegs.sort((a, b) -> {
-            if (a.getRegistrationDate() == null || b.getRegistrationDate() == null) return 0;
+            if (a.getRegistrationDate() == null || b.getRegistrationDate() == null)
+                return 0;
             return b.getRegistrationDate().compareTo(a.getRegistrationDate());
         });
 
@@ -205,10 +206,12 @@ public class CoordinatorController {
     @PreAuthorize("hasRole('COORDINATOR')")
     public ResponseEntity<?> getRegistrationGroupDetails(@PathVariable String groupId) {
         College college = getCurrentCollege();
-        if (college == null) return ResponseEntity.status(403).body("Unauthorized");
+        if (college == null)
+            return ResponseEntity.status(403).body("Unauthorized");
 
         java.util.List<Registration> regs = registrationRepository.findByGroupId(groupId);
-        if (regs.isEmpty()) return ResponseEntity.notFound().build();
+        if (regs.isEmpty())
+            return ResponseEntity.notFound().build();
 
         Registration first = regs.get(0);
         if (!first.getEvent().getCollege().getCollegeCode().equals(college.getCollegeCode())) {
@@ -247,7 +250,8 @@ public class CoordinatorController {
 
     @PostMapping("/registrations/{id}/reject")
     @PreAuthorize("hasRole('COORDINATOR')")
-    public ResponseEntity<?> rejectRegistration(@PathVariable String id, @RequestBody(required = false) Map<String, String> body) {
+    public ResponseEntity<?> rejectRegistration(@PathVariable String id,
+            @RequestBody(required = false) Map<String, String> body) {
         String reason = (body != null) ? body.get("reason") : null;
         return updateRegistrationStatus(id, "DENIED", reason);
     }
@@ -278,16 +282,17 @@ public class CoordinatorController {
                 reg.setStatus("DENIED");
                 reg.setReason(reason);
                 userRepository.findByUsername(reg.getUsername()).ifPresent(u -> {
-                    String msg = "Your registration for '" + reg.getEvent().getTitle() + "' was rejected by the coordinator.";
+                    String msg = "Your registration for '" + reg.getEvent().getTitle()
+                            + "' was rejected by the coordinator.";
                     if (reason != null && !reason.trim().isEmpty()) {
                         msg += " Reason: " + reason;
                     }
                     Notification n = Notification.builder()
-                        .title("Registration Rejected")
-                        .message(msg)
-                        .recipient(u)
-                        .targetAudience("USER:" + u.getUsername())
-                        .build();
+                            .title("Registration Rejected")
+                            .message(msg)
+                            .recipient(u)
+                            .targetAudience("USER:" + u.getUsername())
+                            .build();
                     notificationRepository.save(n);
                 });
             }
@@ -299,11 +304,12 @@ public class CoordinatorController {
                 // Send approval notification
                 userRepository.findByUsername(reg.getUsername()).ifPresent(u -> {
                     Notification n = Notification.builder()
-                        .title("Registration Approved!")
-                        .message("Your registration for '" + reg.getEvent().getTitle() + "' has been approved. You can now view full details in your portal.")
-                        .recipient(u)
-                        .targetAudience("USER:" + u.getUsername())
-                        .build();
+                            .title("Registration Approved!")
+                            .message("Your registration for '" + reg.getEvent().getTitle()
+                                    + "' has been approved. You can now view full details in your portal.")
+                            .recipient(u)
+                            .targetAudience("USER:" + u.getUsername())
+                            .build();
                     notificationRepository.save(n);
                 });
             }
@@ -327,23 +333,54 @@ public class CoordinatorController {
     @PreAuthorize("hasRole('COORDINATOR')")
     public ResponseEntity<?> getPosts() {
         College college = getCurrentCollege();
-        if (college == null) return ResponseEntity.status(403).body("Unauthorized");
-        return ResponseEntity.ok(postRepository.findByEvent_College_CollegeCodeOrderByCreatedAtDesc(college.getCollegeCode()));
+        if (college == null)
+            return ResponseEntity.status(403).body("Unauthorized");
+
+        List<Post> posts = postRepository.findByEvent_College_CollegeCodeOrderByCreatedAtDesc(college.getCollegeCode());
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (Post p : posts) {
+            Map<String, Object> dto = new HashMap<>();
+            dto.put("id", p.getId());
+            dto.put("eventTitle", p.getEvent() != null ? p.getEvent().getTitle() : "Event");
+            dto.put("description", p.getCaption());
+            dto.put("createdAt", p.getCreatedAt());
+            dto.put("likes", p.getLikes());
+            dto.put("feedbackFormLink", p.getFeedbackFormLink());
+            dto.put("collegeName", college.getCollegeName());
+
+            if (p.getPhoto() != null) {
+                dto.put("photo", p.getPhoto());
+            }
+
+            // Add event object if needed by frontend (Coordinator panel uses p.event.id)
+            if (p.getEvent() != null) {
+                Map<String, Object> eventDto = new HashMap<>();
+                eventDto.put("id", p.getEvent().getId());
+                eventDto.put("title", p.getEvent().getTitle());
+                eventDto.put("eventDate", p.getEvent().getEventDate());
+                dto.put("event", eventDto);
+            }
+
+            result.add(dto);
+        }
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/events/eligible-for-post")
     @PreAuthorize("hasRole('COORDINATOR')")
     public ResponseEntity<?> getEligibleEvents() {
         College college = getCurrentCollege();
-        if (college == null) return ResponseEntity.status(403).body("Unauthorized");
-        
+        if (college == null)
+            return ResponseEntity.status(403).body("Unauthorized");
+
         // Use a 1-day buffer to show events that were today or yesterday
         java.time.LocalDateTime cutoff = java.time.LocalDateTime.now().plusDays(1);
         java.util.List<Event> eligible = eventRepository.findByCollege_CollegeCode(college.getCollegeCode()).stream()
                 .filter(e -> e.getEventDate().isBefore(cutoff))
                 .filter(e -> !postRepository.findByEvent(e).isPresent())
                 .collect(java.util.stream.Collectors.toList());
-        
+
         return ResponseEntity.ok(eligible);
     }
 
@@ -383,21 +420,28 @@ public class CoordinatorController {
     @PreAuthorize("hasRole('COORDINATOR')")
     public ResponseEntity<?> updateEvent(@PathVariable Integer id, @RequestBody Event eventData) {
         College college = getCurrentCollege();
-        if (college == null) return ResponseEntity.status(403).body("Unauthorized");
+        if (college == null)
+            return ResponseEntity.status(403).body("Unauthorized");
 
         Optional<Event> opt = eventRepository.findById(id);
-        if (!opt.isPresent()) return ResponseEntity.notFound().build();
+        if (!opt.isPresent())
+            return ResponseEntity.notFound().build();
 
         Event event = opt.get();
         if (!event.getCollege().getCollegeCode().equals(college.getCollegeCode())) {
             return ResponseEntity.status(403).body("Unauthorized");
         }
 
-        if (eventData.getRegistrationDeadline() != null) event.setRegistrationDeadline(eventData.getRegistrationDeadline());
-        if (eventData.getEventDate() != null) event.setEventDate(eventData.getEventDate());
-        if (eventData.getCoordinatorName() != null) event.setCoordinatorName(eventData.getCoordinatorName());
-        if (eventData.getCoordinatorMobile() != null) event.setCoordinatorMobile(eventData.getCoordinatorMobile());
-        if (eventData.getDescription() != null) event.setDescription(eventData.getDescription());
+        if (eventData.getRegistrationDeadline() != null)
+            event.setRegistrationDeadline(eventData.getRegistrationDeadline());
+        if (eventData.getEventDate() != null)
+            event.setEventDate(eventData.getEventDate());
+        if (eventData.getCoordinatorName() != null)
+            event.setCoordinatorName(eventData.getCoordinatorName());
+        if (eventData.getCoordinatorMobile() != null)
+            event.setCoordinatorMobile(eventData.getCoordinatorMobile());
+        if (eventData.getDescription() != null)
+            event.setDescription(eventData.getDescription());
 
         eventRepository.save(event);
         return ResponseEntity.ok(event);
@@ -423,12 +467,12 @@ public class CoordinatorController {
             // Store in uploads/qr/{eventId}/ folder using absolute path
             java.nio.file.Path uploadPath = java.nio.file.Paths.get(getUploadBase(), "qr", String.valueOf(eventId));
             java.nio.file.Files.createDirectories(uploadPath);
-            
+
             String filename = "qr_" + System.currentTimeMillis() + "." + getExtension(qrFile.getOriginalFilename());
             java.nio.file.Path dest = uploadPath.resolve(filename);
-            
+
             java.nio.file.Files.copy(qrFile.getInputStream(), dest, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            
+
             // Store URL path in qrcode_path using atomic update to avoid race conditions
             String urlPath = "/uploads/qr/" + eventId + "/" + filename;
             eventRepository.updateQrCodePath(eventId, urlPath);
@@ -437,6 +481,7 @@ public class CoordinatorController {
             return ResponseEntity.status(500).body("Failed to upload QR: " + ex.getMessage());
         }
     }
+
     /**
      * POST /api/coordinator/events/{eventId}/photos
      * Upload event photos (multiple files). Saves to uploads/photos/{eventId}/
@@ -472,24 +517,26 @@ public class CoordinatorController {
 
         java.util.List<String> savedPaths = new java.util.ArrayList<>();
         for (MultipartFile photo : photos) {
-            if (photo.isEmpty()) continue;
+            if (photo.isEmpty())
+                continue;
             try {
                 String filename = System.currentTimeMillis() + "_" + photo.getOriginalFilename();
                 java.nio.file.Path dest = uploadPath.resolve(filename);
-                java.nio.file.Files.copy(photo.getInputStream(), dest, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                java.nio.file.Files.copy(photo.getInputStream(), dest,
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING);
                 savedPaths.add("/uploads/photos/" + eventId + "/" + filename);
             } catch (Exception ex) {
                 return ResponseEntity.status(500).body("Failed to upload photo: " + ex.getMessage());
             }
         }
 
-        // Store URL path in photos_folder_path using atomic update to avoid race conditions
+        // Store URL path in photos_folder_path using atomic update to avoid race
+        // conditions
         String folderPath = "/uploads/photos/" + eventId;
         eventRepository.updatePhotosFolderPath(eventId, folderPath);
         return ResponseEntity.ok(Map.of(
-            "photosFolderPath", folderPath,
-            "uploadedFiles", savedPaths
-        ));
+                "photosFolderPath", folderPath,
+                "uploadedFiles", savedPaths));
     }
 
     /**
@@ -507,18 +554,23 @@ public class CoordinatorController {
             return ResponseEntity.status(403).body("Coordinator not found");
 
         Optional<Event> optEvent = eventRepository.findById(eventId);
-        if (!optEvent.isPresent()) return ResponseEntity.notFound().build();
+        if (!optEvent.isPresent())
+            return ResponseEntity.notFound().build();
 
         Event event = optEvent.get();
         if (!event.getCollege().getCollegeCode().equals(college.getCollegeCode()))
             return ResponseEntity.status(403).body("Unauthorized");
 
         File file = new File(getUploadBase() + "/photos/" + eventId + "/" + filename);
-        if (file.exists()) file.delete();
+        if (file.exists())
+            file.delete();
         return ResponseEntity.ok(Map.of("deleted", filename));
     }
 
-    /** Returns the absolute base path for uploads, ensuring it's relative to the project root */
+    /**
+     * Returns the absolute base path for uploads, ensuring it's relative to the
+     * project root
+     */
     private String getUploadBase() {
         String userDir = System.getProperty("user.dir");
         java.io.File uploads = new java.io.File(userDir, "uploads");
@@ -529,7 +581,8 @@ public class CoordinatorController {
     }
 
     private String getExtension(String filename) {
-        if (filename == null || !filename.contains(".")) return "jpg";
+        if (filename == null || !filename.contains("."))
+            return "jpg";
         return filename.substring(filename.lastIndexOf('.') + 1);
     }
 
@@ -577,11 +630,13 @@ public class CoordinatorController {
 
         java.util.List<String> photoPaths = new java.util.ArrayList<>();
         for (org.springframework.web.multipart.MultipartFile photo : photos) {
-            if (photo.isEmpty()) continue;
+            if (photo.isEmpty())
+                continue;
             try {
                 String filename = System.currentTimeMillis() + "_" + photo.getOriginalFilename();
                 java.nio.file.Path dest = uploadPath.resolve(filename);
-                java.nio.file.Files.copy(photo.getInputStream(), dest, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                java.nio.file.Files.copy(photo.getInputStream(), dest,
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING);
                 photoPaths.add("/uploads/afterposts/" + eventId + "/" + filename);
             } catch (Exception ex) {
                 return ResponseEntity.status(500).body("Failed to upload photos: " + ex.getMessage());
@@ -603,7 +658,8 @@ public class CoordinatorController {
     @PreAuthorize("hasRole('COORDINATOR')")
     public ResponseEntity<?> updateProfile(@RequestBody Map<String, String> data) {
         College college = getCurrentCollege();
-        if (college == null) return ResponseEntity.status(403).body("Unauthorized");
+        if (college == null)
+            return ResponseEntity.status(403).body("Unauthorized");
 
         String newUsername = data.get("username");
         if (newUsername != null && !newUsername.isEmpty() && !newUsername.equals(college.getUsername())) {
@@ -613,9 +669,12 @@ public class CoordinatorController {
             college.setUsername(newUsername);
         }
 
-        if (data.containsKey("fullName")) college.setCoordinatorName(data.get("fullName"));
-        if (data.containsKey("phone")) college.setPhone(data.get("phone"));
-        if (data.containsKey("district")) college.setDistrict(data.get("district"));
+        if (data.containsKey("fullName"))
+            college.setCoordinatorName(data.get("fullName"));
+        if (data.containsKey("phone"))
+            college.setPhone(data.get("phone"));
+        if (data.containsKey("district"))
+            college.setDistrict(data.get("district"));
 
         String newPassword = data.get("password");
         if (newPassword != null && !newPassword.isEmpty()) {
@@ -623,14 +682,14 @@ public class CoordinatorController {
         }
 
         collegeRepository.save(college);
-        
+
         // Return updated data for frontend to sync
         Map<String, Object> response = new java.util.HashMap<>();
         response.put("fullName", college.getCoordinatorName());
         response.put("username", college.getUsername());
         response.put("phone", college.getPhone());
         response.put("district", college.getDistrict());
-        
+
         return ResponseEntity.ok(response);
     }
 

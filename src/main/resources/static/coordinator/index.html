@@ -65,13 +65,17 @@
             </div>
 
             <div style="display: flex; gap: 1rem; align-items: center;">
-                <a href="#" class="nav-link" data-page="notifications" style="border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center; background: #f1f5f9; color: #475569; text-decoration: none;">
+                <a href="#" class="nav-link" data-page="notifications"
+                    style="border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center; background: #f1f5f9; color: #475569; text-decoration: none;">
                     <i class="fas fa-bell"></i>
                 </a>
-                <a href="#" class="nav-link" data-page="profile" id="headerAvatar" style="width: 44px; height: 44px; text-decoration: none; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                <a href="#" class="nav-link" data-page="profile" id="headerAvatar"
+                    style="width: 44px; height: 44px; text-decoration: none; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700;">
                     C
                 </a>
-                <a href="#" id="headerLogoutBtn" style="border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center; background: #f1f5f9; color: #ef4444; text-decoration: none;" title="Logout">
+                <a href="#" id="headerLogoutBtn"
+                    style="border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center; background: #f1f5f9; color: #ef4444; text-decoration: none;"
+                    title="Logout">
                     <i class="fas fa-sign-out-alt"></i>
                 </a>
             </div>
@@ -84,6 +88,33 @@
             </div>
         </section>
     </main>
+
+    <!-- Image Zoom Modal -->
+    <div id="imageZoomOverlay" class="image-zoom-overlay" onclick="this.classList.remove('active')">
+        <div class="zoom-content" onclick="event.stopPropagation()">
+            <button class="zoom-close"
+                onclick="document.getElementById('imageZoomOverlay').classList.remove('active')">&times;</button>
+            <img id="zoomedImage" src="" alt="Zoomed view">
+        </div>
+    </div>
+
+    <!-- Description Modal -->
+    <div class="modal-overlay" id="descModal">
+        <div class="modal-content" style="width: 90%; max-width: 500px; box-sizing: border-box; padding: 0;">
+            <div class="modal-header flex-between"
+                style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #e2e8f0; background: white; display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="font-size: 1.1rem; font-weight: 700; margin: 0;">Post Description</h2>
+                <button onclick="CoordinatorPanel.closeDescModal()"
+                    style="background:#f1f5f9; border:none; width:32px; height:32px; border-radius:50%; font-size:1rem; cursor:pointer; color:#64748b; display:flex; align-items:center; justify-content:center;">&times;</button>
+            </div>
+            <div
+                style="padding: 1.5rem; max-height: 60vh; overflow-y: auto; overflow-x: hidden; box-sizing: border-box; width: 100%;">
+                <p id="fullDescriptionText"
+                    style="white-space: pre-wrap; word-wrap: break-word; overflow-wrap: anywhere; word-break: break-word; font-size: 0.95rem; line-height: 1.6; color: #334155; text-align: justify; margin: 0; width: 100%; box-sizing: border-box;">
+                </p>
+            </div>
+        </div>
+    </div>
 
     <!-- Core Script -->
     <script src="/js/coordinator.js"></script>

@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard | UniEvent Portal</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --sidebar-width: 280px;
@@ -33,6 +36,15 @@
         .student-main {
             padding: 2rem 3rem;
             max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .sidebar-nav {
@@ -53,7 +65,8 @@
             transition: var(--transition);
         }
 
-        .nav-link:hover, .nav-link.active {
+        .nav-link:hover,
+        .nav-link.active {
             background: rgba(79, 70, 229, 0.08);
             color: var(--primary);
         }
@@ -120,8 +133,16 @@
             font-size: 1.25rem;
         }
 
-        .stat-info .label { color: var(--text-muted); font-size: 0.875rem; }
-        .stat-info .value { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
+        .stat-info .label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .stat-info .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
 
         .recommended-section {
             margin-top: 3rem;
@@ -134,7 +155,10 @@
             padding: 1rem 0;
             scrollbar-width: none;
         }
-        .card-row::-webkit-scrollbar { display: none; }
+
+        .card-row::-webkit-scrollbar {
+            display: none;
+        }
 
         .event-card-compact {
             min-width: 300px;
@@ -217,8 +241,13 @@
             transform: translateY(-50%) scale(1.1);
         }
 
-        .carousel-btn.prev { left: 8px; }
-        .carousel-btn.next { right: 8px; }
+        .carousel-btn.prev {
+            left: 8px;
+        }
+
+        .carousel-btn.next {
+            right: 8px;
+        }
 
         /* Zoom Modal */
         .zoom-modal {
@@ -266,14 +295,415 @@
             background: rgba(255, 255, 255, 0.2);
             transform: scale(1.1);
         }
+
+        /* After Event Post Enhancements - LinkedIn Style */
+        .post-card {
+            background: white;
+            border: 1px solid #e1e9ee;
+            border-radius: 8px;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.08);
+            margin: 0 auto 1.5rem auto;
+            /* CENTER ALIGNMENT FIX */
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+
+        .post-header {
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .post-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #70b5f9;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .post-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .post-meta h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #1e293b;
+        }
+
+        .post-college {
+            font-size: 0.85rem;
+            color: #0a66c2;
+            font-weight: 600;
+        }
+
+        .post-meta p {
+            margin: 0;
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .post-description {
+            padding: 0 1.25rem 0.75rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #475569;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: normal;
+        }
+
+        .read-more-btn {
+            background: none;
+            border: none;
+            color: #0a66c2;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            padding: 0 1.25rem 1rem;
+            display: inline-block;
+            margin-top: -0.5rem;
+        }
+
+        .read-more-btn:hover {
+            text-decoration: underline;
+        }
+
+        .post-stats {
+            padding: 0.75rem 1.25rem;
+            font-size: 0.82rem;
+            color: #64748b;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .post-interactions {
+            padding: 0.5rem 1.25rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .interaction-btn {
+            flex: 1;
+            padding: 0.75rem;
+            background: none;
+            border: none;
+            border-radius: 8px;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .interaction-btn:hover {
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .interaction-btn.liked {
+            color: #0a66c2;
+        }
+
+        /* Carousel Styles (Synchronized) */
+        .post-image-carousel {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            background: #f8fafc;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: zoom-in;
+        }
+
+        .carousel-btn-post {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 10;
+            color: #1e293b;
+            transition: all 0.2s;
+        }
+
+        .carousel-btn-post:hover {
+            background: white;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .carousel-btn-post.prev {
+            left: 1rem;
+        }
+
+        .carousel-btn-post.next {
+            right: 1rem;
+        }
+
+        .carousel-dots {
+            position: absolute;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+            z-index: 10;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            transition: all 0.2s;
+        }
+
+        .dot.active {
+            background: white;
+            width: 20px;
+            border-radius: 4px;
+        }
+
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 24px;
+            max-width: 620px;
+            width: 100%;
+            margin: auto;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 1.5rem 2rem;
+            position: relative;
+        }
+
+        .modal-header h2 {
+            margin: 0 0 0.35rem;
+            font-size: 1.25rem;
+        }
+
+        .modal-header p {
+            margin: 0;
+            opacity: 0.85;
+            font-size: 0.85rem;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-body {
+            padding: 1.75rem 2rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 2rem 1.75rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Form inside modal */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 0.4rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: #4f46e5;
+            outline: none;
+        }
+
+        /* Payment section */
+        .payment-section {
+            background: #fef9ec;
+            border: 1px solid #fde68a;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .payment-section h4 {
+            margin: 0 0 0.75rem;
+            color: #92400e;
+            font-size: 0.95rem;
+        }
+
+        .qr-image {
+            max-width: 200px;
+            border-radius: 10px;
+            border: 2px solid #4f46e5;
+            margin-top: 0.5rem;
+        }
+
+        /* Team members */
+        .team-info {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 0.82rem;
+            color: #0369a1;
+            margin-bottom: 1.25rem;
+        }
+
+        /* Submit / Cancel */
+        .btn-submit {
+            flex: 1;
+            padding: 0.75rem;
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-submit:hover {
+            background: #4338ca;
+        }
+
+        .btn-submit:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .btn-cancel {
+            padding: 0.75rem 1.5rem;
+            background: #f1f5f9;
+            color: #64748b;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Result message in modal */
+        .modal-result {
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .modal-result.success {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .modal-result.error {
+            background: #fee2e2;
+            color: #dc2626;
+        }
     </style>
 </head>
+
 <body class="light-theme">
     <div class="student-layout">
         <!-- Sidebar -->
         <aside class="student-sidebar">
             <a href="/" class="logo" style="margin-left: 1.25rem;">UniEvent</a>
-            
+
             <nav class="sidebar-nav">
                 <a href="/student/dashboard.html" class="nav-link active">
                     <i class="fas fa-th-large"></i> Dashboard
@@ -284,11 +714,8 @@
                 <a href="/student/my-registrations.html" class="nav-link">
                     <i class="fas fa-ticket-alt"></i> My Registrations
                 </a>
-                <a href="/student/certificates.html" class="nav-link">
-                    <i class="fas fa-certificate"></i> Certificates
-                </a>
-                <a href="/student/recommendations.html" class="nav-link">
-                    <i class="fas fa-magic"></i> AI Recommendations
+                <a href="/student/analytics.html" class="nav-link">
+                    <i class="fas fa-chart-pie"></i> Analytics
                 </a>
             </nav>
         </aside>
@@ -301,19 +728,25 @@
                     <input type="text" class="form-input" placeholder="Search events, workshops, or clubs...">
                 </div>
                 <div style="display: flex; gap: 1rem; align-items: center;">
-                    <a href="/student/notifications.html" class="btn btn-secondary" style="border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                    <a href="/student/notifications.html" class="btn btn-secondary"
+                        style="border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center;">
                         <i class="fas fa-bell"></i>
                     </a>
-                    <a href="/student/profile.html" class="avatar" id="headerAvatar" style="text-decoration: none;">S</a>
-                    <a href="#" class="btn btn-secondary" id="headerLogoutBtn" style="border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center;" title="Logout">
+                    <a href="/student/profile.html" class="avatar" id="headerAvatar"
+                        style="text-decoration: none;">S</a>
+                    <a href="#" class="btn btn-secondary" id="headerLogoutBtn"
+                        style="border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center;"
+                        title="Logout">
                         <i class="fas fa-sign-out-alt"></i>
                     </a>
                 </div>
             </header>
 
             <div class="welcome-section fade-in">
-                <h1 style="font-size: 2.25rem; font-family: 'Outfit';">Welcome back, <span id="welcomeStudentName">Student</span>! 👋</h1>
-                <p style="color: var(--text-muted); margin-top: 0.5rem; margin-bottom: 2.5rem;">Here's a quick look at your campus activity today.</p>
+                <h1 style="font-size: 2.25rem; font-family: 'Outfit';">Welcome back, <span
+                        id="welcomeStudentName">Student</span>! 👋</h1>
+                <p style="color: var(--text-muted); margin-top: 0.5rem; margin-bottom: 2.5rem;">Here's a quick look at
+                    your campus activity today.</p>
             </div>
 
             <div class="dashboard-grid fade-in delay-1">
@@ -329,7 +762,8 @@
                             </div>
                         </div>
                         <div class="stat-card-light">
-                            <div class="stat-icon" style="background: rgba(236, 72, 153, 0.1); color: var(--secondary);">
+                            <div class="stat-icon"
+                                style="background: rgba(236, 72, 153, 0.1); color: var(--secondary);">
                                 <i class="fas fa-clipboard-list"></i>
                             </div>
                             <div class="stat-info">
@@ -348,26 +782,102 @@
                         </div>
                     </div>
 
-                    <div class="recommended-section">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                            <h3 style="display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-sparkles" style="color: var(--accent);"></i> Recommended for You</h3>
-                            <a href="/student/recommendations.html" class="link-primary" style="font-size: 0.875rem;">View all</a>
+                    <h3 style="display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-sparkles"
+                            style="color: var(--accent);"></i> Recommended for You</h3>
+                    <div class="card-row" id="recommendedEvents">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <div style="margin-top: 3rem;">
+                    <h3 style="margin-bottom: 1.5rem; text-align: center;">Community Posts</h3>
+                    <div id="latestPostsContainer"
+                        style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- ===== REGISTRATION MODAL ===== -->
+    <div class="modal-overlay" id="regModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modalEventTitle">Register for Event</h2>
+                <p id="modalEventCollege"></p>
+                <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-result" id="modalResult"></div>
+
+                <!-- Photo Gallery (added from events.html) -->
+                <div id="modalGallery" style="display:none; margin-bottom:1.25rem;">
+                    <h4 style="font-size:0.9rem; margin-bottom:0.75rem; color:#475569;">Event Gallery</h4>
+                    <div id="galleryGrid" style="display:flex; overflow-x:auto; gap:0.75rem; padding-bottom:0.5rem;">
+                        <!-- Photos rendered here -->
+                    </div>
+                </div>
+
+                <!-- Event info strip -->
+
+                <div
+                    style="background:#f8fafc;border-radius:10px;padding:1rem;margin-bottom:1.25rem;display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-size:0.82rem;">
+                    <div><span style="color:#94a3b8;">Date:</span> <strong id="mDate">-</strong></div>
+                    <div><span style="color:#94a3b8;">Venue:</span> <strong id="mVenue">-</strong></div>
+                    <div><span style="color:#94a3b8;">Participants:</span> <strong id="mParticipants">-</strong></div>
+                    <div><span style="color:#94a3b8;">Fee:</span> <strong id="mFee">-</strong></div>
+                </div>
+
+                <form id="regForm" onsubmit="submitRegistration(event)">
+                    <!-- Team members info -->
+                    <div class="team-info" id="teamInfo">
+                        <i class="fas fa-info-circle"></i> This event requires <strong id="teamRange">1</strong>
+                        participant(s). Add usernames of all team members below (including yourself).
+                    </div>
+
+                    <!-- Dynamic team members list -->
+                    <div class="form-group">
+                        <label class="form-label">Team Members (Usernames) *</label>
+                        <div id="teamMembersList">
+                            <!-- Dynamically rendered -->
                         </div>
-                        <div class="card-row" id="recommendedEvents">
-                            <!-- Populated by JS -->
+                        <button type="button" id="addMemberBtn" onclick="addMemberField()"
+                            style="margin-top:0.5rem;font-size:0.82rem;background:none;border:1px dashed #94a3b8;border-radius:8px;padding:0.4rem 0.75rem;cursor:pointer;color:#64748b;">
+                            <i class="fas fa-plus"></i> Add Member
+                        </button>
+                    </div>
+
+                    <!-- Payment section (shown if feePerPerson > 0) -->
+                    <div class="payment-section" id="paymentSection" style="display:none;">
+                        <h4><i class="fas fa-rupee-sign"></i> Payment Required — <span id="feeAmount"></span></h4>
+                        <p style="font-size:0.82rem;color:#92400e;margin:0 0 1rem;">Scan the QR code below and upload
+                            the payment screenshot.</p>
+                        <img id="eventQrImage" class="qr-image" src="" alt="QR Code" style="display:none;">
+                        <p id="noQrMsg" style="font-size:0.82rem;color:#64748b;display:none;">QR code not yet uploaded
+                            by coordinator.</p>
+
+                        <div class="form-group" style="margin-top:1rem;margin-bottom:0.75rem;">
+                            <label class="form-label">Transaction / UPI Reference ID *</label>
+                            <input type="text" id="inputTransactionId" class="form-control"
+                                placeholder="e.g. UPI123456789" oninput="updateSubmitBtnState()">
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Payment Screenshot *</label>
+                            <input type="file" id="inputPaymentScreenshot" class="form-control" accept="image/*"
+                                onchange="updateSubmitBtnState()">
                         </div>
                     </div>
 
-                    <div style="margin-top: 3rem;">
-                        <h3 style="margin-bottom: 1.5rem;">Latest Event Posts</h3>
-                        <div id="latestPostsContainer">
-                            <!-- Populated by JS -->
-                        </div>
-                    </div>
-                </div>
-                <!-- Removed right-col with Event Calendar and Campus Influencer -->
+                    <input type="hidden" id="hiddenEventId">
+                </form>
             </div>
-        </main>
+            <div class="modal-footer">
+                <button class="btn-cancel" type="button" onclick="closeModal()">Cancel</button>
+                <button class="btn-submit" type="submit" form="regForm" id="submitBtn">
+                    <i class="fas fa-paper-plane"></i> Submit Registration
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Zoom Modal -->
@@ -376,12 +886,35 @@
         <img id="zoomImage" class="zoom-content" src="" alt="Zoomed Photo">
     </div>
 
+    <!-- ===== POST DESCRIPTION MODAL ===== -->
+    <div class="modal-overlay" id="descModal">
+        <div class="modal" style="width: 90%; max-width: 500px; box-sizing: border-box;">
+            <div class="modal-header"
+                style="background: white; color: #1e293b; border-bottom: 1px solid #f1f5f9; padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="font-size: 1.1rem; font-weight: 700; margin: 0;">Post Description</h2>
+                <button class="modal-close" onclick="closeDescModal()"
+                    style="background: #f1f5f9; color: #64748b; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body"
+                style="padding: 1.5rem; max-height: 60vh; overflow-y: auto; overflow-x: hidden; box-sizing: border-box; width: 100%;">
+                <p id="fullDescriptionText"
+                    style="white-space: pre-wrap; word-wrap: break-word; overflow-wrap: anywhere; word-break: break-word; font-size: 0.95rem; line-height: 1.6; color: #334155; text-align: justify; margin: 0; width: 100%; box-sizing: border-box;">
+                </p>
+            </div>
+        </div>
+    </div>
+
     <script src="/js/student.js"></script>
     <script>
+        let allPosts = []; // Global posts for carousel reference
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const token = localStorage.getItem('token');
+
         document.addEventListener('DOMContentLoaded', async () => {
+
             // Initial UI setup
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            const token = localStorage.getItem('token');
             if (!token) window.location.href = '/login.html';
 
             document.getElementById('welcomeStudentName').textContent = user.fullName || 'Student';
@@ -400,12 +933,16 @@
             try {
                 // Fetch recommended events
                 const eventsRes = await fetch('/api/public/events');
-                const events = await eventsRes.json();
+                let events = await eventsRes.json();
+
+                // Sort by registration count descending and take top 6
+                events.sort((a, b) => (b.registrationCount || 0) - (a.registrationCount || 0));
+
                 const recommendedContainer = document.getElementById('recommendedEvents');
-                recommendedContainer.innerHTML = events.slice(0, 4).map(event => {
+                recommendedContainer.innerHTML = events.slice(0, 6).map(event => {
                     const images = event.imageUrls && event.imageUrls.length > 0 ? event.imageUrls : ['https://images.unsplash.com/photo-1540575861501-7ad058c64030?w=800&q=80'];
                     const hasGallery = images.length > 1;
-                    
+
                     return `
                     <div class="event-card-compact">
                         <div class="card-img-container">
@@ -428,7 +965,7 @@
                             </div>
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <span style="font-weight: 700; color: var(--primary);">${event.feePerPerson > 0 ? '₹' + event.feePerPerson : 'FREE'}</span>
-                                <a href="/student/event-details.html?id=${event.id}" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Details</a>
+                                <button onclick="openModal(${event.id})" class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Register</button>
                             </div>
                         </div>
                     </div>
@@ -436,38 +973,364 @@
 
                 // Fetch stats (mock for now or add endpoint)
                 document.getElementById('statsEventsAvailable').textContent = events.length;
-                
+
                 const myRegsRes = await fetch('/api/student/registrations', { headers: { 'Authorization': `Bearer ${token}` } });
                 const myRegs = await myRegsRes.json();
                 document.getElementById('statsRegistered').textContent = myRegs.length;
                 document.getElementById('statsUpcoming').textContent = myRegs.filter(r => r.status === 'APPROVED').length;
 
-                // Fetch latest posts
+                // Fetch latest posts (After Event Posts) - sorted by date desc
                 const postsRes = await fetch('/api/public/posts');
-                const posts = await postsRes.json();
+                allPosts = await postsRes.json();
+
+                // Sort posts by createdAt descending
+                allPosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
                 const postsContainer = document.getElementById('latestPostsContainer');
-                if (posts.length === 0) {
+                if (allPosts.length === 0) {
                     postsContainer.innerHTML = '<p class="text-muted">No posts available yet.</p>';
                 } else {
-                    postsContainer.innerHTML = posts.map(post => `
-                        <div class="glass" style="padding: 1.5rem; margin-bottom: 1.5rem;">
-                            <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
-                                <div class="avatar" style="width: 40px; height: 40px;">${post.eventTitle ? post.eventTitle.charAt(0) : 'P'}</div>
-                                <div>
-                                    <div style="font-weight: 600; font-size: 0.9rem;">${post.eventTitle}</div>
-                                    <div style="font-size: 0.75rem; color: var(--text-muted);">Event Post</div>
+                    postsContainer.innerHTML = allPosts.map(post => {
+
+                        const eventTitle = post.eventTitle || 'Shared Update';
+                        const initials = (eventTitle || '?').charAt(0).toUpperCase();
+                        const likes = post.likes || 0;
+                        const photos = post.imageUrls && post.imageUrls.length > 0 ? post.imageUrls : [];
+                        const postId = post.id;
+
+                        // Initialize carousel index if not set
+                        if (!window.postCarouselIndices) window.postCarouselIndices = {};
+                        if (window.postCarouselIndices[postId] === undefined) window.postCarouselIndices[postId] = 0;
+                        const currentIndex = window.postCarouselIndices[postId];
+
+                        let photoHtml = '';
+                        if (photos.length > 0) {
+                            photoHtml = `
+                                <div class="post-image-carousel">
+                                    <div class="carousel-track" id="carousel-track-${postId}" style="transform: translateX(-${currentIndex * 100}%);">
+                                        ${photos.map(img => `
+                                            <div class="carousel-slide">
+                                                <img src="${img}" onclick="zoomPostImage('${img}')" alt="Post photo">
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    ${photos.length > 1 ? `
+                                        <button class="carousel-btn-post prev" onclick="changePostImage(${postId}, -1, event)">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                        <button class="carousel-btn-post next" onclick="changePostImage(${postId}, 1, event)">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                        <div class="carousel-dots" id="carousel-dots-${postId}">
+                                            ${photos.map((_, idx) => `<div class="dot ${idx === currentIndex ? 'active' : ''}"></div>`).join('')}
+                                        </div>
+                                    ` : ''}
                                 </div>
+                            `;
+                        }
+
+                        return `
+                        <div class="post-card">
+                            <div class="post-header">
+                                <div class="post-avatar">${initials}</div>
+                                <div class="post-meta">
+                                    <h3>${eventTitle}</h3>
+                                    <div class="post-college">${post.collegeName || ''}</div>
+                                    <p>Event Post • ${new Date(post.createdAt).toLocaleDateString()}</p>
+                                </div>
+                                ${post.feedbackFormLink ? `
+                                    <a href="${post.feedbackFormLink}" target="_blank" class="btn-primary" style="margin-left: auto; padding: 0.45rem 1rem; font-size: 0.75rem; background: #16a34a; border-radius: 8px; box-shadow: 0 2px 4px rgba(22, 163, 74, 0.2);">
+                                        <i class="fas fa-poll"></i> Feedback
+                                    </a>
+                                ` : ''}
                             </div>
-                            <p style="font-size: 0.95rem; margin-bottom: 1rem;">${post.description}</p>
-                            ${post.imageUrls && post.imageUrls.length > 0 ? `<img src="${post.imageUrls[0]}" alt="post" style="width: 100%; border-radius: 12px; height: 300px; object-fit: cover;">` : ''}
+                            <div class="post-description" id="post-desc-${postId}">${post.description || ''}</div>
+                            ${post.description && post.description.length > 100 ? `
+                                <button class="read-more-btn" onclick="openDescModal(${postId})">Read more</button>
+                            ` : ''}
+                            
+                            ${photoHtml}
+
+                            <div class="post-stats">
+                                <span id="like-count-${postId}"><i class="fas fa-thumbs-up" style="color: #0a66c2; font-size: 10px;"></i> ${likes} likes</span>
+                            </div>
+
+                            <div class="post-interactions">
+                                <button class="interaction-btn" onclick="likePost(${postId}, this)">
+                                    <i class="far fa-thumbs-up"></i> Like
+                                </button>
+                            </div>
                         </div>
-                    `).join('');
+                        `;
+                    }).join('');
                 }
 
             } catch (err) {
                 console.error("Error loading dashboard:", err);
             }
         });
+
+        let currentEvent = null;
+        let memberCount = 1;
+        let verifiedMembers = {};
+        let debounceTimers = {};
+
+        async function openModal(eventId) {
+            if (!token || !user.roles || !user.roles.includes('ROLE_STUDENT')) {
+                alert('Please log in as a student to register for events.');
+                window.location.href = '/login.html';
+                return;
+            }
+
+            // Fetch full event details
+            const res = await fetch(`/api/public/events/${eventId}`);
+            if (!res.ok) { alert('Could not load event details.'); return; }
+            currentEvent = await res.json();
+
+            // Fill modal header
+            document.getElementById('modalEventTitle').textContent = currentEvent.title;
+            document.getElementById('modalEventCollege').textContent =
+                currentEvent.college ? currentEvent.college.collegeName : '';
+
+            const eventDate = currentEvent.eventDate ? new Date(currentEvent.eventDate).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'TBA';
+            document.getElementById('mDate').textContent = eventDate;
+            document.getElementById('mVenue').textContent = currentEvent.venue || 'TBA';
+            document.getElementById('mParticipants').textContent = currentEvent.minParticipants === currentEvent.maxParticipants
+                ? currentEvent.minParticipants : `${currentEvent.minParticipants}–${currentEvent.maxParticipants}`;
+            document.getElementById('mFee').textContent = currentEvent.feePerPerson > 0 ? `₹${currentEvent.feePerPerson} / person` : 'Free';
+            document.getElementById('hiddenEventId').value = eventId;
+
+            // Team range hint
+            document.getElementById('teamRange').textContent =
+                currentEvent.minParticipants === currentEvent.maxParticipants
+                    ? currentEvent.minParticipants
+                    : `${currentEvent.minParticipants}–${currentEvent.maxParticipants}`;
+
+            // Reset team members — auto-fill current user
+            memberCount = 1;
+            verifiedMembers = {};
+            const list = document.getElementById('teamMembersList');
+            list.innerHTML = '';
+            addMemberField(user.username || '', true);
+
+            // Initial button state
+            updateSubmitBtnState();
+
+            document.getElementById('addMemberBtn').style.display =
+                currentEvent.maxParticipants > 1 ? 'block' : 'none';
+
+            // Verify the lead member (the logged in student) immediately
+            verifyMember(user.username, 'lead', true);
+
+            // Fetch and show gallery (synchronizing with events.html)
+            const gallery = document.getElementById('modalGallery');
+            const galleryGrid = document.getElementById('galleryGrid');
+            gallery.style.display = 'none';
+            galleryGrid.innerHTML = '';
+            try {
+                const pRes = await fetch(`/api/public/events/${eventId}/photos`);
+                if (pRes.ok) {
+                    const photos = await pRes.json();
+                    if (photos.length > 0) {
+                        gallery.style.display = 'block';
+                        galleryGrid.innerHTML = photos.map(url => `
+                    <img src="${url}" style="height:80px; width:80px; object-fit:cover; border-radius:8px; cursor:zoom-in; border:1px solid #e2e8f0; transition: transform 0.2s;"
+                             onclick="window.open('${url}', '_blank')" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    `).join('');
+                    }
+                }
+            } catch (e) { console.warn('Gallery load failed', e); }
+
+            // Payment
+            const paySection = document.getElementById('paymentSection');
+            if (currentEvent.feePerPerson > 0 || currentEvent.requiresPayment) {
+                paySection.style.display = 'block';
+                document.getElementById('feeAmount').textContent = currentEvent.feePerPerson > 0 ? `₹${currentEvent.feePerPerson} / person` : 'Required';
+                const qrImg = document.getElementById('eventQrImage');
+                const noQr = document.getElementById('noQrMsg');
+                if (currentEvent.qrCodePath) {
+                    qrImg.src = currentEvent.qrCodePath;
+                    qrImg.style.display = 'block';
+                    noQr.style.display = 'none';
+                } else {
+                    qrImg.style.display = 'none';
+                    noQr.style.display = 'block';
+                }
+            } else {
+                paySection.style.display = 'none';
+            }
+
+            // Clear result message
+            const rsEl = document.getElementById('modalResult');
+            rsEl.style.display = 'none';
+            rsEl.className = 'modal-result';
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('submitBtn').style.display = 'block';
+
+            document.getElementById('regModal').classList.add('active');
+        }
+
+
+        function closeModal() {
+            document.getElementById('regModal').classList.remove('active');
+            currentEvent = null;
+        }
+
+        function addMemberField(defaultVal = '', isFirst = false) {
+            if (!currentEvent) return;
+            const currentCount = document.querySelectorAll('.member-row').length;
+            if (currentCount >= currentEvent.maxParticipants) return;
+
+            const list = document.getElementById('teamMembersList');
+            const idx = isFirst ? 'lead' : Date.now();
+            const div = document.createElement('div');
+            div.className = 'member-row';
+            div.style.cssText = 'display:flex; flex-direction:column; gap:0.25rem; margin-bottom:1rem; border-bottom:1px solid #f1f5f9; padding-bottom:1rem;';
+            div.id = `memberRow_${idx}`;
+            div.innerHTML = `
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                    <div style="flex-grow: 1;">
+                        <label class="form-label" style="font-size:0.75rem; color:#64748b; margin-bottom:0.2rem; display:block;">Username ${isFirst ? '(Lead)' : ''} *</label>
+                        <input type="text" class="form-control member-input" id="member_${idx}"
+                            placeholder="Enter username" value="${defaultVal}"
+                            ${isFirst ? 'readonly style="background:#f1f5f9; font-weight:600;"' : `oninput="onUsernameInput('${idx}')"`}>
+                    </div>
+                    ${!isFirst ? `<button type="button" onclick="removeMember('${idx}')" style="margin-top:1.25rem; background:#fee2e2;border:none;border-radius:8px;padding:0.5rem 0.75rem;cursor:pointer;color:#dc2626;height:38px;">
+                        <i class="fas fa-trash"></i>
+                    </button>` : ''}
+                </div>
+                <div id="memberStatus_${idx}" style="font-size:0.72rem; margin-top:0.25rem; margin-left:0.55rem; display:none;"></div>
+            `;
+            list.appendChild(div);
+
+            if (defaultVal) {
+                verifyMember(defaultVal, idx, isFirst);
+            } else {
+                verifiedMembers[idx] = false;
+                updateSubmitBtnState();
+            }
+
+            if (document.querySelectorAll('.member-row').length >= currentEvent.maxParticipants) {
+                document.getElementById('addMemberBtn').style.display = 'none';
+            }
+        }
+
+        function onUsernameInput(idx) {
+            if (debounceTimers[idx]) clearTimeout(debounceTimers[idx]);
+            verifiedMembers[idx] = false;
+            updateSubmitBtnState();
+            const val = document.getElementById(`member_${idx}`).value.trim();
+            if (!val) {
+                document.getElementById(`memberStatus_${idx}`).style.display = 'none';
+                return;
+            }
+            debounceTimers[idx] = setTimeout(() => verifyMember(val, idx, false), 500);
+        }
+
+        async function verifyMember(username, idx, isLead = false) {
+            const statusEl = document.getElementById(`memberStatus_${idx}`);
+            if (!statusEl) return;
+            statusEl.style.display = 'block';
+            statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+            statusEl.style.color = '#64748b';
+
+            try {
+                const res = await fetch(`/api/public/users/${username}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    statusEl.innerHTML = `<i class="fas fa-check-circle" style="color:#16a34a;"></i> Verified: ${data.fullName}`;
+                    statusEl.style.color = '#16a34a';
+                    verifiedMembers[idx] = true;
+                } else {
+                    const msg = res.status === 404 ? 'User not found' : 'Error verifying';
+                    statusEl.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${msg}`;
+                    statusEl.style.color = '#ef4444';
+                    verifiedMembers[idx] = false;
+                }
+            } catch (err) {
+                statusEl.innerHTML = `Network error`;
+                statusEl.style.color = '#ef4444';
+                verifiedMembers[idx] = false;
+            }
+            updateSubmitBtnState();
+        }
+
+        function removeMember(idx) {
+            const row = document.getElementById(`memberRow_${idx}`);
+            if (row) row.remove();
+            delete verifiedMembers[idx];
+            updateSubmitBtnState();
+            if (document.querySelectorAll('.member-row').length < currentEvent.maxParticipants) {
+                document.getElementById('addMemberBtn').style.display = 'block';
+            }
+        }
+
+        function updateSubmitBtnState() {
+            if (!currentEvent) return;
+            const submitBtn = document.getElementById('submitBtn');
+            const allVerified = Object.values(verifiedMembers).every(v => v === true);
+            const count = document.querySelectorAll('.member-row').length;
+            const countValid = count >= currentEvent.minParticipants && count <= currentEvent.maxParticipants;
+
+            let paymentValid = true;
+            if (currentEvent.feePerPerson > 0 || currentEvent.requiresPayment) {
+                const tid = document.getElementById('inputTransactionId').value.trim();
+                const screenshot = document.getElementById('inputPaymentScreenshot').files[0];
+                paymentValid = (tid.length > 0 && screenshot);
+            }
+
+            const overallValid = allVerified && countValid && paymentValid;
+            submitBtn.disabled = !overallValid;
+            submitBtn.style.opacity = overallValid ? '1' : '0.5';
+        }
+
+        async function submitRegistration(e) {
+            e.preventDefault();
+            const resultEl = document.getElementById('modalResult');
+            const submitBtn = document.getElementById('submitBtn');
+            resultEl.style.display = 'none';
+
+            const teamMembers = Array.from(document.querySelectorAll('.member-input')).map(i => i.value.trim()).filter(v => v);
+
+            const formData = new FormData();
+            formData.append('eventId', document.getElementById('hiddenEventId').value);
+            formData.append('teamMembers', JSON.stringify(teamMembers));
+
+            if (currentEvent.feePerPerson > 0 || currentEvent.requiresPayment) {
+                formData.append('transactionId', document.getElementById('inputTransactionId').value.trim());
+                formData.append('qrcode', document.getElementById('inputPaymentScreenshot').files[0]);
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+            try {
+                const res = await fetch('/api/student/register', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    resultEl.textContent = `✅ Registration successful! ID: ${data.groupId}`;
+                    resultEl.className = 'modal-result success';
+                    resultEl.style.display = 'block';
+                    submitBtn.style.display = 'none';
+                } else {
+                    resultEl.textContent = '❌ ' + (data.message || 'Failed');
+                    resultEl.className = 'modal-result error';
+                    resultEl.style.display = 'block';
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Submit Registration';
+                }
+            } catch (err) {
+                resultEl.textContent = '❌ Network error';
+                resultEl.className = 'modal-result error';
+                resultEl.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Submit Registration';
+            }
+        }
 
         function changeImage(elId, direction, event) {
             if (event) event.stopPropagation();
@@ -488,6 +1351,73 @@
             zoomImg.src = url;
             modal.classList.add('active');
         }
+
+        function zoomPostImage(url) {
+            const modal = document.getElementById('zoomModal');
+            const zoomImg = document.getElementById('zoomImage');
+            zoomImg.src = url;
+            modal.classList.add('active');
+        }
+
+        async function likePost(postId, btn) {
+            try {
+                const res = await fetch(`/api/public/posts/${postId}/like`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    const countEl = document.getElementById(`like-count-${postId}`);
+                    if (countEl) countEl.innerHTML = `<i class="fas fa-thumbs-up" style="color: #0a66c2; font-size: 10px;"></i> ${data.likes} likes`;
+                    btn.classList.add('liked');
+                    btn.innerHTML = `<i class="fas fa-thumbs-up"></i> Liked`;
+                } else {
+                    const data = await res.json();
+                    alert(data.message || "Failed to like post");
+                }
+            } catch (err) {
+                console.error("Error liking post:", err);
+            }
+        }
+
+        function openDescModal(postId) {
+            const post = allPosts.find(p => p.id == postId);
+            if (!post) return;
+            document.getElementById('fullDescriptionText').textContent = post.description || '';
+            document.getElementById('descModal').classList.add('active');
+        }
+
+        function closeDescModal() {
+            document.getElementById('descModal').classList.remove('active');
+        }
+
+        function changePostImage(postId, direction, event) {
+            if (event) event.stopPropagation();
+
+            const post = allPosts.find(p => p.id == postId);
+            if (!post) return;
+            const photos = post.imageUrls || [];
+            if (photos.length === 0) return;
+
+            if (!window.postCarouselIndices) window.postCarouselIndices = {};
+            if (window.postCarouselIndices[postId] === undefined) window.postCarouselIndices[postId] = 0;
+
+            let currentIndex = window.postCarouselIndices[postId];
+            currentIndex = (currentIndex + direction + photos.length) % photos.length;
+            window.postCarouselIndices[postId] = currentIndex;
+
+            const track = document.getElementById(`carousel-track-${postId}`);
+            if (track) {
+                track.style.transform = `translateX(-${currentIndex * 100}%)`;
+            }
+
+            const dots = document.querySelectorAll(`#carousel-dots-${postId} .dot`);
+            dots.forEach((dot, idx) => {
+                if (idx === currentIndex) dot.classList.add('active');
+                else dot.classList.remove('active');
+            });
+        }
     </script>
 </body>
+
 </html>

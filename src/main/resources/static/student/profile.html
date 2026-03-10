@@ -1,49 +1,201 @@
-<!DOCTYPE html> <html lang="en"> <head>     <meta charset="UTF-8">     <meta name="viewport" content="width=device-width, initial-scale=1.0">     <title>My Profile | UniEvent Portal</title>     <link rel="stylesheet" href="/css/style.css">     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">     <style>         :root { --sidebar-width: 280px; }         .student-layout { display: grid; grid-template-columns: var(--sidebar-width) 1fr; min-height: 100vh; background: #f8fafc; }         .student-sidebar { background: white; border-right: 1px solid var(--glass-border); padding: 2rem 1.5rem; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }         .student-main { padding: 4rem; display: flex; justify-content: center; }         .nav-link { display: flex; align-items: center; gap: 1rem; padding: 0.875rem 1.25rem; color: var(--text-muted); text-decoration: none; border-radius: 12px; margin-bottom: 0.5rem; font-weight: 500; transition: var(--transition); }         .nav-link:hover, .nav-link.active { background: rgba(79, 70, 229, 0.08); color: var(--primary); }                  .profile-card { background: white; width: 100%; max-width: 900px; border-radius: 40px; border: 1px solid var(--glass-border); overflow: hidden; box-shadow: var(--shadow-xl); }         .profile-header-bg { height: 160px; background: linear-gradient(135deg, var(--primary), var(--secondary)); }         .profile-info-section { padding: 0 4rem 4rem; position: relative; }         .profile-avatar-large { width: 150px; height: 150px; border-radius: 40px; border: 8px solid white; background: var(--secondary); color: white; display: flex; align-items: center; justify-content: center; font-size: 4rem; font-weight: 800; position: absolute; top: -75px; box-shadow: var(--shadow-lg); font-family: 'Outfit'; }                  .profile-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 100px; }                  .profile-footer { margin-top: auto; display: flex; align-items: center; gap: 1rem; padding-top: 2rem; border-top: 1px solid var(--glass-border); }         .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; }     </style> </head> <body class="light-theme">     <div class="student-layout">         <aside class="student-sidebar">             <a href="/" class="logo" style="margin-left: 1.25rem;">UniEvent</a>             <nav class="sidebar-nav" style="margin-top: 2rem; flex: 1;">                 <a href="/student/dashboard.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>                 <a href="/student/events.html" class="nav-link"><i class="fas fa-search"></i> Browse Events</a>                 <a href="/student/my-registrations.html" class="nav-link"><i class="fas fa-ticket-alt"></i> My Registrations</a>                  <a href="/student/certificates.html" class="nav-link"><i class="fas fa-certificate"></i> Certificates</a>                 <a href="/student/recommendations.html" class="nav-link"><i class="fas fa-magic"></i> AI Recommendations</a>             </nav>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | UniEvent Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-width: 280px;
+        }
+
+        .student-layout {
+            display: grid;
+            grid-template-columns: var(--sidebar-width) 1fr;
+            min-height: 100vh;
+            background: #f8fafc;
+        }
+
+        .student-sidebar {
+            background: white;
+            border-right: 1px solid var(--glass-border);
+            padding: 2rem 1.5rem;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .student-main {
+            padding: 4rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.875rem 1.25rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(79, 70, 229, 0.08);
+            color: var(--primary);
+        }
+
+        .profile-card {
+            background: white;
+            width: 100%;
+            max-width: 900px;
+            border-radius: 40px;
+            border: 1px solid var(--glass-border);
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .profile-header-bg {
+            height: 160px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .profile-info-section {
+            padding: 0 4rem 4rem;
+            position: relative;
+        }
+
+        .profile-avatar-large {
+            width: 150px;
+            height: 150px;
+            border-radius: 40px;
+            border: 8px solid white;
+            background: var(--secondary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            font-weight: 800;
+            position: absolute;
+            top: -75px;
+            box-shadow: var(--shadow-lg);
+            font-family: 'Outfit';
+        }
+
+        .profile-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 100px;
+        }
+
+        .profile-footer {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body class="light-theme">
+    <div class="student-layout">
+        <aside class="student-sidebar"> <a href="/" class="logo" style="margin-left: 1.25rem;">UniEvent</a>
+            <nav class="sidebar-nav" style="margin-top: 2rem; flex: 1;"> <a href="/student/dashboard.html"
+                    class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a> <a href="/student/events.html"
+                    class="nav-link"><i class="fas fa-search"></i> Browse Events</a> <a
+                    href="/student/my-registrations.html" class="nav-link"><i class="fas fa-ticket-alt"></i> My
+                    Registrations</a> <a href="/student/analytics.html" class="nav-link"><i
+                        class="fas fa-chart-pie"></i> Analytics</a> </nav>
         </aside>
 
         <main class="student-main" style="display: flex; flex-direction: column; width: 100%;">
-            <header class="top-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; width: 100%;">
+            <header class="top-bar"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; width: 100%;">
                 <div style="flex: 1;"></div>
                 <div style="display: flex; gap: 1rem; align-items: center;">
-                    <a href="/student/notifications.html" class="btn btn-secondary" style="border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                    <a href="/student/notifications.html" class="btn btn-secondary"
+                        style="border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center;">
                         <i class="fas fa-bell"></i>
                     </a>
-                    <a href="/student/profile.html" class="avatar" id="headerAvatar" style="width: 44px; height: 44px; text-decoration: none;">S</a>
-                    <a href="#" class="btn btn-secondary" id="headerLogoutBtn" style="border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center;" title="Logout">
+                    <a href="/student/profile.html" class="avatar" id="headerAvatar"
+                        style="width: 44px; height: 44px; text-decoration: none;">S</a>
+                    <a href="#" class="btn btn-secondary" id="headerLogoutBtn"
+                        style="border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center;"
+                        title="Logout">
                         <i class="fas fa-sign-out-alt"></i>
                     </a>
                 </div>
             </header>
 
-            <div class="profile-card fade-in" style="margin: 0 auto;">                 <div class="profile-header-bg"></div>                 <div class="profile-info-section">                     <div class="profile-avatar-large" id="mainAvatar">S</div>
-                    
-                    <div id="profileAlert" style="margin-top: 100px; padding: 1rem; border-radius: 8px; font-weight: 500; display: none;"></div>
+            <div class="profile-card fade-in" style="margin: 0 auto;">
+                <div class="profile-header-bg"></div>
+                <div class="profile-info-section">
+                    <div class="profile-avatar-large" id="mainAvatar">S</div>
+
+                    <div id="profileAlert"
+                        style="margin-top: 100px; padding: 1rem; border-radius: 8px; font-weight: 500; display: none;">
+                    </div>
 
                     <form id="profileForm">
                         <div class="profile-form-grid" style="margin-top: 20px;">
                             <div class="form-group">
                                 <label>Full Name</label>
-                                <input type="text" class="form-control" id="profileFullName" readonly style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; color: #64748b;">
+                                <input type="text" class="form-control" id="profileFullName" readonly
+                                    style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; color: #64748b;">
                             </div>
                             <div class="form-group">
                                 <label>Email Address</label>
-                                <input type="email" class="form-control" id="profileEmail" readonly style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; color: #64748b;">
+                                <input type="email" class="form-control" id="profileEmail" readonly
+                                    style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; color: #64748b;">
                             </div>
                             <div class="form-group">
                                 <label>Username</label>
-                                <input type="text" class="form-control" id="profileUsername" readonly style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; color: #64748b;">
+                                <input type="text" class="form-control" id="profileUsername" readonly
+                                    style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; color: #64748b;">
                             </div>
                             <div class="form-group">
                                 <label>Phone Number</label>
-                                <input type="tel" class="form-control" id="profilePhone" required style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px;">
+                                <input type="tel" class="form-control" id="profilePhone" required
+                                    style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px;">
                             </div>
                             <div class="form-group">
                                 <label>District</label>
-                                <input type="text" class="form-control" id="profileDistrict" readonly style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; color: #64748b;">
+                                <input type="text" class="form-control" id="profileDistrict" readonly
+                                    style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; color: #64748b;">
                             </div>
                             <div class="form-group">
                                 <label>University / College</label>
-                                <input type="text" class="form-control" id="profileCollege" readonly style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; color: #64748b;">
+                                <input type="text" class="form-control" id="profileCollege" readonly
+                                    style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; color: #64748b;">
                             </div>
                         </div>
 
@@ -54,26 +206,40 @@
                     </form>
 
                     <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--glass-border);">
-                        <h3 style="font-family: 'Outfit'; margin-bottom: 1.5rem; color: var(--text-main);">Change Password</h3>
-                        
-                        <div id="passwordAlert" style="margin-bottom: 1rem; padding: 1rem; border-radius: 8px; font-weight: 500; display: none;"></div>
+                        <h3 style="font-family: 'Outfit'; margin-bottom: 1.5rem; color: var(--text-main);">Change
+                            Password</h3>
+
+                        <div id="passwordAlert"
+                            style="margin-bottom: 1rem; padding: 1rem; border-radius: 8px; font-weight: 500; display: none;">
+                        </div>
 
                         <form id="passwordForm">
                             <div class="profile-form-grid" style="margin-top: 0;">
                                 <div class="form-group">
                                     <label>New Password</label>
-                                    <input type="password" class="form-control" id="newPassword" required style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px;" minlength="6">
+                                    <input type="password" class="form-control" id="newPassword" required
+                                        style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px;"
+                                        minlength="6">
                                 </div>
                                 <div class="form-group">
                                     <label>Confirm New Password</label>
-                                    <input type="password" class="form-control" id="confirmPassword" required style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px;" minlength="6">
+                                    <input type="password" class="form-control" id="confirmPassword" required
+                                        style="width: 100%; padding: 0.7rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px;"
+                                        minlength="6">
                                 </div>
                             </div>
                             <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
-                                <button type="submit" class="btn btn-primary" style="background: #ef4444; border-color: #ef4444;">Update Password</button>
+                                <button type="submit" class="btn btn-primary"
+                                    style="background: #ef4444; border-color: #ef4444;">Update Password</button>
                             </div>
                         </form>
-                    </div>                 </div>             </div>         </main>     </div>      <script src="/js/student.js"></script>     <script>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="/js/student.js"></script>
+    <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const token = localStorage.getItem('token');
             if (!token) {
@@ -113,7 +279,7 @@
                         document.getElementById('profilePhone').value = data.phone || '';
                         document.getElementById('profileDistrict').value = data.district || '';
                         document.getElementById('profileCollege').value = data.college || '';
-                        
+
                         // Update avatars if name changed
                         const newInitial = (data.fullName || 'S').charAt(0);
                         document.getElementById('headerAvatar').textContent = newInitial;
@@ -226,10 +392,13 @@
                     el.style.color = '#475569';
                     el.style.borderLeft = '4px solid #475569';
                 }
-                
+
                 setTimeout(() => {
                     el.style.display = 'none';
                 }, 5000);
             }
         });
-    </script> </body> </html>
+    </script>
+</body>
+
+</html>

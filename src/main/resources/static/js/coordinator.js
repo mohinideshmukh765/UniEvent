@@ -5,7 +5,7 @@
 
 const CoordinatorPanel = {
     currentPage: 'dashboard',
-    
+
     // User Session Data
     user: {
         name: "",
@@ -18,7 +18,7 @@ const CoordinatorPanel = {
         phone: "",
         initials: ""
     },
-    
+
     // Live Data (Populated on init)
     data: {
         events: [],
@@ -34,6 +34,7 @@ const CoordinatorPanel = {
     },
 
     selectedDashboardTab: 'registrations', // Default to registrations to show table data
+    postCarouselIndices: {},
 
     // Page Content Templates
     templates: {
@@ -638,7 +639,7 @@ const CoordinatorPanel = {
 
     calculateEventStatus(eventDateStr, regDeadlineStr) {
         if (!eventDateStr) return 'Active';
-        
+
         const now = new Date();
         const eventDate = new Date(eventDateStr);
         const regDeadline = regDeadlineStr ? new Date(regDeadlineStr) : null;
@@ -677,7 +678,7 @@ const CoordinatorPanel = {
                     phone: parsed.phone || this.user.phone,
                     role: (parsed.roles && parsed.roles[0]) ? parsed.roles[0].replace('ROLE_', '') : this.user.role
                 };
-                
+
                 // Set initials from name
                 if (this.user.name) {
                     const names = this.user.name.trim().split(' ');
@@ -702,7 +703,7 @@ const CoordinatorPanel = {
     navigate(pageId) {
         this.currentPage = pageId;
         this.render();
-        
+
         // Update active class in sidebar
         document.querySelectorAll('.nav-link').forEach(link => {
             link.classList.remove('active');
@@ -726,7 +727,7 @@ const CoordinatorPanel = {
             });
             if (!res.ok) throw new Error("Failed to load registration details");
             const data = await res.json();
-            
+
             let modal = document.getElementById('regDetailsModal');
             if (!modal) {
                 modal = document.createElement('div');
@@ -734,7 +735,7 @@ const CoordinatorPanel = {
                 modal.className = 'modal-overlay';
                 document.body.appendChild(modal);
             }
-            
+
             let paymentHtml = '';
             if (data.feePerPerson > 0) {
                 paymentHtml = `
@@ -798,7 +799,7 @@ const CoordinatorPanel = {
                     </div>
                 </div>
             `;
-            
+
             modal.classList.add('active');
         } catch (error) {
             console.error(error);
@@ -814,7 +815,7 @@ const CoordinatorPanel = {
                 if (pageId) this.navigate(pageId);
             });
         });
-        
+
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', (e) => {
@@ -823,7 +824,7 @@ const CoordinatorPanel = {
                 window.location.href = '/login.html';
             });
         }
-        
+
         const headerLogoutBtn = document.getElementById('headerLogoutBtn');
         if (headerLogoutBtn) {
             headerLogoutBtn.addEventListener('click', (e) => {
@@ -838,7 +839,7 @@ const CoordinatorPanel = {
         const contentArea = document.getElementById('contentArea');
         if (contentArea) {
             contentArea.innerHTML = this.templates[this.currentPage] || `<h1>404</h1><p>Page not found</p>`;
-            
+
             // Post-render logic
             if (this.currentPage === 'dashboard') {
                 this.populateDashboardStats();
@@ -927,7 +928,7 @@ const CoordinatorPanel = {
 
         container.innerHTML = entries.map(([evName, count]) => {
             // max width 100% relative to the maxVal
-            const widthPct = Math.max(5, (count / maxVal) * 100); 
+            const widthPct = Math.max(5, (count / maxVal) * 100);
             return `
                 <div>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem; font-size: 0.9rem; font-weight: 600;">
@@ -962,8 +963,8 @@ const CoordinatorPanel = {
                 const eventTitle = r.event ? r.event.title : 'Unknown';
                 const upi = r.upiId || 'N/A';
                 const rDate = r.registrationDate ? new Date(r.registrationDate) : null;
-                const date = rDate ? rDate.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) : 'N/A';
-                
+                const date = rDate ? rDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A';
+
                 let actionHtml = '';
                 if (r.status === 'PENDING') {
                     actionHtml = `
@@ -1035,11 +1036,11 @@ const CoordinatorPanel = {
     async coordinatorApproveReg(groupId) {
         const token = localStorage.getItem('token');
         try {
-            const res = await fetch(`/api/coordinator/registrations/${groupId}/approve`, { 
-                method: 'POST', 
-                headers: { 'Authorization': `Bearer ${token}` } 
+            const res = await fetch(`/api/coordinator/registrations/${groupId}/approve`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
             });
-            if (res.ok) { 
+            if (res.ok) {
                 const actionsContainer = document.getElementById(`actions-${groupId}`);
                 const cardContainer = document.getElementById(`pending-card-${groupId}`);
                 if (actionsContainer) {
@@ -1053,9 +1054,9 @@ const CoordinatorPanel = {
                     cardContainer.style.borderLeft = '4px solid #10b981';
                 }
                 // Also update the local data to reflect in the dashboard if they switch back
-                await this.fetchAllData(); 
-            } else { 
-                alert('Failed to approve.'); 
+                await this.fetchAllData();
+            } else {
+                alert('Failed to approve.');
             }
         } catch (error) {
             console.error('Error approving:', error);
@@ -1066,18 +1067,18 @@ const CoordinatorPanel = {
     async coordinatorRejectReg(groupId) {
         const reason = prompt('Please enter the reason for denial (this will be sent to the student):');
         if (reason === null) return; // User clicked Cancel
-        
+
         const token = localStorage.getItem('token');
         try {
-            const res = await fetch(`/api/coordinator/registrations/${groupId}/reject`, { 
-                method: 'POST', 
-                headers: { 
+            const res = await fetch(`/api/coordinator/registrations/${groupId}/reject`, {
+                method: 'POST',
+                headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ reason: reason })
             });
-            if (res.ok) { 
+            if (res.ok) {
                 const actionsContainer = document.getElementById(`actions-${groupId}`);
                 const cardContainer = document.getElementById(`pending-card-${groupId}`);
                 if (actionsContainer) {
@@ -1091,8 +1092,8 @@ const CoordinatorPanel = {
                     cardContainer.style.borderLeft = '4px solid #ef4444';
                 }
                 await this.fetchAllData();
-            } else { 
-                alert('Failed to reject.'); 
+            } else {
+                alert('Failed to reject.');
             }
         } catch (error) {
             console.error('Error rejecting:', error);
@@ -1152,7 +1153,7 @@ const CoordinatorPanel = {
         const filterDateStart = document.getElementById('postFilterDateStart')?.value;
         const filterDateEnd = document.getElementById('postFilterDateEnd')?.value;
 
-        let filtered = this.data.posts;
+        let filtered = [...this.data.posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
         if (filterEventId) {
             filtered = filtered.filter(p => p.event && p.event.id == filterEventId);
@@ -1178,54 +1179,140 @@ const CoordinatorPanel = {
             const photos = p.photo ? p.photo.split(',').filter(s => s.trim() !== '') : [];
             const eventTitle = p.event ? p.event.title : 'Shared Update';
             const initials = (eventTitle || '?').charAt(0).toUpperCase();
-            
-            return `
-                <div class="card post-card" style="padding: 0; overflow: hidden; border: 1px solid #e2e8f0; border-radius: 16px; margin-bottom: 1.5rem; transition: all 0.3s ease;">
-                    <div style="padding: 1.25rem; display: flex; align-items: center; gap: 1rem; background: white;">
-                        <div style="width: 45px; height: 45px; border-radius: 12px; background: var(--primary-light); color: var(--primary-dark); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem;">
-                            ${initials}
+            const postId = p.id;
+            const likes = p.likes || 0;
+
+            // Initialize carousel index if not set
+            if (this.postCarouselIndices[postId] === undefined) this.postCarouselIndices[postId] = 0;
+            const currentIndex = this.postCarouselIndices[postId];
+
+            let photoHtml = '';
+            if (photos.length > 0) {
+                photoHtml = `
+                    <div class="post-image-carousel">
+                        <div class="carousel-track" id="carousel-track-${postId}" style="transform: translateX(-${currentIndex * 100}%);">
+                            ${photos.map(img => `
+                                <div class="carousel-slide">
+                                    <img src="${img}" onclick="CoordinatorPanel.zoomPostImage('${img}')" alt="Post photo">
+                                </div>
+                            `).join('')}
                         </div>
-                        <div style="flex: 1;">
-                            <h3 style="margin: 0; font-size: 1.05rem; color: #0f172a; font-weight: 700;">${eventTitle}</h3>
-                            <p style="margin: 0; font-size: 0.75rem; color: #64748b; font-weight: 500;">
-                                <i class="far fa-clock"></i> ${this.formatDateTime(p.createdAt)}
-                                ${p.event?.eventDate ? ` • <i class="far fa-calendar-check"></i> Event: ${new Date(p.event.eventDate).toLocaleDateString()}` : ''}
-                            </p>
+                        ${photos.length > 1 ? `
+                            <button class="carousel-btn prev" onclick="CoordinatorPanel.changePostImage(${postId}, -1)">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="carousel-btn next" onclick="CoordinatorPanel.changePostImage(${postId}, 1)">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <div class="carousel-dots" id="carousel-dots-${postId}">
+                                ${photos.map((_, idx) => `<div class="dot ${idx === currentIndex ? 'active' : ''}"></div>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="post-avatar">${initials}</div>
+                        <div class="post-meta">
+                            <h3>${eventTitle}</h3>
+                            <div class="post-college">${p.collegeName || ''}</div>
+                            <p>${this.formatDateTime(p.createdAt)}</p>
                         </div>
                         ${p.feedbackFormLink ? `
-                            <a href="${p.feedbackFormLink}" target="_blank" class="btn-primary" style="padding: 0.45rem 1rem; font-size: 0.75rem; background: #16a34a; border-radius: 8px; box-shadow: 0 2px 4px rgba(22, 163, 74, 0.2);">
+                            <a href="${p.feedbackFormLink}" target="_blank" class="btn-primary" style="margin-left: auto; padding: 0.45rem 1rem; font-size: 0.75rem; background: #16a34a; border-radius: 8px; box-shadow: 0 2px 4px rgba(22, 163, 74, 0.2);">
                                 <i class="fas fa-poll"></i> Feedback
                             </a>
                         ` : ''}
                     </div>
                     
-                    <div style="padding: 0 1.25rem 1.25rem 1.25rem; background: white;">
-                        <p style="margin: 0; font-size: 0.95rem; line-height: 1.7; color: #334155; white-space: pre-wrap;">${p.caption}</p>
-                    </div>
-
-                    ${photos.length > 0 ? `
-                        <div style="display: grid; grid-template-columns: repeat(${photos.length === 1 ? '1' : '2'}, 1fr); gap: 2px; background: #f1f5f9;">
-                            ${photos.slice(0, 4).map((img, idx) => `
-                                <div style="position: relative; aspect-ratio: ${photos.length === 1 ? '16/9' : '1'}; cursor: zoom-in;" onclick="window.open('${img}', '_blank')">
-                                    <img src="${img}" style="width: 100%; height: 100%; object-fit: cover;">
-                                    ${idx === 3 && photos.length > 4 ? `<div style="position: absolute; inset: 0; background: rgba(0,0,0,0.6); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; font-weight: 800; backdrop-filter: blur(2px);">+${photos.length - 4}</div>` : ''}
-                                </div>
-                            `).join('')}
-                        </div>
+                    <div class="post-description" id="post-desc-${postId}">${p.description || ''}</div>
+                    ${p.description && p.description.length > 100 ? `
+                        <button class="read-more-btn" onclick="CoordinatorPanel.openDescModal(${postId})">Read more</button>
                     ` : ''}
-
-                    <div style="padding: 0.85rem 1.25rem; border-top: 1px solid #f1f5f9; display: flex; gap: 1.5rem; background: #fdfdfd;">
-                        <span class="post-action" style="font-size: 0.85rem; color: #64748b; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-weight: 600;"><i class="far fa-heart"></i> Like</span>
-                        <span class="post-action" style="font-size: 0.85rem; color: #64748b; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-weight: 600;"><i class="far fa-comment"></i> Comment</span>
-                        <span class="post-action" style="font-size: 0.85rem; color: #64748b; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-weight: 600; margin-left: auto;"><i class="fas fa-share-alt"></i> Share</span>
+                    
+                    ${photoHtml}
+                    
+                    <div class="post-stats">
+                        <span id="like-count-${postId}"><i class="fas fa-thumbs-up"></i> ${likes} likes</span>
+                    </div>
+                    
+                    <div class="post-interactions">
+                        <button class="interaction-btn" onclick="CoordinatorPanel.likePost(${postId}, this)">
+                            <i class="far fa-thumbs-up"></i> Like
+                        </button>
                     </div>
                 </div>
             `;
         }).join('');
     },
 
+    async likePost(postId, btn) {
+        try {
+            const res = await fetch(`/api/public/posts/${postId}/like`, { method: 'POST' });
+            if (res.ok) {
+                const data = await res.json();
+                const countEl = document.getElementById(`like-count-${postId}`);
+                if (countEl) countEl.innerHTML = `<i class="fas fa-thumbs-up"></i> ${data.likes} likes`;
+                btn.classList.add('liked');
+                btn.innerHTML = `<i class="fas fa-thumbs-up"></i> Like`;
+
+                // Update local data
+                const post = this.data.posts.find(p => p.id == postId);
+                if (post) post.likes = data.likes;
+            }
+        } catch (err) {
+            console.error("Error liking post:", err);
+        }
+    },
+
+    changePostImage(postId, direction) {
+        event.stopPropagation();
+        const post = this.data.posts.find(p => p.id == postId);
+        if (!post || !post.photo) return;
+
+        const photos = post.photo.split(',').filter(s => s.trim() !== '');
+        if (!this.postCarouselIndices[postId]) this.postCarouselIndices[postId] = 0;
+
+        const newIndex = (this.postCarouselIndices[postId] + direction + photos.length) % photos.length;
+        this.postCarouselIndices[postId] = newIndex;
+
+        const track = document.getElementById(`carousel-track-${postId}`);
+        const dots = document.querySelectorAll(`#carousel-dots-${postId} .dot`);
+
+        if (track) {
+            track.style.transform = `translateX(-${newIndex * 100}%)`;
+        }
+
+        dots.forEach((dot, idx) => {
+            dot.classList.toggle('active', idx === newIndex);
+        });
+    },
+
+    zoomPostImage(imageUrl) {
+        const overlay = document.getElementById('imageZoomOverlay');
+        const img = document.getElementById('zoomedImage');
+        if (overlay && img) {
+            img.src = imageUrl;
+            overlay.classList.add('active');
+        }
+    },
+
     handlePostFilter() {
         this.renderPosts();
+    },
+
+    openDescModal(postId) {
+        const post = this.data.posts.find(p => p.id == postId);
+        if (!post) return;
+        document.getElementById('fullDescriptionText').textContent = post.description || '';
+        document.getElementById('descModal').classList.add('active');
+    },
+
+    closeDescModal() {
+        document.getElementById('descModal').classList.remove('active');
     },
 
     showCreatePostModal() {
@@ -1305,7 +1392,7 @@ const CoordinatorPanel = {
         if (!preview) return;
         preview.innerHTML = '';
         if (label) label.innerHTML = `<span style="color:var(--primary); font-weight:700;">${files.length} photo(s) selected</span> (Max 10)`;
-        
+
         files.forEach((file) => {
             const reader = new FileReader();
             reader.onload = ev => {
@@ -1347,7 +1434,7 @@ const CoordinatorPanel = {
             if (response.ok) {
                 alert('Success! Your community post has been published.');
                 document.getElementById('postCreateModal').classList.remove('active');
-                await this.fetchAllData(); 
+                await this.fetchAllData();
                 this.renderPosts();
             } else {
                 const err = await response.text();
@@ -1412,7 +1499,7 @@ const CoordinatorPanel = {
 
     async saveProfile(e) {
         e.preventDefault();
-        
+
         const password = document.getElementById('editPassword').value;
         const confirmPassword = document.getElementById('editConfirmPassword').value;
 
@@ -1447,7 +1534,7 @@ const CoordinatorPanel = {
 
             if (response.ok) {
                 const refreshedUser = await response.json();
-                
+
                 // If username was changed, force logout immediately
                 if (updatedData.username && updatedData.username.trim() !== '' && updatedData.username !== oldUsername) {
                     alert("Username updated successfully! Please log in again with your new username.");
@@ -1463,11 +1550,11 @@ const CoordinatorPanel = {
                 localUserData.phone = refreshedUser.phone;
                 localUserData.district = refreshedUser.district;
                 localStorage.setItem('user', JSON.stringify(localUserData));
-                
+
                 this.loadSessionUser();
                 this.updateHeaderWithUser();
                 this.populateProfileData();
-                
+
                 alert("Profile updated successfully!");
             } else {
                 const errorText = await response.text();
@@ -1607,11 +1694,11 @@ const CoordinatorPanel = {
 
     filterDashboard(type) {
         this.selectedDashboardTab = type;
-        
+
         // Visual feedback on cards
         document.querySelectorAll('.stat-card').forEach(card => card.style.borderColor = 'var(--border-color)');
         document.getElementById(`stat-${type}`).style.borderColor = 'var(--primary)';
-        
+
         this.renderDashboardTable();
     },
 
@@ -1800,7 +1887,7 @@ const CoordinatorPanel = {
         const district = document.getElementById('regDistrictFilter')?.value || 'all';
         const dateStart = document.getElementById('regDateStart')?.value || '';
         const dateEnd = document.getElementById('regDateEnd')?.value || '';
-        
+
         const tbody = document.getElementById('registrationsTableBody');
         if (tbody) {
             tbody.innerHTML = this.getFilteredRegistrationsRows(query, category, district, dateStart, dateEnd);
@@ -1828,9 +1915,9 @@ const CoordinatorPanel = {
         }
 
         if (dateStart || dateEnd) {
-            const start = dateStart ? new Date(dateStart).setHours(0,0,0,0) : null;
-            const end = dateEnd ? new Date(dateEnd).setHours(23,59,59,999) : null;
-            
+            const start = dateStart ? new Date(dateStart).setHours(0, 0, 0, 0) : null;
+            const end = dateEnd ? new Date(dateEnd).setHours(23, 59, 59, 999) : null;
+
             rows = rows.filter(e => {
                 const evDate = new Date(e.date).getTime();
                 if (start && evDate < start) return false;
@@ -1888,9 +1975,9 @@ const CoordinatorPanel = {
         }
 
         if (dateStart || dateEnd) {
-            const start = dateStart ? new Date(dateStart).setHours(0,0,0,0) : null;
-            const end = dateEnd ? new Date(dateEnd).setHours(23,59,59,999) : null;
-            
+            const start = dateStart ? new Date(dateStart).setHours(0, 0, 0, 0) : null;
+            const end = dateEnd ? new Date(dateEnd).setHours(23, 59, 59, 999) : null;
+
             rows = rows.filter(e => {
                 const evDate = new Date(e.date).getTime();
                 if (start && evDate < start) return false;
@@ -1925,12 +2012,12 @@ const CoordinatorPanel = {
 
     getFilteredRegistrationsRows(query = '', category = 'all', district = 'all', dateStart = '', dateEnd = '') {
         let rows = this.data.registrations;
-        
+
         // Filter by category
         if (category !== 'all') {
             rows = rows.filter(r => r.category === category);
         }
-        
+
         // Filter by district
         if (district !== 'all') {
             rows = rows.filter(r => r.district === district);
@@ -1940,19 +2027,19 @@ const CoordinatorPanel = {
         if (dateStart || dateEnd) {
             rows = rows.filter(r => {
                 if (!r.time) return false;
-                const regDate = new Date(r.time).setHours(0,0,0,0);
-                const start = dateStart ? new Date(dateStart).setHours(0,0,0,0) : null;
-                const end = dateEnd ? new Date(dateEnd).setHours(0,0,0,0) : null;
-                
+                const regDate = new Date(r.time).setHours(0, 0, 0, 0);
+                const start = dateStart ? new Date(dateStart).setHours(0, 0, 0, 0) : null;
+                const end = dateEnd ? new Date(dateEnd).setHours(0, 0, 0, 0) : null;
+
                 if (start && regDate < start) return false;
                 if (end && regDate > end) return false;
                 return true;
             });
         }
-        
+
         if (query) {
-            rows = rows.filter(r => 
-                (r.student || '').toLowerCase().includes(query) || 
+            rows = rows.filter(r =>
+                (r.student || '').toLowerCase().includes(query) ||
                 (r.email || '').toLowerCase().includes(query) ||
                 (r.phone || '').toLowerCase().includes(query)
             );
@@ -1998,17 +2085,17 @@ const CoordinatorPanel = {
         if (dateStart || dateEnd) {
             filteredRegs = filteredRegs.filter(r => {
                 if (!r.time) return false;
-                const regDate = new Date(r.time).setHours(0,0,0,0);
-                const start = dateStart ? new Date(dateStart).setHours(0,0,0,0) : null;
-                const end = dateEnd ? new Date(dateEnd).setHours(23,59,59,999) : null;
+                const regDate = new Date(r.time).setHours(0, 0, 0, 0);
+                const start = dateStart ? new Date(dateStart).setHours(0, 0, 0, 0) : null;
+                const end = dateEnd ? new Date(dateEnd).setHours(23, 59, 59, 999) : null;
                 if (start && regDate < start) return false;
                 if (end && regDate > end) return false;
                 return true;
             });
         }
         if (query) {
-            filteredRegs = filteredRegs.filter(r => 
-                (r.student || '').toLowerCase().includes(query) || 
+            filteredRegs = filteredRegs.filter(r =>
+                (r.student || '').toLowerCase().includes(query) ||
                 (r.email || '').toLowerCase().includes(query) ||
                 (r.phone || '').toLowerCase().includes(query)
             );
@@ -2021,23 +2108,23 @@ const CoordinatorPanel = {
 
         const token = localStorage.getItem('token');
         let fullGroupData = [];
-        
+
         try {
-            const groupPromises = filteredRegs.map(r => 
+            const groupPromises = filteredRegs.map(r =>
                 fetch(`/api/coordinator/registrations/group/${r.id}`, { headers: { 'Authorization': `Bearer ${token}` } })
-                .then(res => res.ok ? res.json() : null)
+                    .then(res => res.ok ? res.json() : null)
             );
-            
+
             const results = await Promise.all(groupPromises);
             fullGroupData = results.filter(g => g !== null);
-            
+
             fullGroupData.sort((a, b) => {
-                if(a.groupId < b.groupId) return -1;
-                if(a.groupId > b.groupId) return 1;
+                if (a.groupId < b.groupId) return -1;
+                if (a.groupId > b.groupId) return 1;
                 return 0;
             });
 
-        } catch(err) {
+        } catch (err) {
             console.error("Export fetch error:", err);
             alert("Error preparing export data.");
             return;
@@ -2053,7 +2140,7 @@ const CoordinatorPanel = {
     downloadExcel(groups) {
         let csvContent = "data:text/csv;charset=utf-8,";
         csvContent += "Group ID,Event,Registration Status,Total Amount,Leader Name,Leader College,Leader Email,Leader Phone,Member 2 Name,Member 2 College,Member 2 Email,Member 2 Phone,Member 3 Name,Member 3 College,Member 3 Email,Member 3 Phone,Member 4 Name,Member 4 College,Member 4 Email,Member 4 Phone,Member 5 Name,Member 5 College,Member 5 Email,Member 5 Phone\n";
-        
+
         groups.forEach(g => {
             const members = g.members || [];
             const totalMoney = (g.feePerPerson || 0) * members.length;
@@ -2064,9 +2151,9 @@ const CoordinatorPanel = {
                 g.status,
                 totalMoney
             ];
-            
+
             // Allow up to 5 members (or pad empty if fewer)
-            for(let i = 0; i < 5; i++) {
+            for (let i = 0; i < 5; i++) {
                 if (members[i]) {
                     row.push(`"${members[i].fullName || members[i].username || ''}"`);
                     row.push(`"${members[i].college || ''}"`);
@@ -2129,7 +2216,7 @@ const CoordinatorPanel = {
         groups.forEach(g => {
             const members = g.members || [];
             const totalMoney = (g.feePerPerson || 0) * members.length;
-            
+
             let membersHtml = members.map((m, idx) => {
                 const name = m.fullName || m.username || 'N/A';
                 const role = idx === 0 ? '(Leader)' : '';
@@ -2181,7 +2268,7 @@ const CoordinatorPanel = {
         const query = document.getElementById('eventSearchInput')?.value.toLowerCase() || '';
         const category = document.getElementById('eventCategoryFilter')?.value || 'all';
         const status = document.getElementById('eventStatusFilter')?.value || 'all';
-        
+
         let filtered = this.data.events;
         if (query) filtered = filtered.filter(e => e.name.toLowerCase().includes(query));
         if (category !== 'all') filtered = filtered.filter(e => e.category === category);
@@ -2510,7 +2597,7 @@ const CoordinatorPanel = {
                     amount: parseInt(amount),
                     eventName: selectedEvent,
                     successUrl: window.location.href.split('?')[0] + '?payment=success',
-                    cancelUrl:  window.location.href.split('?')[0] + '?payment=cancelled'
+                    cancelUrl: window.location.href.split('?')[0] + '?payment=cancelled'
                 })
             });
 

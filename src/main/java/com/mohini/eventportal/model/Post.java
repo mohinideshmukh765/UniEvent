@@ -23,7 +23,7 @@ public class Post {
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
-    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private Event event;
 
     @Column(columnDefinition = "TEXT", name = "photo")
@@ -41,6 +41,10 @@ public class Post {
     @Column(name = "created_at")
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(name = "likes")
+    @Builder.Default
+    private Integer likes = 0;
 
     @Transient
     private String images;
