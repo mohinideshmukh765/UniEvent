@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | UniEvent Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="light-theme">
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <a href="/" class="logo">UniEvent</a>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item active"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="approvals.html" class="nav-item"><i class="fas fa-check-double"></i> College Approvals</a>
+                <a href="colleges.html" class="nav-item"><i class="fas fa-university"></i> Manage Colleges</a>
+                <a href="coordinators.html" class="nav-item"><i class="fas fa-user-tie"></i> Coordinators</a>
+                <a href="events.html" class="nav-item"><i class="fas fa-calendar-star"></i> Event Moderation</a>
+                <a href="categories.html" class="nav-item"><i class="fas fa-tags"></i> Categories</a>
+                <a href="students.html" class="nav-item"><i class="fas fa-user-graduate"></i> Students</a>
+                <a href="registrations.html" class="nav-item"><i class="fas fa-ticket-alt"></i> Registrations</a>
+                <a href="posts.html" class="nav-item"><i class="fas fa-image"></i> Post Moderation</a>
+                <a href="analytics.html" class="nav-item"><i class="fas fa-chart-bar"></i> Analytics</a>
+                <a href="notifications.html" class="nav-item"><i class="fas fa-paper-plane"></i> Notifications</a>
+                <a href="reports.html" class="nav-item"><i class="fas fa-file-pdf"></i> Reports</a>
+                <a href="logs.html" class="nav-item"><i class="fas fa-history"></i> Activity Logs</a>
+                <a href="settings.html" class="nav-item"><i class="fas fa-sliders-h"></i> Settings</a>
+                <a href="ai-insights.html" class="nav-item"><i class="fas fa-brain"></i> AI Insights</a>
+            </nav>
+            <a href="#" id="logoutBtn" class="nav-item" style="margin-top: auto; color: #f87171;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-header">
+                <div>
+                    <h1>Portal Overview</h1>
+                    <p style="color: var(--admin-text-muted);">Welcome back, <span id="adminName">Admin</span></p>
+                </div>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div class="stat-card" style="padding: 0.5rem 1rem; margin-bottom: 0;">
+                        <i class="fas fa-search" style="color: var(--admin-text-muted);"></i>
+                        <input type="text" placeholder="Search..." style="border: none; outline: none; background: transparent; font-size: 0.9rem;">
+                    </div>
+                    <button class="btn btn-secondary" style="border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; padding: 0;">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(79, 70, 229, 0.1); color: var(--primary);">
+                        <i class="fas fa-university"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h4>Total Colleges</h4>
+                        <div class="value" id="totalColleges">48</div>
+                    </div>
+                    <div class="stat-trend trend-up"><i class="fas fa-arrow-up"></i> 2</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h4>Total Students</h4>
+                        <div class="value" id="totalStudents">6,200</div>
+                    </div>
+                    <div class="stat-trend trend-up"><i class="fas fa-arrow-up"></i> 12%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h4>Total Events</h4>
+                        <div class="value" id="totalEvents">135</div>
+                    </div>
+                    <div class="stat-trend trend-up"><i class="fas fa-arrow-up"></i> 5</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(236, 72, 153, 0.1); color: #ec4899;">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h4>Registrations</h4>
+                        <div class="value" id="totalRegistrations">3,980</div>
+                    </div>
+                    <div class="stat-trend trend-up"><i class="fas fa-arrow-up"></i> 8%</div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h3>District Event Distribution</h3>
+                    </div>
+                    <div style="height: 300px; display: flex; align-items: flex-end; gap: 3rem; padding: 0 4rem;" id="district-chart">
+                        <div style="flex: 1; height: 85%; background: #3b82f6; border-radius: 8px 8px 0 0; position: relative;">
+                            <span style="position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); font-size: 0.8rem; color: var(--admin-text-muted);">Kolhapur</span>
+                        </div>
+                        <div style="flex: 1; height: 65%; background: #6366f1; border-radius: 8px 8px 0 0; position: relative;">
+                            <span style="position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); font-size: 0.8rem; color: var(--admin-text-muted);">Sangli</span>
+                        </div>
+                        <div style="flex: 1; height: 50%; background: #8b5cf6; border-radius: 8px 8px 0 0; position: relative;">
+                            <span style="position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); font-size: 0.8rem; color: var(--admin-text-muted);">Satara</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <h3>Upcoming Events</h3>
+                    <div style="margin-top: 1.5rem;">
+                        <div style="padding: 1rem 0; border-bottom: 1px solid var(--admin-border); display: flex; gap: 1rem;">
+                            <div style="background: #f1f5f9; padding: 0.5rem; border-radius: 10px; width: 50px; text-align: center;">
+                                <div style="font-size: 0.7rem; font-weight: 700; color: var(--admin-text-muted);">OCT</div>
+                                <div style="font-size: 1.1rem; font-weight: 800; color: var(--admin-navy);">24</div>
+                            </div>
+                            <div>
+                                <div style="font-weight: 700; font-size: 0.95rem;">Youth Festival 2024</div>
+                                <div style="font-size: 0.8rem; color: var(--admin-text-muted);">KIT College, Kolhapur</div>
+                            </div>
+                        </div>
+                        <div style="padding: 1rem 0; border-bottom: 1px solid var(--admin-border); display: flex; gap: 1rem;">
+                            <div style="background: #f1f5f9; padding: 0.5rem; border-radius: 10px; width: 50px; text-align: center;">
+                                <div style="font-size: 0.7rem; font-weight: 700; color: var(--admin-text-muted);">NOV</div>
+                                <div style="font-size: 1.1rem; font-weight: 800; color: var(--admin-navy);">02</div>
+                            </div>
+                            <div>
+                                <div style="font-weight: 700; font-size: 0.95rem;">Robo-War Championship</div>
+                                <div style="font-size: 0.8rem; color: var(--admin-text-muted);">WCE Sangli</div>
+                            </div>
+                        </div>
+                        <div style="padding: 1rem 0; display: flex; gap: 1rem;">
+                            <div style="background: #f1f5f9; padding: 0.5rem; border-radius: 10px; width: 50px; text-align: center;">
+                                <div style="font-size: 0.7rem; font-weight: 700; color: var(--admin-text-muted);">NOV</div>
+                                <div style="font-size: 1.1rem; font-weight: 800; color: var(--admin-navy);">15</div>
+                            </div>
+                            <div>
+                                <div style="font-weight: 700; font-size: 0.95rem;">Inter-College Debate</div>
+                                <div style="font-size: 0.8rem; color: var(--admin-text-muted);">SUK Main Campus</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <div class="card-header">
+                    <h3>Recent Activities</h3>
+                    <button class="btn btn-secondary" style="font-size: 0.8rem;">View All</button>
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Activity</th>
+                            <th>User / College</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>10:30 AM</td>
+                            <td style="font-weight: 600;">Technical Symposia created</td>
+                            <td>KIT College of Engineering</td>
+                            <td><span class="status-badge status-active">Published</span></td>
+                        </tr>
+                        <tr>
+                            <td>09:45 AM</td>
+                            <td style="font-weight: 600;">New student registration</td>
+                            <td>DKTE Institute, Ichalkaranji</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td>Yesterday</td>
+                            <td style="font-weight: 600;">Cultural Fest updated</td>
+                            <td>Shivaji University Campus</td>
+                            <td><span class="status-badge status-disabled">Revised</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/admin-shared.js"></script>
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>

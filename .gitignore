@@ -1,0 +1,51 @@
+# Maven
+target/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE - IntelliJ
+.idea/
+*.iml
+
+# Eclipse / STS
+.project
+.classpath
+.settings/
+.springBeans
+.sts4-cache
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+
+# Java
+*.class
+
+# Build files
+*.jar
+*.war
+*.ear
+
+# Temp files
+*.tmp
+*.swp
+
+# Sensitive configs
+application-dev.properties
+application-prod.properties
+.env
+
+# JVM crash logs
+hs_err_pid*
+replay_pid*

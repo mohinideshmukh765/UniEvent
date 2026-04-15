@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Logs | UniEvent Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="light-theme">
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <a href="/" class="logo">UniEvent</a>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="approvals.html" class="nav-item"><i class="fas fa-check-double"></i> College Approvals</a>
+                <a href="colleges.html" class="nav-item"><i class="fas fa-university"></i> Manage Colleges</a>
+                <a href="coordinators.html" class="nav-item"><i class="fas fa-user-tie"></i> Coordinators</a>
+                <a href="events.html" class="nav-item"><i class="fas fa-calendar-star"></i> Event Moderation</a>
+                <a href="categories.html" class="nav-item"><i class="fas fa-tags"></i> Categories</a>
+                <a href="students.html" class="nav-item"><i class="fas fa-user-graduate"></i> Students</a>
+                <a href="registrations.html" class="nav-item"><i class="fas fa-ticket-alt"></i> Registrations</a>
+                <a href="posts.html" class="nav-item"><i class="fas fa-image"></i> Post Moderation</a>
+                <a href="analytics.html" class="nav-item"><i class="fas fa-chart-bar"></i> Analytics</a>
+                <a href="notifications.html" class="nav-item"><i class="fas fa-paper-plane"></i> Notifications</a>
+                <a href="reports.html" class="nav-item"><i class="fas fa-file-pdf"></i> Reports</a>
+                <a href="logs.html" class="nav-item active"><i class="fas fa-history"></i> Activity Logs</a>
+                <a href="settings.html" class="nav-item"><i class="fas fa-sliders-h"></i> Settings</a>
+                <a href="ai-insights.html" class="nav-item"><i class="fas fa-brain"></i> AI Insights</a>
+            </nav>
+            <a href="#" id="logoutBtn" class="nav-item" style="margin-top: auto; color: #f87171;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-header">
+                <div>
+                    <h1>Activity Logs</h1>
+                    <p style="color: var(--admin-text-muted);">Audit trail of all system actions and user interactions.</p>
+                </div>
+                <div class="stat-card" style="padding: 0.5rem 1rem; margin-bottom: 0;">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search logs..." style="border: none; background: transparent; padding-left: 0.5rem;">
+                </div>
+            </header>
+
+            <div class="admin-card">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>User</th>
+                            <th>Role</th>
+                            <th>Action</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Oct 14, 11:25 AM</td>
+                            <td style="font-weight: 700;">Admin User</td>
+                            <td>ADMIN</td>
+                            <td><span style="color: #10b981; font-weight: 600;">Approved College</span></td>
+                            <td>Ghogare Institute (GI-202) verified and approved</td>
+                        </tr>
+                        <tr>
+                            <td>Oct 14, 11:10 AM</td>
+                            <td style="font-weight: 700;">Prof. Rahul Patil</td>
+                            <td>COORDINATOR</td>
+                            <td><span style="color: #4f46e5; font-weight: 600;">Created Event</span></td>
+                            <td>Technical Symposia 2024 posted to board</td>
+                        </tr>
+                        <tr>
+                            <td>Oct 14, 10:45 AM</td>
+                            <td style="font-weight: 700;">Aryan Sharma</td>
+                            <td>STUDENT</td>
+                            <td><span style="color: #3b82f6; font-weight: 600;">Registered</span></td>
+                            <td>Registered for Hackathon 2024</td>
+                        </tr>
+                        <tr>
+                            <td>Oct 14, 09:30 AM</td>
+                            <td style="font-weight: 700;">Admin User</td>
+                            <td>ADMIN</td>
+                            <td><span style="color: #ef4444; font-weight: 600;">Post Deleted</span></td>
+                            <td>Innappropriate content removed from gallery</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+    <script src="/js/admin-shared.js"></script>
+</body>
+</html>

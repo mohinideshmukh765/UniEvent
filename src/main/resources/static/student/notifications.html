@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications | UniEvent Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-width: 280px;
+        }
+
+        .student-layout {
+            display: grid;
+            grid-template-columns: var(--sidebar-width) 1fr;
+            min-height: 100vh;
+            background: #f8fafc;
+        }
+
+        .student-sidebar {
+            background: white;
+            border-right: 1px solid var(--glass-border);
+            padding: 2rem 1.5rem;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .student-main {
+            padding: 2rem 3rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.875rem 1.25rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(79, 70, 229, 0.08);
+            color: var(--primary);
+        }
+
+        .notification-item {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .notification-item:hover {
+            transform: translateX(8px);
+            border-color: var(--primary);
+        }
+
+        .notification-item.unread::before {
+            content: '';
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            transform: translateY(-50%);
+        }
+
+        .notif-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .icon-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+
+        .icon-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+
+        .icon-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .icon-info {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+        }
+
+        .profile-footer {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body class="light-theme">
+    <div class="student-layout">
+        <!-- Sidebar -->
+        <aside class="student-sidebar">
+            <a href="/" class="logo" style="margin-left: 1.25rem;">UniEvent</a>
+            <nav class="sidebar-nav" style="margin-top: 2rem; flex: 1;">
+                <a href="/student/dashboard.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="/student/events.html" class="nav-link"><i class="fas fa-search"></i> Browse Events</a>
+                <a href="/student/my-registrations.html" class="nav-link"><i class="fas fa-ticket-alt"></i> My
+                    Registrations</a>
+                <a href="/student/analytics.html" class="nav-link"><i class="fas fa-chart-pie"></i> Analytics</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="student-main">
+            <header class="top-bar"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
+                <div>
+                    <h1 style="font-family: 'Outfit'; font-size: 2.25rem;">Notifications</h1>
+                    <p style="color: var(--text-muted); margin-top: 0.5rem;">Stay updated with the latest event news.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <a href="/student/notifications.html" class="btn btn-secondary"
+                        style="border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-bell"></i>
+                    </a>
+                    <a href="/student/profile.html" class="avatar" id="headerAvatar"
+                        style="width: 44px; height: 44px; text-decoration: none;">S</a>
+                    <a href="#" class="btn btn-secondary" id="headerLogoutBtn"
+                        style="border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center;"
+                        title="Logout">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
+                </div>
+            </header>
+
+            <div class="fade-in" id="notificationsContainer">
+                <p class="text-muted">Loading notifications...</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/student.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const token = localStorage.getItem('token');
+            if (!token) window.location.href = '/login.html';
+
+            document.getElementById('headerAvatar').textContent = (user.fullName || 'S').charAt(0);
+
+            const logoutBtn = document.getElementById('headerLogoutBtn');
+            if (logoutBtn) {
+                logoutBtn.onclick = (e) => {
+                    e.preventDefault();
+                    localStorage.clear();
+                    window.location.href = '/login.html';
+                };
+            }
+
+            await loadNotifications(token);
+        });
+
+        async function loadNotifications(token) {
+            const container = document.getElementById('notificationsContainer');
+            try {
+                const res = await fetch('/api/student/notifications', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error("Failed to fetch notifications");
+                const notifications = await res.json();
+
+                if (notifications.length === 0) {
+                    container.innerHTML = `<p class="text-muted">You don't have any notifications at the moment.</p>`;
+                    return;
+                }
+
+                container.innerHTML = notifications.map(notif => {
+                    let iconClass = 'icon-info';
+                    let icon = 'fa-info-circle';
+
+                    const lowerTitle = notif.title.toLowerCase();
+                    if (lowerTitle.includes('approved')) {
+                        iconClass = 'icon-success'; icon = 'fa-check-circle';
+                    } else if (lowerTitle.includes('rejected') || lowerTitle.includes('denied')) {
+                        iconClass = 'icon-danger'; icon = 'fa-times-circle';
+                    } else if (lowerTitle.includes('pending') || lowerTitle.includes('submitted')) {
+                        iconClass = 'icon-warning'; icon = 'fa-clock';
+                    }
+
+                    const date = new Date(notif.sentAt);
+                    const formattedDate = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+                    return `
+                        <div class="notification-item">
+                            <div class="notif-icon ${iconClass}"><i class="fas ${icon}"></i></div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 700; margin-bottom: 0.25rem;">${notif.title}</div>
+                                <p style="font-size: 0.95rem; color: var(--text-muted);">${notif.message}</p>
+                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 1rem;">${formattedDate}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = `<p class="text-danger">Error loading notifications. Please try again later.</p>`;
+            }
+        }
+    </script>
+</body>
+
+</html>
