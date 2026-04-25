@@ -6,7 +6,7 @@
 ![Java](https://img.shields.io/badge/Java-17-orange?style=flat-square&logo=openjdk)
 
 ## 📌 Overview
-**UniEvent** is a centralized inter-college event management platform specifically designed for institutions in the **Kolhapur District** affiliated with **Shivaji University**. The portal bridges the gap between various institutions (like KIT, DYP, DOT, etc.) by providing a unified space to discover, register, and manage cultural, sports, and technical events.
+**UniEvent** is a centralized inter-college event management platform specifically designed for institutions in the **Kolhapur District** affiliated with **Shivaji University**. The portal bridges the gap between various institutions by providing a unified space to discover, register, and manage cultural, sports, and technical events.
 
 Built with **Spring Boot** and **PostgreSQL**, it offers a robust solution for tracking registrations, managing student coordinators, and showcasing event highlights through a modern web interface.
 
@@ -14,50 +14,35 @@ Built with **Spring Boot** and **PostgreSQL**, it offers a robust solution for t
 
 ## 🚀 Key Features
 
-### 🔹 For Students
-- **Event Discovery:** Browse all upcoming events across Kolhapur district colleges.
-- **Easy Registration:** One-click registration for events with dynamic form fields.
-- **Event Feed:** View post-event highlights, photos, and like your favorite moments.
-- **Email Notifications:** Receive instant confirmation emails upon registration.
+### 🔹 For Admins
+- **Bulk College Onboarding:** Upload college details via Excel (`.xlsx`) to automatically create coordinator accounts and send credentials via email.
+- **College Management:** Activate or deactivate college institutions and monitor their activity.
+- **Global Dashboard:** Overview of total colleges, students, and events across the district.
 
-### 🔹 For Coordinators & Admins
-- **Dynamic Event Creation:** Enable or disable registration fields (Name, Phone, Payment, etc.) based on event requirements.
-- **QR Code Integration:** Automated QR code generation for events and tracking.
-- **Excel Export:** Download complete registration lists in `.xlsx` format for offline management (via Apache POI).
-- **AfterPost Management:** Upload event photos and highlights to the public feed post-event.
-- **Role-Based Access Control:** Secure JWT-based authentication ensuring data privacy and proper authorization.
+### 🔹 For Coordinators (College Level)
+- **Event Management:** Create and publish events with dynamic registration requirements (toggle fields like Name, Email, Phone, etc.).
+- **Registration Control:** Review student registrations, approve or reject them with specific reasons.
+- **QR Code Support:** Upload manual QR codes for event-specific payments or information.
+- **Event Gallery:** Upload and manage up to 10 photos per event to showcase highlights.
+- **After-Event Posts:** Create post-event updates with captions and feedback links.
+- **Excel Export:** Download registration lists for any event in Excel format for offline tracking.
+
+### 🔹 For Students
+- **Event Discovery:** Browse upcoming events organized by various colleges in Kolhapur.
+- **Registration Flux:** Register for events individually or in groups, with support for transaction ID and payment screenshot uploads.
+- **Personalized Portal:** View status of own registrations and receive notifications for approvals/rejections.
+- **Event Feed:** View highlights from past events and like shared moments.
 
 ---
 
 ## 🛠️ Tech Stack
 - **Backend:** Java 17, Spring Boot 3.3.5
-- **Security:** Spring Security & JSON Web Tokens (JWT)
+- **Security:** Spring Security & JWT (JSON Web Tokens)
 - **Database:** PostgreSQL
 - **Persistence:** Spring Data JPA (Hibernate)
-- **Email Service:** Spring Boot Starter Mail (Gmail SMTP)
-- **Reporting:** Apache POI (Excel Generation)
-- **Frontend:** Thymeleaf, CSS, JavaScript
-- **Build Tool:** Maven
-
----
-
-## 📂 Project Structure
-```bash
-eventportal/
-├── src/main/java/com/mohini/eventportal/
-│   ├── config/            # Security & JWT configurations
-│   ├── controller/        # REST & Web controllers
-│   ├── model/             # JPA Entities (Event, User, Registration, etc.)
-│   ├── repository/        # Data access layer
-│   └── service/           # Business logic layer
-├── src/main/resources/
-│   ├── static/            # CSS, JS, and Images
-│   ├── templates/         # Thymeleaf HTML views
-│   └── application.properties # Core configurations
-├── SQL FILE PROJECT.sql   # Database schema & initial setups
-├── uploads/               # Local storage for QR codes & photos
-└── pom.xml                # Maven dependencies
-```
+- **Email Service:** Spring Boot Starter Mail (SMTP)
+- **Reporting & Parsing:** Apache POI (Excel)
+- **Frontend:** HTML, CSS, JavaScript (Thymeleaf templates)
 
 ---
 
@@ -65,54 +50,54 @@ eventportal/
 
 ### 1️⃣ Prerequisites
 - **JDK 17** or higher
-- **PostgreSQL** installed and running
+- **PostgreSQL**
 - **Maven**
 
 ### 2️⃣ Database Setup
-1. Create a database named `eventportal` in PostgreSQL.
-2. Update the `src/main/resources/application.properties` file:
+1. Create a database named `eventportal`.
+2. Configure settings in `src/main/resources/application.properties`:
    ```properties
    spring.datasource.url=jdbc:postgresql://localhost:5432/eventportal
    spring.datasource.username=your_username
    spring.datasource.password=your_password
    ```
 
-### 3️⃣ Email Configuration (Optional)
-To enable email notifications, update the SMTP settings:
+### 3️⃣ Email Configuration
+Ensure you have an App Password if using Gmail:
 ```properties
 spring.mail.username=your_email@gmail.com
 spring.mail.password=your_app_password
 ```
 
-### 4️⃣ Run the Application
-```bash
-mvn clean install
-mvn touch spring-boot:run
-```
-Access the application at `http://localhost:8081`.
+### 4️⃣ College Onboarding Format
+For bulk upload, use an Excel file with the following headers:
+`CollegeCode` | `CollegeName` | `CoordinatorName` | `Email` | `Phone` | `City` | `District`
 
 ---
 
-## 📊 Database Schema
-The system uses the following core tables:
-- **`users`**: Manages Auth & Profile (Admin, Coordinator, Student).
-- **`event`**: Stores event metadata, dynamic requirements, and QR paths.
-- **`registration`**: Links users to events with participation details.
-- **`afterpost`**: Stores post-event highlights, photos, and engagement (likes).
+## 📂 Project Structure
+```bash
+eventportal/
+├── src/main/java/com/mohini/eventportal/
+│   ├── controller/        # Admin, Coordinator, Student, and Auth APIs
+│   ├── service/           # Business logic (Excel, Email processing)
+│   ├── model/             # Entities (Event, Post, College, User, Registration)
+│   └── repository/        # PostgreSQL data access
+├── src/main/resources/
+│   ├── static/            # Frontend assets
+│   └── templates/         # HTML views
+├── SQL FILE PROJECT.sql   # Schema setups
+└── uploads/               # Storage for photos, QR codes, and screenshots
+```
 
 ---
 
 ## 🤝 Contributing
-Contributions are welcome! If you find any bugs or have feature suggestions, please open an issue or submit a pull request.
-
 1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+2. Create Feature Branch
+3. Submit a Pull Request
 
 ---
 
 ## 📄 License
-Distributed under the MIT License. See `LICENSE` for more information.
-
+Distributed under the MIT License. See `LICENSE` for details.
