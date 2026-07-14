@@ -1,103 +1,141 @@
-# UniEvent: Kolhapur District Event Management System
+<div align="center">
 
-![UniEvent Banner](https://img.shields.io/badge/Project-UniEvent-blue?style=for-the-badge&logo=spring)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.5-brightgreen?style=flat-square&logo=springboot)
-![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-blue?style=flat-square&logo=postgresql)
-![Java](https://img.shields.io/badge/Java-17-orange?style=flat-square&logo=openjdk)
+# 🎓 UniEvent: Enterprise Event Management Portal
+**A Centralized Inter-College Event Management System for Kolhapur District**
 
-## 📌 Overview
-**UniEvent** is a centralized inter-college event management platform specifically designed for institutions in the **Kolhapur District** affiliated with **Shivaji University**. The portal bridges the gap between various institutions by providing a unified space to discover, register, and manage cultural, sports, and technical events.
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.5-brightgreen?style=for-the-badge&logo=springboot)](https://spring.io/projects/spring-boot)
+[![Java](https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=openjdk)](https://openjdk.java.net/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
+[![Spring Security](https://img.shields.io/badge/Security-JWT%20%7C%20Spring-red?style=for-the-badge&logo=springsecurity)](#)
 
-Built with **Spring Boot** and **PostgreSQL**, it offers a robust solution for tracking registrations, managing student coordinators, and showcasing event highlights through a modern web interface.
+*Bridging the gap between institutions through a unified, secure, and highly dynamic event management ecosystem.*
 
----
-
-## 🚀 Key Features
-
-### 🔹 For Admins
-- **Bulk College Onboarding:** Upload college details via Excel (`.xlsx`) to automatically create coordinator accounts and send credentials via email.
-- **College Management:** Activate or deactivate college institutions and monitor their activity.
-- **Global Dashboard:** Overview of total colleges, students, and events across the district.
-
-### 🔹 For Coordinators (College Level)
-- **Event Management:** Create and publish events with dynamic registration requirements (toggle fields like Name, Email, Phone, etc.).
-- **Registration Control:** Review student registrations, approve or reject them with specific reasons.
-- **QR Code Support:** Upload manual QR codes for event-specific payments or information.
-- **Event Gallery:** Upload and manage up to 10 photos per event to showcase highlights.
-- **After-Event Posts:** Create post-event updates with captions and feedback links.
-- **Excel Export:** Download registration lists for any event in Excel format for offline tracking.
-
-### 🔹 For Students
-- **Event Discovery:** Browse upcoming events organized by various colleges in Kolhapur.
-- **Registration Flux:** Register for events individually or in groups, with support for transaction ID and payment screenshot uploads.
-- **Personalized Portal:** View status of own registrations and receive notifications for approvals/rejections.
-- **Event Feed:** View highlights from past events and like shared moments.
+</div>
 
 ---
 
-## 🛠️ Tech Stack
-- **Backend:** Java 17, Spring Boot 3.3.5
-- **Security:** Spring Security & JWT (JSON Web Tokens)
-- **Database:** PostgreSQL
-- **Persistence:** Spring Data JPA (Hibernate)
-- **Email Service:** Spring Boot Starter Mail (SMTP)
-- **Reporting & Parsing:** Apache POI (Excel)
-- **Frontend:** HTML, CSS, JavaScript (Thymeleaf templates)
+## 📌 Executive Summary
+
+**UniEvent** is a robust, full-stack enterprise web application designed to streamline the event coordination process across multiple colleges affiliated with Shivaji University in the Kolhapur District. 
+
+Moving beyond standard CRUD operations, this platform solves real-world administrative bottlenecks by providing **bulk Excel onboarding**, **dynamic registration forms**, **automated email workflows**, and **secure payment integrations**. It features a strictly enforced Role-Based Access Control (RBAC) system for Admins, College Coordinators, and Students.
 
 ---
 
-## ⚙️ Installation & Setup
+## 🚀 Key Technical Features (The "Wow" Factor)
+
+### 1️⃣ Advanced Data Processing & Automation
+- **Bulk Excel Parsing (Apache POI):** Admins can onboard entire colleges instantly by uploading `.xlsx` files. The system parses the data, creates secure coordinator accounts, and handles the automated database persistence.
+- **Automated Email Workflows (JavaMailSender):** The platform automatically dispatches customized emails for account credentials, event registration approvals, and rejections.
+
+### 2️⃣ Dynamic & Secure Operations
+- **Stateless Authentication (JWT):** Implements robust Spring Security using JSON Web Tokens. Secures all REST endpoints and ensures completely stateless, scalable role-based access.
+- **Dynamic Registration Engine:** Coordinators can dynamically toggle required fields (Name, Email, Phone, custom data) per event without requiring database schema changes, demonstrating highly flexible backend design.
+
+### 3️⃣ Complete Event Lifecycle Management
+- **Intelligent Payment Verification:** Students can upload payment screenshots and Transaction IDs. Coordinators review these proofs to explicitly approve or reject (with reasons) the registrations.
+- **Media Management & QR Support:** Features secure multi-part file uploads for event galleries (up to 10 photos), dynamic QR codes for payments, and post-event highlight feeds.
+- **Excel Report Generation:** Coordinators can export filtered lists of registered students directly to Excel for offline event day management.
+
+---
+
+## 🏛️ System Architecture
+
+The application follows a clean, layered architectural pattern ensuring separation of concerns, testability, and high maintainability.
+
+```mermaid
+graph TD
+    Client[Frontend: HTML/CSS/JS] -->|REST / JSON| Controller[Controllers]
+    Controller -->|JWT Validation| Security[Spring Security]
+    Controller --> Service[Service Layer]
+    Service -->|Business Logic| Repository[Spring Data JPA]
+    Repository --> Database[(PostgreSQL)]
+    Service --> Mail[SMTP Email Service]
+    Service --> FileSys[Local File Storage]
+```
+
+### 🛠️ Technology Stack
+*   **Backend Core:** Java 17, Spring Boot 3.3.5
+*   **Security:** Spring Security, JWT (JSON Web Tokens), BCrypt Password Hashing
+*   **Database & ORM:** PostgreSQL, Spring Data JPA, Hibernate
+*   **Integrations:** Apache POI (Excel read/write), Spring Boot Starter Mail (SMTP)
+*   **Frontend:** Vanilla JavaScript, HTML5, CSS3 (Fetch API for async requests)
+
+---
+
+## 👥 Role-Based Capabilities
+
+### 🛡️ Administrator Module
+*   Upload college directories via Excel for instant system-wide onboarding.
+*   Activate, deactivate, and manage institutional access.
+*   Access a bird's-eye view analytics dashboard of total colleges, students, and events.
+
+### 👨‍🏫 Coordinator Module (College Level)
+*   Create rich events with custom registration parameters and QR codes.
+*   Review student applications, verify payment screenshots, and issue approvals/rejections.
+*   Publish post-event galleries.
+
+### 🎓 Student Module
+*   Discover and filter events hosted by various colleges across the district.
+*   Register individually or as a team, uploading proof-of-payment.
+*   Track real-time registration status via a personalized dashboard and receive alerts.
+*   Engage with a dynamic "Event Feed" showcasing past event highlights.
+
+---
+
+## ⚙️ Local Development Setup
 
 ### 1️⃣ Prerequisites
 - **JDK 17** or higher
-- **PostgreSQL**
-- **Maven**
+- **PostgreSQL** (Running on default port 5432)
+- **Maven** 3.8+
 
-### 2️⃣ Database Setup
-1. Create a database named `eventportal`.
-2. Configure settings in `src/main/resources/application.properties`:
-   ```properties
-   spring.datasource.url=jdbc:postgresql://localhost:5432/eventportal
-   spring.datasource.username=your_username
-   spring.datasource.password=your_password
-   ```
+### 2️⃣ Database Initialization
+Create a database named `eventportal` in PostgreSQL.
+```sql
+CREATE DATABASE eventportal;
+```
 
-### 3️⃣ Email Configuration
-Ensure you have an App Password if using Gmail:
+Update your `src/main/resources/application.properties`:
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/eventportal
+spring.datasource.username=postgres
+spring.datasource.password=your_secure_password
+```
+
+### 3️⃣ Email & Storage Configuration
+Provide a valid App Password (e.g., Gmail) to enable the automated mailing system.
 ```properties
 spring.mail.username=your_email@gmail.com
 spring.mail.password=your_app_password
+
+# The system automatically generates an 'uploads' directory in the project root
+# for storing QR codes, payment screenshots, and gallery images.
 ```
 
-### 4️⃣ College Onboarding Format
-For bulk upload, use an Excel file with the following headers:
-`CollegeCode` | `CollegeName` | `CoordinatorName` | `Email` | `Phone` | `City` | `District`
+### 4️⃣ Build and Run
+```bash
+mvn clean install
+mvn spring-boot:run
+```
+The application will be available at `http://localhost:8080`.
 
 ---
 
-## 📂 Project Structure
-```bash
+## 📂 Project Structure Snapshot
+```text
 eventportal/
 ├── src/main/java/com/mohini/eventportal/
-│   ├── controller/        # Admin, Coordinator, Student, and Auth APIs
-│   ├── service/           # Business logic (Excel, Email processing)
-│   ├── model/             # Entities (Event, Post, College, User, Registration)
-│   └── repository/        # PostgreSQL data access
+│   ├── config/            # App and CORS configuration
+│   ├── security/          # JWT Filters, Auth entry points, Providers
+│   ├── controller/        # REST endpoints (Admin, Coordinator, Student, Auth)
+│   ├── service/           # Core business logic (Excel, Mail, Auth, Events)
+│   ├── model/             # JPA Entities (User, Event, Registration, Post)
+│   └── repository/        # Spring Data JPA Interfaces
 ├── src/main/resources/
-│   ├── static/            # Frontend assets
-│   └── templates/         # HTML views
-├── SQL FILE PROJECT.sql   # Schema setups
-└── uploads/               # Storage for photos, QR codes, and screenshots
+│   └── static/            # Frontend Assets (HTML, CSS, JS divided by roles)
+└── uploads/               # Dynamic local file storage
 ```
 
 ---
 
-## 🤝 Contributing
-1. Fork the Project
-2. Create Feature Branch
-3. Submit a Pull Request
-
----
-
-## 📄 License
-Distributed under the MIT License. See `LICENSE` for details.
