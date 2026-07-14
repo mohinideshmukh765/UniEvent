@@ -39,20 +39,6 @@ Moving beyond standard CRUD operations, this platform solves real-world administ
 
 ---
 
-## 🏛️ System Architecture
-
-The application follows a clean, layered architectural pattern ensuring separation of concerns, testability, and high maintainability.
-
-```mermaid
-graph TD
-    Client[Frontend: HTML/CSS/JS] -->|REST / JSON| Controller[Controllers]
-    Controller -->|JWT Validation| Security[Spring Security]
-    Controller --> Service[Service Layer]
-    Service -->|Business Logic| Repository[Spring Data JPA]
-    Repository --> Database[(PostgreSQL)]
-    Service --> Mail[SMTP Email Service]
-    Service --> FileSys[Local File Storage]
-```
 
 ### 🛠️ Technology Stack
 *   **Backend Core:** Java 17, Spring Boot 3.3.5
