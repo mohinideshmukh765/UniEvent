@@ -43,9 +43,8 @@ Moving beyond standard CRUD operations, this platform solves real-world administ
 ### 🛠️ Technology Stack
 *   **Backend Core:** Java 17, Spring Boot 3.3.5
 *   **Security:** Spring Security, JWT (JSON Web Tokens), BCrypt Password Hashing
-*   **Database & ORM:** PostgreSQL, Spring Data JPA, Hibernate
+*   **Database** PostgreSQL, Spring Data JPA
 *   **Integrations:** Apache POI (Excel read/write), Spring Boot Starter Mail (SMTP)
-*   **Frontend:** Vanilla JavaScript, HTML5, CSS3 (Fetch API for async requests)
 
 ---
 
